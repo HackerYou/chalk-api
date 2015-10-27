@@ -1,0 +1,20 @@
+{
+  "name": "starbuck-api",
+  "version": "1.0.0",
+  "description": "The API for the HackerYou notes application",
+  "main": "server.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "author": "Ryan Christiani",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "mongoose": "^4.2.3",
+    "request": "^2.65.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  }
+}
