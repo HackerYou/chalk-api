@@ -12,7 +12,7 @@ app.get('/', (req,res) => {
 });
 
 //Topics
-app.get('/v1/topic',api.topics.getTopics);
+app.get('/v1/topic',api.topic.getTopics);
 app.post('/v1/topic',api.topic.createTopic);
 
 
