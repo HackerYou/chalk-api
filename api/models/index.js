@@ -1,5 +1,6 @@
 'use strict';
 
-module.exports = {
 
+module.exports = {
+	topic: require('./topic.js')
 };
