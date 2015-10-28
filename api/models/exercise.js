@@ -3,13 +3,10 @@
 let mongoose = require('mongoose');
 let mixin = require('./modelMixin.js');
 
-let Schema = new mongoose.Schema;
+let Schema = mongoose.Schema;
 
-let exerciseSchema = Schema(
-	Object.assign(mixin,{
-		tile: String,
-		content: String
-	})
-);
+let model = Object.assign(mixin,{
+	topics: [{type: Schema.ObjectId, ref: 'Topic'}]
+});
 
-module.exports = mongoose.model('Exercise', exerciseSchema);
+module.exports = mongoose.model('Exercise', model);
