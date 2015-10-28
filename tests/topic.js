@@ -20,6 +20,7 @@ describe('Topics', () => {
 		topic.createTopic({ body: {title:'test'} }, {
 			send(data) {
 				expect(data).to.be.an('object');
+				expect(data).to.have.key('topic');
 				done();
 			}
 		});
