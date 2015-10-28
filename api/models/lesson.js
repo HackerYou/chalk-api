@@ -1,14 +1,13 @@
 'use strict';
 
 let mongoose = require('mongoose');
-let mixin = require('./modelMixin.js');
-
 let Schema = mongoose.Schema;
+let mixin = require('./modelMixin.js');
 
 let model = Object.assign({
 	topics: [{type: Schema.ObjectId, ref: 'Topic'}]
 },mixin);
 
-let exerciseSchema = new Schema(model);
+let lessonSchema = new Schema(model);
 
-module.exports = mongoose.model('Exercise', exerciseSchema );
+module.exports = mongoose.model('Lesson',lessonSchema);

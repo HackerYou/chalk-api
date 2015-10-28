@@ -19,6 +19,7 @@ describe('Exercise', () => {
 		exercise.createExercise({body: { title: 'test' } }, {
 			send(data) {
 				expect(data).to.be.an('object');
+				expect(data).to.have.key('exercise');
 				done();
 			}
 		});
