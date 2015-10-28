@@ -16,10 +16,8 @@ gulp.task('lint', () => {
 
 gulp.task('test', () => {
 	gulp.src('./tests/**/*.js')
-		.pipe(mocha({reporter: 'spec'}))
-		.on('error', (err) => {
-			console.log(err.message);
-		});
+		.pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+		.pipe(mocha({reporter: 'spec'}));
 });
 
 

@@ -5,8 +5,10 @@ let mixin = require('./modelMixin.js');
 
 let Schema = mongoose.Schema;
 
-let model = Object.assign(mixin,{
+let model = Object.assign({
 	topics: [{type: Schema.ObjectId, ref: 'Topic'}]
-});
+},mixin);
 
-module.exports = mongoose.model('Exercise', model);
+let exerciseSchema = new Schema(model);
+
+module.exports = mongoose.model('Exercise', exerciseSchema );
