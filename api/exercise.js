@@ -7,7 +7,7 @@ exercise.createExercise = (req,res) => {
 	let model = req.body;
 
 	model.createdAt = +new Date();
-	new models.exercise(model).save((err) => {
+	new models.exercise(model).save((err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -15,7 +15,7 @@ exercise.createExercise = (req,res) => {
 		}
 		else {
 			res.send({
-				exercise: model
+				exercise: doc
 			});
 		}
 	});

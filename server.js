@@ -25,7 +25,9 @@ app.post('/v1/lesson',api.lesson.createLesson);
 
 //Courses 
 app.get('/v1/course',api.course.getCourses);
+app.get('/v1/course/:id',api.course.getCourse);
 app.post('/v1/course',api.course.createCourse);
+app.put('/v1/course/:id',api.course.updateCourse);
 
 
 app.listen('3200');
