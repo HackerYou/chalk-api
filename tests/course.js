@@ -6,6 +6,7 @@ let course = require('../api/course.js');
 let mongoose = require('mongoose');
 
 describe('Courses', () => {
+	let courseId;
 	before(() => {
 		mongoose.connect('mongodb://localhost/notes');
 	});
@@ -19,6 +20,7 @@ describe('Courses', () => {
 			}
 		},{
 			send(data) {
+				courseId = data.course._id;
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('course');
 				done();
@@ -37,7 +39,35 @@ describe('Courses', () => {
 		});
 	});
 	
+	it('should get a specific course', (done) => {
+		course.getCourse({params: { id: courseId } }, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.course.length).to.be.eql(1);
+				done();
+			}
+		});
+	});
 	
+	it('should update the courses', (done) => {
+		course.updateCourse({
+			params: {id:courseId},
+			body: {
+			     "_id": courseId,
+			     "title": "updated",
+			     "createdAt": 1446064502200,
+			     "lessons": []
+			   }
+		},{
+			send(data) {
+				expect(data.course.title).to.be.eql('updated');
+				expect(data.course.updatedAt).to.be.a('number');
+				done();
+			}
+		});
+	});
+
+
 }); //End of describe
 
 

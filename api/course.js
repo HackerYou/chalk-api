@@ -6,7 +6,8 @@ let models = require('./models/index.js');
 course.createCourse = (req,res) => {
 	let model = req.body;
 	model.createdAt = +new Date();
-	new models.course(model).save((err) => {
+	new models.course(model).save((err,doc) => {
+
 		if(err) {
 			res.send({
 				error: err
@@ -14,7 +15,7 @@ course.createCourse = (req,res) => {
 		}
 		else {
 			res.send({
-				course: model
+				course: doc
 			});
 		}
 	});
@@ -30,6 +31,44 @@ course.getCourses = (req,res) => {
 		else {
 			res.send({
 				course: docs
+			});
+		}
+	});
+};
+
+course.getCourse = (req,res) => {
+	let id = req.params.id;
+	models.course.find({_id:id}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				course: doc
+			});
+		}
+	});
+};
+
+course.updateCourse = (req,res) => {
+	let model = req.body;
+	let id = req.params.id;
+
+	model.updatedAt = +new Date();
+	models.course.findOneAndUpdate(
+		{ _id:id },
+		model,
+		{ new: true },(err,doc) => {
+		if(err){
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				course: doc
 			});
 		}
 	});

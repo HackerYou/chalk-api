@@ -6,7 +6,7 @@ let models = require('./models/index.js');
 lesson.createLesson = (req,res) => {
 	let model = req.body;
 	model.createdAt = +new Date();
-	new models.lesson(model).save((err) => {
+	new models.lesson(model).save((err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -14,7 +14,7 @@ lesson.createLesson = (req,res) => {
 		}
 		else {
 			res.send({
-				lesson: model
+				lesson: doc
 			});
 		}
 	});

@@ -6,7 +6,7 @@ let models = require('./models/index.js');
 topic.createTopic = (req,res) => {
 	let model = req.body;
 	model.createdAt = +new Date();
-	new models.topic(model).save((err) => {
+	new models.topic(model).save((err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -14,7 +14,7 @@ topic.createTopic = (req,res) => {
 		}
 		else {
 			res.send({
-				topic: model
+				topic: doc
 			});
 		}
 	});

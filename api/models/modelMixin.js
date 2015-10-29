@@ -6,5 +6,6 @@ module.exports = {
 	title: String,
 	content: String,
 	createdAt: Number,
-	createdBy: mongoose.Schema.ObjectId
+	createdBy: mongoose.Schema.ObjectId,
+	updatedAt: Number
 };
