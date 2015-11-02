@@ -49,7 +49,7 @@ course.getCourse = (req,res) => {
 				course: doc
 			});
 		}
-	});
+	}).populate('lessons');
 };
 
 course.updateCourse = (req,res) => {
@@ -70,6 +70,75 @@ course.updateCourse = (req,res) => {
 			res.send({
 				course: doc
 			});
+		}
+	});
+};
+
+course.removeCourse = (req,res) => {
+	let courseId = req.params.courseId;
+	models.course.find({_id: courseId},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			doc[0].remove((err) => {
+				if(err) {
+					res.send({
+						error:err
+					});
+				}
+				else {
+					res.send({
+						course: []
+					});
+				}
+			});	
+		}
+	});
+};
+
+course.addLesson = (req,res) => {
+	let lessonId = req.params.lessonId;
+	let courseId = req.params.courseId;
+	models.course.find({_id: courseId}, (err,doc) => {
+		let course = doc[0];
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			course.lessons.push(lessonId);
+			course.save((err,doc) => {
+				res.send({
+					course: doc
+				});
+			});
+		}
+	});
+};
+
+course.removeLesson = (req,res) => {
+	let courseId = req.params.courseId;
+	let lessonId = req.params.lessonId;
+
+	models.course.find({_id:courseId}, (err,doc) => {
+		let course = doc[0];
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			let lessonIndex = course.lessons.indexOf(lessonId);
+			course.lessons.splice(lessonIndex,1);
+			course.save((err,doc) => {
+				res.send({
+					course: doc
+				});
+			})
 		}
 	});
 };

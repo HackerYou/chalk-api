@@ -3,12 +3,24 @@
 let expect = require('expect.js');
 let models = require('../api/models/index.js');
 let course = require('../api/course.js');
+let lesson = require('../api/lesson.js');
 let mongoose = require('mongoose');
 
 describe('Courses', () => {
 	let courseId;
+	let lessonId;
 	before(() => {
 		mongoose.connect('mongodb://localhost/notes');
+
+		lesson.createLesson({
+			body: {
+				title: "Course add lesson"
+			}
+		}, {
+			send(data) {
+				lessonId = data.lesson._id;
+			}
+		})
 	});
 	after(() => {
 		mongoose.disconnect();
@@ -67,7 +79,48 @@ describe('Courses', () => {
 		});
 	});
 
+	it('should add a lesson', (done) => {
+		course.addLesson({
+			params: {
+				lessonId: lessonId,
+				courseId: courseId
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data).to.have.key('course');
+				expect(data.course.lessons).to.have.length(1);
+				done();
+			}
+		});
+	});
+	it('should remove a lesson', (done) => {
+		course.removeLesson({
+			params: {
+				lessonId: lessonId,
+				courseId: courseId
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.course.lessons).to.have.length(0);
+				done();
+			}
+		});
+	});
 
+	it('should remove a course', (done) => {
+		course.removeCourse({
+			params: {
+				courseId: courseId
+			}
+		}, {
+			send(data) {
+				expect(data.course).to.be.empty();
+				done();
+			}
+		});
+	});
 }); //End of describe
 
 
