@@ -28,7 +28,9 @@ app.get('/v1/course',api.course.getCourses);
 app.get('/v1/course/:id',api.course.getCourse);
 app.post('/v1/course',api.course.createCourse);
 app.put('/v1/course/:id',api.course.updateCourse);
-
+app.delete('/v1/course/:courseId',api.course.removeCourse);
+app.put('/v1/course/:courseId/lesson/:lessonId',api.course.addLesson);
+app.delete('/v1/course/:courseId/lesson/:lessonId',api.course.removeLesson);
 
 app.listen('3200');
 console.log('App listening on port 3200');
