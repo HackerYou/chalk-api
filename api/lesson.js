@@ -20,6 +20,32 @@ lesson.createLesson = (req,res) => {
 	});
 };
 
+lesson.removeLesson = (req,res) => {
+	let lessonId = req.params.lessonId;
+	models.lesson.find({_id:lessonId}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			let lesson = doc[0];
+			lesson.remove((err) => {
+				if(err) {
+					res.send({
+						error: err
+					});
+				}
+				else {
+					res.send({
+						lesson: []
+					});
+				}
+			});
+		}
+	});
+};
+
 lesson.getLessons = (req,res) => {
 	models.lesson.find({},{'__v' : 0}, (err,docs) => {
 		if(err) {
@@ -56,6 +82,7 @@ lesson.addTopic = (req,res) => {
 	let lessonId = req.params.lessonId;
 	models.lesson.find({_id:lessonId},(err,doc) => {
 		let lesson = doc[0];
+		lesson.updatedAt = +new Date();
 		if(err) {
 			res.send({
 				error: err
@@ -86,6 +113,7 @@ lesson.removeTopic = (req,res) => {
 			let lesson = doc[0];
 			let topicIndex = lesson.topics.indexOf(topicId);
 			lesson.topics.splice(topicId,1);
+			lesson.updatedAt = +new Date();
 			lesson.save((err,doc)=>{
 				if(err) {
 					res.send({
@@ -102,31 +130,7 @@ lesson.removeTopic = (req,res) => {
 	});
 };
 
-lesson.removeLesson = (req,res) => {
-	let lessonId = req.params.lessonId;
-	models.lesson.find({_id:lessonId}, (err,doc) => {
-		if(err) {
-			res.send({
-				error: err
-			});
-		}
-		else {
-			let lesson = doc[0];
-			lesson.remove((err) => {
-				if(err) {
-					res.send({
-						error: err
-					});
-				}
-				else {
-					res.send({
-						lesson: []
-					});
-				}
-			});
-		}
-	});
-};
+
 
 module.exports = lesson;
 

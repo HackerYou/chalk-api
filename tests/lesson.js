@@ -65,6 +65,23 @@ describe('Lessons', () => {
 		});
 	});
 
+	it('should update a lesson', (done) => {
+		lesson.updateTopic({
+			params: {
+				lessonId: lessonId
+			},
+			body: {
+				title: 'New lesson title'
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.lesson.title).to.be.eql('New lesson title');
+				done();
+			}
+		})
+	});
+
 	it('should add a topic', (done) => {
 		lesson.addTopic({
 			params: {

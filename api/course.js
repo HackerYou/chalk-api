@@ -104,6 +104,7 @@ course.addLesson = (req,res) => {
 	let courseId = req.params.courseId;
 	models.course.find({_id: courseId}, (err,doc) => {
 		let course = doc[0];
+		course.updatedAt = +new Date();
 		if(err) {
 			res.send({
 				error: err
@@ -123,9 +124,9 @@ course.addLesson = (req,res) => {
 course.removeLesson = (req,res) => {
 	let courseId = req.params.courseId;
 	let lessonId = req.params.lessonId;
-
 	models.course.find({_id:courseId}, (err,doc) => {
 		let course = doc[0];
+		course.updatedAt = +new Date();
 		if(err) {
 			res.send({
 				error: err
