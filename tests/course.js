@@ -9,7 +9,7 @@ let mongoose = require('mongoose');
 describe('Courses', () => {
 	let courseId;
 	let lessonId;
-	before(() => {
+	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
 
 		lesson.createLesson({
@@ -19,6 +19,7 @@ describe('Courses', () => {
 		}, {
 			send(data) {
 				lessonId = data.lesson._id;
+				done();
 			}
 		})
 	});
