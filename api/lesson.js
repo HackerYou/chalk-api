@@ -58,7 +58,7 @@ lesson.getLessons = (req,res) => {
 				lesson: docs
 			});
 		}
-	}).populate('topics');
+	});
 };
 
 lesson.getLesson = (req,res) => {
@@ -72,6 +72,24 @@ lesson.getLesson = (req,res) => {
 		else {
 			res.send({
 				lesson: doc[0]
+			});
+		}
+	}).populate('topics');
+};
+
+lesson.updateLesson = (req,res) => {
+	let lessonId = req.params.lessonId;
+	let model = req.body;
+
+	models.lesson.findOneAndUpdate({_id:lessonId},model,{new:true}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				lesson: doc
 			});
 		}
 	});

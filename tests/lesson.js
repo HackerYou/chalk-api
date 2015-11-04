@@ -66,7 +66,7 @@ describe('Lessons', () => {
 	});
 
 	it('should update a lesson', (done) => {
-		lesson.updateTopic({
+		lesson.updateLesson({
 			params: {
 				lessonId: lessonId
 			},

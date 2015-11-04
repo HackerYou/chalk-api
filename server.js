@@ -23,6 +23,7 @@ app.post('/v1/exercise',api.exercise.createExercise);
 app.get('/v1/lesson',api.lesson.getLessons);
 app.post('/v1/lesson',api.lesson.createLesson);
 app.get('/v1/lesson/:lessonId',api.lesson.getLesson);
+app.put('/v1/lesson/:lessonId',api.lesson.updateLesson);
 app.delete('/v1/lesson/:lessonId',api.lesson.removeLesson);
 app.put('/v1/lesson/:lessonId/topic/:topicId',api.lesson.addTopic);
 app.delete('/v1/lesson/:lessonId/topic/:topicId',api.lesson.removeTopic);
