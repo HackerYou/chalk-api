@@ -22,11 +22,16 @@ app.post('/v1/exercise',api.exercise.createExercise);
 //Lessons
 app.get('/v1/lesson',api.lesson.getLessons);
 app.post('/v1/lesson',api.lesson.createLesson);
+app.get('/v1/lesson/:lessonId',api.lesson.getLesson);
+app.put('/v1/lesson/:lessonId',api.lesson.updateLesson);
+app.delete('/v1/lesson/:lessonId',api.lesson.removeLesson);
+app.put('/v1/lesson/:lessonId/topic/:topicId',api.lesson.addTopic);
+app.delete('/v1/lesson/:lessonId/topic/:topicId',api.lesson.removeTopic);
 
 //Courses 
 app.get('/v1/course',api.course.getCourses);
-app.get('/v1/course/:id',api.course.getCourse);
 app.post('/v1/course',api.course.createCourse);
+app.get('/v1/course/:id',api.course.getCourse);
 app.put('/v1/course/:id',api.course.updateCourse);
 app.delete('/v1/course/:courseId',api.course.removeCourse);
 app.put('/v1/course/:courseId/lesson/:lessonId',api.course.addLesson);

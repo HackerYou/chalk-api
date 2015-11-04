@@ -3,7 +3,7 @@ node_js: 4.2
 services: mongodb
 before_script:
   - npm install -g gulp
-script: gulp test
+script: gulp test --type ci
 env:
   - CXX=g++-4.8
 addons:
