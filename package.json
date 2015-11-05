@@ -1,5 +1,5 @@
 {
-  "name": "starbuck-api",
+  "name": "chalk-api",
   "version": "1.0.0",
   "description": "The API for the HackerYou notes application",
   "main": "server.js",
