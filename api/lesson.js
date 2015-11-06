@@ -2,6 +2,7 @@
 
 let lesson = {};
 let models = require('./models/index.js');
+let topic = require('./topic.js');
 
 lesson.createLesson = (req,res) => {
 	let model = req.body;
@@ -63,7 +64,7 @@ lesson.getLessons = (req,res) => {
 
 lesson.getLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
-	models.lesson.find({_id: lessonId}, (err,doc) => {
+	models.lesson.find({_id: lessonId}, {'__v' : 0}, (err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -80,7 +81,7 @@ lesson.getLesson = (req,res) => {
 lesson.updateLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let model = req.body;
-
+	model.updatedAt = +new Date();
 	models.lesson.findOneAndUpdate({_id:lessonId},model,{new:true}, (err,doc) => {
 		if(err) {
 			res.send({
@@ -107,10 +108,12 @@ lesson.addTopic = (req,res) => {
 			});
 		}
 		else {
-			lesson.topics.push(topicId);
-			lesson.save((err,doc) => {
-				res.send({
-					lesson: doc
+			topic.addLesson(topicId,lessonId).then((result) => {
+				lesson.topics.push(topicId);
+				lesson.save((err,doc) => {
+					res.send({
+						lesson: doc
+					});
 				});
 			});
 		}

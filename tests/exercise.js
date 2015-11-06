@@ -6,11 +6,13 @@ let expect = require('expect.js');
 let models = require('../api/models/index.js');
 
 describe('Exercise', () => {
+	let exerciseId;
+	let newExercise;
 	before(() => {
 		mongoose.connect('mongodb://localhost/notes');
 	});
 	after(() => {
-		models.exercise.find({'title':'test'}, (err,doc) => {
+		models.exercise.find({_id:exerciseId}, (err,doc) => {
 			doc[0].remove();
 		});
 		mongoose.disconnect();	
@@ -20,6 +22,8 @@ describe('Exercise', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('exercise');
+				exerciseId = data.exercise._id;
+				newExercise = data.exercise;
 				done();
 			}
 		});
@@ -32,6 +36,37 @@ describe('Exercise', () => {
 				done();
 			}
 		})
+	});
+
+	it('should return a specific exercise', (done) => {
+		exercise.getExercise({
+			params: {
+				exerciseId: exerciseId
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.exercise._id).to.be.eql(exerciseId);
+				done();	
+			}
+		})
+	});
+
+	it('should update an exercise', (done) => {
+		newExercise.title = 'Updated Exercise';
+		exercise.updateExercise({
+			params: {
+				exerciseId: exerciseId
+			},
+			body: newExercise
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.exercise.updatedAt).to.have.a('number');
+				expect(data.exercise.title).to.be.eql('Updated Exercise');
+				done();
+			}
+		});
 	});
 });
 

@@ -17,7 +17,9 @@ gulp.task('lint', () => {
 
 gulp.task('test', () => {
 	gulp.src('./tests/**/*.js')
-		.pipe(plumber({errorHandler: gulputil.env.type === 'ci' ? gulputil.noop() : notify.onError("Error: <%= error.message %>")   }))
+		.pipe(plumber({
+			errorHandler: gulputil.env.type === 'ci' ? gulputil.noop() : notify.onError("Error: <%= error.message %>")   
+		}))
 		.pipe(mocha({reporter: 'spec'}));
 });
 

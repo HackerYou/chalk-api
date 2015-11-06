@@ -76,6 +76,7 @@ describe('Lessons', () => {
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
+				expect(data.lesson.updatedAt).to.be.a('number');
 				expect(data.lesson.title).to.be.eql('New lesson title');
 				done();
 			}
