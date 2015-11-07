@@ -36,6 +36,48 @@ exercise.getExercises = (req,res) => {
 	});
 };
 
+exercise.getExercise = (req,res) => {
+	let exerciseId = req.params.exerciseId;
+	models.exercise.findOne({_id: exerciseId}, (err, doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				exercise: doc
+			});
+		}
+	});
+};
+
+exercise.addTopic = (exerciseId, topicId) => {
+	return new Promise((resolve,reject) => {
+		
+	});
+};
+exercise.updateExercise = (req,res) => {
+	let exerciseId =req.params.exerciseId;
+	let model = req.body;
+	model.updatedAt = +new Date();
+	models.exercise.findOneAndUpdate({_id:exerciseId}, model,{new:true},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				exercise: doc
+			});
+		}
+	});
+};
+
+
+
+
 module.exports = exercise;
 
 

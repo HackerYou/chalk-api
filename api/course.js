@@ -5,9 +5,9 @@ let models = require('./models/index.js');
 
 course.createCourse = (req,res) => {
 	let model = req.body;
+	
 	model.createdAt = +new Date();
 	new models.course(model).save((err,doc) => {
-
 		if(err) {
 			res.send({
 				error: err
@@ -38,7 +38,7 @@ course.getCourses = (req,res) => {
 
 course.getCourse = (req,res) => {
 	let id = req.params.id;
-	models.course.find({_id:id}, (err,doc) => {
+	models.course.find({_id:id}, {'__v': 0},(err,doc) => {
 		if(err) {
 			res.send({
 				error: err

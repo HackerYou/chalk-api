@@ -14,6 +14,9 @@ app.get('/', (req,res) => {
 //Topics
 app.get('/v1/topic',api.topic.getTopics);
 app.post('/v1/topic',api.topic.createTopic);
+app.get('/v1/topic/:topicId',api.topic.getTopic);
+app.put('/v1/topic/:topicId',api.topic.updateTopic);
+app.delete('/v1/topic/:topicId',api.topic.removeTopic);
 
 //Exercises
 app.get('/v1/exercise',api.exercise.getExercises);
@@ -39,3 +42,6 @@ app.delete('/v1/course/:courseId/lesson/:lessonId',api.course.removeLesson);
 
 app.listen('3200');
 console.log('App listening on port 3200');
+
+
+
