@@ -21,6 +21,9 @@ app.delete('/v1/topic/:topicId',api.topic.removeTopic);
 //Exercises
 app.get('/v1/exercise',api.exercise.getExercises);
 app.post('/v1/exercise',api.exercise.createExercise);
+app.get('/v1/exercise/:exerciseId',app.exercise.getExercise);
+app.put('/v1/exercise/:exerciseId',app.exercise.updateExercise);
+app.delete('/v1/exercise/:exerciseId',app.exercise.removeExercise);
 
 //Lessons
 app.get('/v1/lesson',api.lesson.getLessons);

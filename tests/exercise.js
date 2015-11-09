@@ -12,9 +12,6 @@ describe('Exercise', () => {
 		mongoose.connect('mongodb://localhost/notes');
 	});
 	after(() => {
-		models.exercise.find({_id:exerciseId}, (err,doc) => {
-			doc[0].remove();
-		});
 		mongoose.disconnect();	
 	});
 	it('should create an exercise', (done) => {
@@ -67,6 +64,20 @@ describe('Exercise', () => {
 				done();
 			}
 		});
+	});
+
+	it('should remove an exercise', (done) => {
+		exercise.removeExercise({
+			params: {
+				exerciseId: exerciseId
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.exercise).to.have.length(0);
+				done();
+			}
+		})
 	});
 });
 

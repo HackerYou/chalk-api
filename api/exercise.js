@@ -57,6 +57,7 @@ exercise.addTopic = (exerciseId, topicId) => {
 		
 	});
 };
+
 exercise.updateExercise = (req,res) => {
 	let exerciseId =req.params.exerciseId;
 	let model = req.body;
@@ -75,6 +76,24 @@ exercise.updateExercise = (req,res) => {
 	});
 };
 
+exercise.removeExercise = (req,res) => {
+	let exerciseId = req.params.exerciseId;
+
+	models.exercise.findOne({_id:exerciseId}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			doc.remove((err) => {
+				res.send({
+					exercise: []
+				});
+			});
+		}
+	});
+};
 
 
 
