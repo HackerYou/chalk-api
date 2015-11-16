@@ -12,9 +12,6 @@ describe('Exercise', () => {
 		mongoose.connect('mongodb://localhost/notes');
 	});
 	after(() => {
-		models.exercise.find({_id:exerciseId}, (err,doc) => {
-			doc[0].remove();
-		});
 		mongoose.disconnect();	
 	});
 	it('should create an exercise', (done) => {
@@ -58,15 +55,31 @@ describe('Exercise', () => {
 			params: {
 				exerciseId: exerciseId
 			},
-			body: newExercise
+			body: newExercise.toJSON()
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.exercise.updatedAt).to.have.a('number');
+				expect(data.exercise.updated_at).to.have.a('number');
 				expect(data.exercise.title).to.be.eql('Updated Exercise');
+				expect(data.exercise.revisions).to.be.an('array');
+				expect(data.exercise.revisions).to.have.length(1);
 				done();
 			}
 		});
+	});
+
+	it('should remove an exercise', (done) => {
+		exercise.removeExercise({
+			params: {
+				exerciseId: exerciseId
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.exercise).to.have.length(0);
+				done();
+			}
+		})
 	});
 });
 

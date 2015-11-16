@@ -7,11 +7,12 @@ let lesson = require('../api/lesson.js');
 let mongoose = require('mongoose');
 
 describe('Courses', () => {
-	let courseId;
+	let mockCourse;
 	let lessonId;
+	let template;
+	let templateId;
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
-
 		lesson.createLesson({
 			body: {
 				title: "Course add lesson"
@@ -26,16 +27,65 @@ describe('Courses', () => {
 	after(() => {
 		mongoose.disconnect();
 	});
-	it('should create a course', (done) => {
-		course.createCourse({
+
+
+	it('should create a template', (done) => {
+		course.createTemplate({
 			body: {
-				'title' : 'test'
+				"title": "New Template"
 			}
+		}, {
+			send(data) {
+				templateId = data.course._id;
+				expect(data).to.be.an('object');
+				expect(data.course.template).to.be(true);
+				done();
+			}
+		});
+	});
+
+	it('should get all templates', (done) => {
+		course.getTemplates({}, 
+		{
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.course[0].template).to.be.eql(true);
+				done();
+			} 
+		})
+	});
+
+	it('should get a template', (done) => {
+		course.getTemplate({
+			params: {
+				templateId: templateId
+			}
+		}, {
+			send(data) {
+				template = data.course;
+				expect(data).to.be.an('object');
+				done();
+			}
+		})
+	});
+
+
+	it('should create a course', (done) => {
+		Object.assign(template, {
+			'term': 'Summer 2015',
+			'description': 'Test description'
+		});
+		console.log(template);
+		course.createCourse({
+			body: template
 		},{
 			send(data) {
-				courseId = data.course._id;
+				mockCourse = data.course;
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('course');
+				expect(data.course.lessons).to.be.an('array');
+				expect(data.course.students).to.be.an('array');
+				expect(data.course.template).to.be.eql(false);
 				done();
 			}
 		});
@@ -53,7 +103,7 @@ describe('Courses', () => {
 	});
 	
 	it('should get a specific course', (done) => {
-		course.getCourse({params: { id: courseId } }, {
+		course.getCourse({params: { id: mockCourse._id } }, {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.course.length).to.be.eql(1);
@@ -63,18 +113,14 @@ describe('Courses', () => {
 	});
 	
 	it('should update the courses', (done) => {
+		mockCourse.title = 'updated';
 		course.updateCourse({
-			params: {id:courseId},
-			body: {
-			     "_id": courseId,
-			     "title": "updated",
-			     "createdAt": 1446064502200,
-			     "lessons": []
-			   }
+			params: {id:mockCourse._id},
+			body: mockCourse.toJSON()
 		},{
 			send(data) {
 				expect(data.course.title).to.be.eql('updated');
-				expect(data.course.updatedAt).to.be.a('number');
+				expect(data.course.updated_at).to.be.a('number');
 				done();
 			}
 		});
@@ -84,7 +130,7 @@ describe('Courses', () => {
 		course.addLesson({
 			params: {
 				lessonId: lessonId,
-				courseId: courseId
+				courseId: mockCourse._id
 			}
 		}, {
 			send(data) {
@@ -95,11 +141,12 @@ describe('Courses', () => {
 			}
 		});
 	});
+
 	it('should remove a lesson', (done) => {
 		course.removeLesson({
 			params: {
 				lessonId: lessonId,
-				courseId: courseId
+				courseId: mockCourse._id
 			}
 		}, {
 			send(data) {
@@ -113,7 +160,7 @@ describe('Courses', () => {
 	it('should remove a course', (done) => {
 		course.removeCourse({
 			params: {
-				courseId: courseId
+				courseId: mockCourse._id
 			}
 		}, {
 			send(data) {

@@ -4,8 +4,8 @@ let mongoose = require('mongoose');
 
 module.exports = {
 	title: String,
-	content: String,
-	createdAt: Number,
-	createdBy: mongoose.Schema.ObjectId,
-	updatedAt: Number
+	created_at: Number,
+	created_by: mongoose.Schema.ObjectId,
+	updated_at: Number,
+	updated_by: mongoose.Schema.ObjectId
 };

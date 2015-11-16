@@ -6,7 +6,7 @@ let topic = require('./topic.js');
 
 lesson.createLesson = (req,res) => {
 	let model = req.body;
-	model.createdAt = +new Date();
+	model.created_at = +new Date();
 	new models.lesson(model).save((err,doc) => {
 		if(err) {
 			res.send({
@@ -81,18 +81,30 @@ lesson.getLesson = (req,res) => {
 lesson.updateLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let model = req.body;
-	model.updatedAt = +new Date();
-	models.lesson.findOneAndUpdate({_id:lessonId},model,{new:true}, (err,doc) => {
+	model.updated_at = +new Date();	
+	models.lesson.findOne({_id:lessonId}, (err,olddoc) => {
 		if(err) {
 			res.send({
 				error: err
 			});
 		}
-		else {
-			res.send({
-				lesson: doc
-			});
-		}
+		model.revisions.push(olddoc.toObject());
+		models.lesson.findOneAndUpdate(
+			{_id:lessonId},
+			model,
+			{new:true}, 
+			(err,doc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+			}
+			else {
+				res.send({
+					lesson: doc
+				});
+			}
+		});
 	});
 };
 
@@ -101,7 +113,7 @@ lesson.addTopic = (req,res) => {
 	let lessonId = req.params.lessonId;
 	models.lesson.find({_id:lessonId},(err,doc) => {
 		let lesson = doc[0];
-		lesson.updatedAt = +new Date();
+		lesson.updated_at = +new Date();
 		if(err) {
 			res.send({
 				error: err
@@ -134,18 +146,20 @@ lesson.removeTopic = (req,res) => {
 			let lesson = doc[0];
 			let topicIndex = lesson.topics.indexOf(topicId);
 			lesson.topics.splice(topicId,1);
-			lesson.updatedAt = +new Date();
-			lesson.save((err,doc)=>{
-				if(err) {
-					res.send({
-						error: err
-					});
-				}
-				else {
-					res.send({
-						lesson: doc
-					});
-				}
+			lesson.updated_at = +new Date();
+			topic.removeLesson(topicId,lessonId).then(() => {
+				lesson.save((err,doc)=>{
+					if(err) {
+						res.send({
+							error: err
+						});
+					}
+					else {
+						res.send({
+							lesson: doc
+						});
+					}
+				})
 			})
 		}
 	});

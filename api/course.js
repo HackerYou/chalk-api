@@ -5,9 +5,10 @@ let models = require('./models/index.js');
 
 course.createCourse = (req,res) => {
 	let model = req.body;
-	
-	model.createdAt = +new Date();
-	new models.course(model).save((err,doc) => {
+	model.template = false;
+	model.created_at = +new Date();
+
+	new models.course(model.toObject()).save((err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -19,6 +20,56 @@ course.createCourse = (req,res) => {
 			});
 		}
 	});
+};
+
+course.createTemplate = (req,res) => {
+	let model = req.body;
+	model.template = true;
+	model.created_at = +new Date();
+	new models.course(model).save((err,doc) => {
+
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				course: doc
+			});
+		}
+	});
+};
+
+course.getTemplates = (req,res) => {
+	models.course.find({"template": true},{ '__v': 0} , (err,docs) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				course: docs
+			});
+		}
+	});
+};
+
+course.getTemplate = (req,res) => {
+	let templateId = req.params.templateId;
+	models.course.findOne({_id:templateId}, {__v: 0,_id:0},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		else {
+			res.send({
+				course: doc
+			});
+		}
+	}).populate('lessons');
 };
 
 course.getCourses = (req,res) => {
@@ -56,11 +107,12 @@ course.updateCourse = (req,res) => {
 	let model = req.body;
 	let id = req.params.id;
 
-	model.updatedAt = +new Date();
+	model.updated_at = +new Date();
 	models.course.findOneAndUpdate(
 		{ _id:id },
 		model,
-		{ new: true },(err,doc) => {
+		{ new: true },
+		(err,doc) => {
 		if(err){
 			res.send({
 				error: err
@@ -104,7 +156,7 @@ course.addLesson = (req,res) => {
 	let courseId = req.params.courseId;
 	models.course.find({_id: courseId}, (err,doc) => {
 		let course = doc[0];
-		course.updatedAt = +new Date();
+		course.updated_at = +new Date();
 		if(err) {
 			res.send({
 				error: err
@@ -126,7 +178,7 @@ course.removeLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	models.course.find({_id:courseId}, (err,doc) => {
 		let course = doc[0];
-		course.updatedAt = +new Date();
+		course.updated_at = +new Date();
 		if(err) {
 			res.send({
 				error: err

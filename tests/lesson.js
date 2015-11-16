@@ -9,6 +9,7 @@ let mongoose = require('mongoose');
 describe('Lessons', () => {
 	let lessonId;
 	let topicId;
+	let mockLesson;
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
 		topic.createTopic({
@@ -28,12 +29,15 @@ describe('Lessons', () => {
 	it('should create a lesson', (done) => {
 		lesson.createLesson({
 			body: {
-				'title' : 'Test'
+				'title' : 'Test',
+				'body' : 'This is a test'
 			}
 		}, {
 			send(data) {
 				lessonId = data.lesson._id;
+				mockLesson = data.lesson;
 				expect(data).to.be.an('object');
+				expect(data.lesson.body).to.be.a('string');
 				expect(data).to.have.key('lesson');
 				done();
 			}
@@ -66,18 +70,19 @@ describe('Lessons', () => {
 	});
 
 	it('should update a lesson', (done) => {
+		mockLesson.title = "New lesson title";
 		lesson.updateLesson({
 			params: {
 				lessonId: lessonId
 			},
-			body: {
-				title: 'New lesson title'
-			}
+			body: mockLesson.toJSON()
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.lesson.updatedAt).to.be.a('number');
+				expect(data.lesson.updated_at).to.be.a('number');
 				expect(data.lesson.title).to.be.eql('New lesson title');
+				expect(data.lesson.revisions).to.be.an('array');
+				expect(data.lesson.revisions).to.have.length(1);
 				done();
 			}
 		})
@@ -108,7 +113,10 @@ describe('Lessons', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.lesson.topics).to.have.length(0);
-				done();
+				models.topic.findOne({_id:topicId},(err,doc) => {
+					expect(doc.lessons).to.have.length(0);	
+					done();
+				});
 			}
 		});
 	});
