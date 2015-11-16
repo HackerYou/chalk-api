@@ -9,6 +9,9 @@ let gulputil = require('gulp-util');
 
 gulp.task('lint', () => {
 	gulp.src('./api/**/*.js')
+		.pipe(plumber({
+			errorHandler: gulputil.env.type === 'ci' ? gulputil.noop() : notify.onError("Error: <%= error.message %>")   
+		}))
 		.pipe(eslint({
 			useEslintrc: true
 		}))

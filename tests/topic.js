@@ -18,7 +18,7 @@ describe('Topics', () => {
 			}
 		}, {
 			send(data) {
-				exerciseId = data._id;
+				exerciseId = data.exercise._id;
 				done();
 			}
 		});
@@ -68,11 +68,13 @@ describe('Topics', () => {
 			params: {
 				topicId: topicId
 			},
-			body: newTopic
+			body: newTopic.toJSON()
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.topic.title).to.be.eql('New Topic update');
+				expect(data.topic.revisions).to.be.an('array');
+				expect(data.topic.revisions).to.have.length(1);
 				done();
 			}
 		})
@@ -88,7 +90,11 @@ describe('Topics', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.topic.exercises).to.have.length(1);
-				done();
+				expect(data.topic.exercises[0].toString()).to.be.a('string');
+				models.exercise.findOne({_id:data.topic.exercises[0]}, (err,doc) => {
+					expect(doc.topics).to.have.length(1)
+					done();
+				});
 			}
 		});
 	});
@@ -103,7 +109,10 @@ describe('Topics', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.topic.exercises).to.have.length(0);
-				done();
+				models.exercise.findOne({_id: exerciseId}, (err,doc) => {
+					expect(doc.topics).to.have.length(0);
+					done();
+				});
 			}
 		});
 	});

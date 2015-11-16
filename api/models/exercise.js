@@ -6,7 +6,8 @@ let mixin = require('./modelMixin.js');
 let Schema = mongoose.Schema;
 
 let model = Object.assign({
-	topics: [{type: Schema.ObjectId, ref: 'Topic'}]
+	topics: [{type: Schema.ObjectId, ref: 'Topic'}],
+	revisions: [Schema.Types.Mixed]
 },mixin);
 
 let exerciseSchema = new Schema(model);

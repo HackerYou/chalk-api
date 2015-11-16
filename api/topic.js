@@ -2,10 +2,11 @@
 
 let topic = {};
 let models = require('./models/index.js');
+let exercise = require('./exercise.js');
 
 topic.createTopic = (req,res) => {
 	let model = req.body;
-	model.createdAt = +new Date();
+	model.created_at = +new Date();
 	new models.topic(model).save((err,doc) => {
 		if(err) {
 			res.send({
@@ -54,18 +55,22 @@ topic.getTopic = (req,res) => {
 topic.updateTopic = (req,res) => {
 	let topicId = req.params.topicId;
 	let model = req.body;
-	model.updatedAt = +new Date();
-	models.topic.findOneAndUpdate({_id:topicId},model,{new:true}, (err,doc) => {
-		if(err) {
-			res.send({
-				error: err
-			});
-		}
-		else {
-			res.send({
-				topic: doc
-			});
-		}
+	model.updated_at = +new Date();
+	models.topic.findOne({_id:topicId}, (err,olddoc) => {
+		model.revisions.push(olddoc.toObject());
+		models.topic.findOneAndUpdate({_id:topicId},model,{new:true}, (err,doc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+			}
+			else {
+				res.send({
+					topic: doc
+				});
+			}
+		});
+
 	});
 };
 
@@ -86,6 +91,23 @@ topic.addLesson = (topicId, lessonId) => {
 	});
 };
 
+topic.removeLesson = (topicId, lessonId) => {
+	return new Promise((resolve,reject) => {
+		models.topic.findOne({_id: topicId}, (err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			let topicIndex = doc.lessons.indexOf(lessonId);
+			doc.lessons.splice(topicIndex,1);
+			doc.save((err) => {
+				if(err) {
+					reject(err);
+				}
+				resolve(doc);
+			});
+		});
+	});
+};
 
 topic.removeTopic = (req, res) => {
 	let topicId = req.params.topicId;
@@ -124,17 +146,20 @@ topic.addExercise = (req,res) => {
 		}
 		else {
 			doc.exercises.push(exerciseId);
-			doc.save((err, newDoc) => {
-				if(err) {
-					res.send({
-						error: err
-					});
-				}
-				else {
-					res.send({
-						topic: newDoc
-					});
-				}
+			doc.updated_at = +new Date();
+			exercise.addTopic(exerciseId,topicId).then(() => {
+				doc.save((err, newDoc) => {
+					if(err) {
+						res.send({
+							error: err
+						});
+					}
+					else {
+						res.send({
+							topic: newDoc
+						});
+					}
+				});
 			});
 		}
 	});
@@ -152,16 +177,18 @@ topic.removeExercise = (req,res) => {
 		}
 		else {
 			let exerciseIndex = doc.exercises.indexOf(exerciseId);
+			doc.update_at = +new Date();
 			doc.exercises.splice(exerciseIndex,1);
-			doc.save((err,newDoc) => {
-				res.send({
-					topic: newDoc
+			exercise.removeTopic(exerciseId,topicId).then(() => {
+				doc.save((err,newDoc) => {
+					res.send({
+						topic: newDoc
+					});
 				});
 			});
 		}
 	});
 };
-
 
 module.exports = topic;
 

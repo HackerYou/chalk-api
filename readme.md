@@ -1,4 +1,4 @@
-#Notes API [![Build Status](https://travis-ci.org/HackerYou/starbuck-api.svg)](https://travis-ci.org/HackerYou/starbuck-api)
+#Chalk Notes API [![Build Status](https://travis-ci.org/HackerYou/chalk-api.svg)](https://travis-ci.org/HackerYou/starbuck-api)
 
-API for notes app.
+API for Chalk Notes app.
 

@@ -6,7 +6,7 @@ let models = require('./models/index.js');
 exercise.createExercise = (req,res) => {
 	let model = req.body;
 
-	model.createdAt = +new Date();
+	model.created_at = +new Date();
 	new models.exercise(model).save((err,doc) => {
 		if(err) {
 			res.send({
@@ -54,25 +54,62 @@ exercise.getExercise = (req,res) => {
 
 exercise.addTopic = (exerciseId, topicId) => {
 	return new Promise((resolve,reject) => {
-		
+		models.exercise.findOne({_id:exerciseId},(err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			doc.topics.push(topicId);
+			doc.save((err) => {
+				if(err){
+					reject(err);
+				}
+				resolve(doc);
+			}); 
+		});
+	});
+};
+
+exercise.removeTopic = (exerciseId,topicId) => {
+	return new Promise((resolve,reject) => {
+		models.exercise.findOne({_id:exerciseId},(err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			let topicIndex = doc.topics.indexOf(topicId);
+			doc.updated_at = +new Date();
+			doc.topics.splice(topicIndex,1);
+			doc.save((err) => {
+				if(err) {
+					reject(err);
+				}
+				resolve(doc);
+			});
+		});
 	});
 };
 
 exercise.updateExercise = (req,res) => {
 	let exerciseId =req.params.exerciseId;
 	let model = req.body;
-	model.updatedAt = +new Date();
-	models.exercise.findOneAndUpdate({_id:exerciseId}, model,{new:true},(err,doc) => {
-		if(err) {
-			res.send({
-				error: err
-			});
-		}
-		else {
-			res.send({
-				exercise: doc
-			});
-		}
+	model.updated_at = +new Date();
+	models.exercise.findOne({_id:exerciseId},(err,olddoc) => {
+		model.revisions.push(olddoc.toObject());
+		models.exercise.findOneAndUpdate(
+			{_id:exerciseId},
+			model,
+			{new:true},
+			(err,doc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+			}
+			else {
+				res.send({
+					exercise: doc
+				});
+			}
+		});
 	});
 };
 
