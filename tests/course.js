@@ -5,6 +5,8 @@ let models = require('../api/models/index.js');
 let course = require('../api/course.js');
 let lesson = require('../api/lesson.js');
 let mongoose = require('mongoose');
+let request = require('supertest');
+request = request('http://localhost:3200');
 
 describe('Courses', () => {
 	let mockCourse;
@@ -30,6 +32,19 @@ describe('Courses', () => {
 
 
 	it('should create a template', (done) => {
+		// request
+		// 	.post('/v1/course/template')
+		// 	.send({
+		// 		"title": "New Template"
+		// 	})
+		// 	.end((err,res) => {
+		// 		if(err) {
+		// 			throw err;
+		// 		}
+		// 		res.to.be.an('object');
+		// 		res.course.template.to.be(true);
+		// 		done();
+		// 	});
 		course.createTemplate({
 			body: {
 				"title": "New Template"
@@ -155,7 +170,7 @@ describe('Courses', () => {
 		});
 	});
 
-	it('should remove a lesson', (done) => {
+	it('should   a lesson', (done) => {
 		course.removeLesson({
 			params: {
 				lessonId: lessonId,
@@ -191,7 +206,6 @@ describe('Courses', () => {
 			}
 		}, {
 			send(data) {
-				console.log(data);
 				expect(data).to.be.an('object');
 				expect(data.course).to.be.an('array');
 				expect(data.course).to.have.length(0);
