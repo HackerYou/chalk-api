@@ -58,26 +58,39 @@ describe('Courses', () => {
 	it('should get a template', (done) => {
 		course.getTemplate({
 			params: {
-				templateId: templateId
+				id: templateId
 			}
 		}, {
 			send(data) {
 				template = data.course;
 				expect(data).to.be.an('object');
+				expect(data.course.template).to.be.eql(true);
 				done();
 			}
 		})
 	});
 
+	it('should update a template', (done) => {
+		template.title = 'Updated Template';
+		course.updateTemplate({
+			params: {
+				id: templateId
+			},
+			body: template
+		}, {
+			send(data) {
+				done();
+			}
+		});
+	});
 
 	it('should create a course', (done) => {
-		Object.assign(template, {
+		let courseFromTemplate = Object.assign({},template.toJSON(), {
 			'term': 'Summer 2015',
 			'description': 'Test description'
 		});
-		console.log(template);
 		course.createCourse({
-			body: template
+			body: courseFromTemplate
 		},{
 			send(data) {
 				mockCourse = data.course;
@@ -160,7 +173,7 @@ describe('Courses', () => {
 	it('should remove a course', (done) => {
 		course.removeCourse({
 			params: {
-				courseId: mockCourse._id
+				id: mockCourse._id
 			}
 		}, {
 			send(data) {
@@ -169,6 +182,24 @@ describe('Courses', () => {
 			}
 		});
 	});
+
+	it('should remove a template', (done) => {
+		expect(template.template).to.be.eql(true);
+		course.removeCourse({
+			params: {
+				id: templateId
+			}
+		}, {
+			send(data) {
+				console.log(data);
+				expect(data).to.be.an('object');
+				expect(data.course).to.be.an('array');
+				expect(data.course).to.have.length(0);
+				done();
+			}
+		})
+	});
+
 }); //End of describe
 
 

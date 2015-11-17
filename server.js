@@ -35,11 +35,16 @@ app.put('/v1/lesson/:lessonId/topic/:topicId',api.lesson.addTopic);
 app.delete('/v1/lesson/:lessonId/topic/:topicId',api.lesson.removeTopic);
 
 //Courses 
+app.post('/v1/course/template',api.course.createTemplate);
+app.get('/v1/course/template',api.course.getTemplates);
+app.get('/v1/course/template/:id',api.course.getTemplate);
+app.put('/v1/course/template/:id',api.course.updateTemplate);
+app.delete('/v1/course/template/:id',api.course.removeTemplate);
 app.get('/v1/course',api.course.getCourses);
 app.post('/v1/course',api.course.createCourse);
 app.get('/v1/course/:id',api.course.getCourse);
 app.put('/v1/course/:id',api.course.updateCourse);
-app.delete('/v1/course/:courseId',api.course.removeCourse);
+app.delete('/v1/course/:id',api.course.removeCourse);
 app.put('/v1/course/:courseId/lesson/:lessonId',api.course.addLesson);
 app.delete('/v1/course/:courseId/lesson/:lessonId',api.course.removeLesson);
 

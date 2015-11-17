@@ -2,13 +2,15 @@
 
 let course = {};
 let models = require('./models/index.js');
-
+//TODO: Some duplication in methods
+//Maybe we don't need a method for courses and templates
+//Some required, not all.
 course.createCourse = (req,res) => {
 	let model = req.body;
 	model.template = false;
 	model.created_at = +new Date();
 
-	new models.course(model.toObject()).save((err,doc) => {
+	new models.course(model).save((err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -57,7 +59,7 @@ course.getTemplates = (req,res) => {
 };
 
 course.getTemplate = (req,res) => {
-	let templateId = req.params.templateId;
+	let templateId = req.params.id;
 	models.course.findOne({_id:templateId}, {__v: 0,_id:0},(err,doc) => {
 		if(err) {
 			res.send({
@@ -70,6 +72,30 @@ course.getTemplate = (req,res) => {
 			});
 		}
 	}).populate('lessons');
+};
+
+course.updateTemplate = (req,res) => {
+	let templateId = req.params.id;
+	let model = req.body;
+
+	model.updated_at = +new Date();
+
+	models.course.findOneAndUpdate(
+		{_id:templateId},
+		model,
+		{new: true},
+		(err,doc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+			}
+			else {
+				res.send({
+					course: doc
+				});
+			}
+		});
 };
 
 course.getCourses = (req,res) => {
@@ -127,7 +153,7 @@ course.updateCourse = (req,res) => {
 };
 
 course.removeCourse = (req,res) => {
-	let courseId = req.params.courseId;
+	let courseId = req.params.id;
 	models.course.find({_id: courseId},(err,doc) => {
 		if(err) {
 			res.send({
