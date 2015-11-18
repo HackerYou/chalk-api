@@ -2,3 +2,9 @@
 
 API for Chalk Notes app.
 
+For information about the available endpoints check out the [wiki](https://github.com/HackerYou/chalk-api/wiki).
+
+
+###Tests
+Should test with supertest to test the actual endpoints as apposed to methods. 
+
