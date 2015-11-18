@@ -6,7 +6,7 @@ let course = require('../api/course.js');
 let lesson = require('../api/lesson.js');
 let mongoose = require('mongoose');
 let request = require('supertest');
-request = request('http://localhost:3200');
+
 
 describe('Courses', () => {
 	let mockCourse;
