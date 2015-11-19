@@ -8,7 +8,7 @@ let model = Object.assign({
 	lessons: [{type: Schema.ObjectId, ref: 'Lesson'}],
 	template: Boolean,
 	term: String,
-	instructor: Schema.ObjectId,
+	instructor: String,
 	description: String,
 	students: []
 }, mixin);

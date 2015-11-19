@@ -15,6 +15,11 @@ app.use(function(req, res, next) {
 
 app.use(bodyParser.json());
 
+app.use((req,res,next) => {
+	console.log(req.url);
+	next();
+});
+
 app.get('/', (req,res) => {
 	res.send('Hi');
 });
@@ -55,6 +60,21 @@ app.put('/v1/course/:id',api.course.updateCourse);
 app.delete('/v1/course/:id',api.course.removeCourse);
 app.put('/v1/course/:courseId/lesson/:lessonId',api.course.addLesson);
 app.delete('/v1/course/:courseId/lesson/:lessonId',api.course.removeLesson);
+
+//Announcements
+app.post('/v1/announcement',api.announcement.createAnnouncement);
+app.get('/v1/announcement',api.announcement.getAnnouncements);
+app.get('/v1/announcement/:id',api.announcement.getAnnouncement);
+app.put('/v1/announcement/:id',api.announcement.updateAnnouncement);
+app.delete('/v1/announcement/:id',api.announcement.removeAnnouncement);
+
+//Users
+app.get('/v1/user/authenticate',api.user.authenticate);
+app.post('/v1/user',api.user.createUser);
+app.get('/v1/user',api.user.getUsers)
+app.get('/v1/user/:id',api.user.getUser);
+app.put('/v1/user/:id',api.user.updateUser);
+app.delete('/v1/user/:id',api.user.removeUser);
 
 app.listen('3200');
 console.log('App listening on port 3200');
