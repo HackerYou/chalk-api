@@ -151,7 +151,7 @@ user.authenticate = (req,res) => {
 					}, 
 					config.secret, 
 					{
-						expiresIn: 1440
+						expiresIn: "2 days"
 					});
 					res.send({
 						success: true,
