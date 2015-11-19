@@ -14,9 +14,11 @@ describe("User", () => {
 		mongoose.connect('mongodb://localhost/notes');
 		let userPassword = bcrypt.hashSync('test',10);
 		let userModel = {
+			firstName: 'Ryan',
+			lastName: 'Christiani',
 			email: userEmail,
 			password: userPassword
-		}
+		};
 		models.user(userModel).save((err) => {
 			if(err) {
 				throw err;
