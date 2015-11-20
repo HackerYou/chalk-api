@@ -7,7 +7,8 @@ let Schema = mongoose.Schema;
 
 let model = Object.assign({
 	topics: [{type: Schema.ObjectId, ref: 'Topic'}],
-	revisions: [Schema.Types.Mixed]
+	revisions: [Schema.Types.Mixed],
+	body: String
 },mixin);
 
 let exerciseSchema = new Schema(model);
