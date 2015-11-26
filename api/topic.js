@@ -49,7 +49,7 @@ topic.getTopic = (req,res) => {
 				topic: doc[0]
 			});
 		}
-	});
+	}).populate('exercises');
 };
 
 topic.updateTopic = (req,res) => {

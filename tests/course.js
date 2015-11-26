@@ -170,7 +170,7 @@ describe('Courses', () => {
 		});
 	});
 
-	it('should   a lesson', (done) => {
+	it('should remove a lesson', (done) => {
 		course.removeLesson({
 			params: {
 				lessonId: lessonId,

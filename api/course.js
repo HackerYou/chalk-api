@@ -44,7 +44,7 @@ course.createTemplate = (req,res) => {
 };
 
 course.getTemplates = (req,res) => {
-	models.course.find({"template": true},{ '__v': 0} , (err,docs) => {
+	models.course.find({"template": true},{ '__v': 0,students:0} , (err,docs) => {
 		if(err) {
 			res.send({
 				error: err
@@ -60,7 +60,7 @@ course.getTemplates = (req,res) => {
 
 course.getTemplate = (req,res) => {
 	let templateId = req.params.id;
-	models.course.findOne({_id:templateId}, {__v: 0,_id:0},(err,doc) => {
+	models.course.findOne({_id:templateId}, {__v: 0,_id:0,students:0},(err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -126,7 +126,7 @@ course.getCourse = (req,res) => {
 				course: doc
 			});
 		}
-	}).populate('lessons');
+	}).populate('lessons students');
 };
 
 course.updateCourse = (req,res) => {
@@ -191,9 +191,16 @@ course.addLesson = (req,res) => {
 		else {
 			course.lessons.push(lessonId);
 			course.save((err,doc) => {
-				res.send({
-					course: doc
-				});
+				if(err) {
+					res.send({
+						error: err
+					});
+				}
+				else {
+					res.send({
+						course: doc
+					});
+				}
 			});
 		}
 	});
@@ -202,8 +209,8 @@ course.addLesson = (req,res) => {
 course.removeLesson = (req,res) => {
 	let courseId = req.params.courseId;
 	let lessonId = req.params.lessonId;
-	models.course.find({_id:courseId}, (err,doc) => {
-		let course = doc[0];
+	models.course.findOne({_id:courseId}, (err,doc) => {
+		let course = doc;     
 		course.updated_at = +new Date();
 		if(err) {
 			res.send({
@@ -213,7 +220,7 @@ course.removeLesson = (req,res) => {
 		else {
 			let lessonIndex = course.lessons.indexOf(lessonId);
 			course.lessons.splice(lessonIndex,1);
-			course.save((err,doc) => {
+			course.save((err,doc) => { 
 				res.send({
 					course: doc
 				});

@@ -38,7 +38,7 @@ exercise.getExercises = (req,res) => {
 
 exercise.getExercise = (req,res) => {
 	let exerciseId = req.params.exerciseId;
-	models.exercise.findOne({_id: exerciseId}, (err, doc) => {
+	models.exercise.findOne({_id: exerciseId},{__v:0}, (err, doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -53,13 +53,15 @@ exercise.getExercise = (req,res) => {
 };
 
 exercise.addTopic = (exerciseId, topicId) => {
+
 	return new Promise((resolve,reject) => {
 		models.exercise.findOne({_id:exerciseId},(err,doc) => {
 			if(err) {
 				reject(err);
 			}
 			doc.topics.push(topicId);
-			doc.save((err) => {
+			doc.save((err,newDoc) => {
+
 				if(err){
 					reject(err);
 				}

@@ -17,7 +17,8 @@ describe("User", () => {
 			firstName: 'Ryan',
 			lastName: 'Christiani',
 			email: userEmail,
-			password: userPassword
+			password: userPassword,
+			admin: true
 		};
 		models.user(userModel).save((err) => {
 			if(err) {

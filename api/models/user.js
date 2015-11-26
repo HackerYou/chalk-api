@@ -11,7 +11,7 @@ let model = {
 	lastName: String,
 	email: String,
 	password: String,
-	courses: [{type: Schema.ObjectId, ref: 'Course'}],
+	courses: [{type: String, ref: 'Course'}],
 	updated_at: Number,
 	created_at: Number
 };
