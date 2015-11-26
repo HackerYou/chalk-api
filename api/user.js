@@ -59,7 +59,7 @@ user.getUsers = (req,res) => {
 
 user.getUser = (req,res) => {
 	let id = req.params.id;
-	models.user.findOne({_id:id},{__v:0},(err,doc) => {
+	models.user.findOne({_id:id},{__v:0,password:0},(err,doc) => {
 		if(err) {
 			res.send({
 				error: err
@@ -70,28 +70,34 @@ user.getUser = (req,res) => {
 				user: doc
 			});
 		}
-	});
+	}).populate('courses');
 };
 
 user.updateUser = (req,res) => {
 	let id = req.params.id;
 	let model = req.body;
 	model.updated_at = +new Date();
-
 	models.user.findOne({_id:id},(err,doc) => {
-		doc.update({$set: model}, (err,updatedDoc) =>{
-			models.user.findOne({_id:id}, {__v:0,password: 0},(err,newdoc) => {
-				if(err) {
-					res.send({
-						error: err
-					});
-				}
-				else {
-					res.send({
-						user: newdoc
-					});
-				}
-			});
+		doc.update({$set: model.toObject()}, (err) =>{
+			if(err) {
+				res.send({
+					error: err
+				});
+			}
+			else {
+				models.user.findOne({_id:id}, {__v:0,password: 0},(err,newdoc) => {
+					if(err) {
+						res.send({
+							error: err
+						});
+					}
+					else {
+						res.send({
+							user: newdoc
+						});
+					}
+				});
+			}
 		});
 	});
 };
@@ -156,7 +162,8 @@ user.authenticate = (req,res) => {
 					res.send({
 						success: true,
 						message: 'Authentication successful',
-						token: token
+						token: token,
+						user_id: doc._id
 					});
 				}
 			});

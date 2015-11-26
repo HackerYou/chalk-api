@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 let mixin = require('./modelMixin.js');
 
 let model = Object.assign({
-	lessons: [{type: Schema.ObjectId, ref: 'Lesson'}],
+	lessons: [{type: String, ref: 'Lesson'}],
 	template: Boolean,
 	term: String,
 	instructor: String,

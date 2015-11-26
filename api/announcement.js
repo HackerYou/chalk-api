@@ -67,7 +67,7 @@ announcement.updateAnnouncement = (req,res) => {
 	model.updated_at = +new Date();
 	models.announcement.findOneAndUpdate(
 		{_id: id},
-		model,
+		model.toObject(),
 		{new:true}, 
 		(err,doc) => {
 			if(err) {

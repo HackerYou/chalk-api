@@ -54,6 +54,9 @@ app.post('/v1/topic',routeAuth,api.topic.createTopic);
 app.get('/v1/topic/:topicId',routeAuth,api.topic.getTopic);
 app.put('/v1/topic/:topicId',routeAuth,api.topic.updateTopic);
 app.delete('/v1/topic/:topicId',routeAuth,api.topic.removeTopic);
+app.put('/v1/topic/:topicId/exercise/:exerciseId',routeAuth,api.topic.addExercise);
+app.delete('/v1/topic/:topicId/exercise/:exerciseId',routeAuth,api.topic.removeExercise);
+
 
 //Exercises
 app.get('/v1/exercise',routeAuth,api.exercise.getExercises);
