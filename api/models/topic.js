@@ -11,7 +11,8 @@ let model = Object.assign({
 	revisions: [Schema.Types.Mixed],
 	body: String,
 	description: String,
-	category: String
+	category: String,
+	time: Number
 },mixin);
 
 let topicSchema = new Schema(model);
