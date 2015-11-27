@@ -45,7 +45,7 @@ function routeAuth(req,res,next) {
 }
  
 app.get('/', (req,res) => {
-	res.send('Notes Api Test Again');
+	res.send('Notes Api');
 });
 
 //Topics
@@ -85,8 +85,10 @@ app.post('/v1/course',routeAuth,api.course.createCourse);
 app.get('/v1/course/:id',routeAuth,api.course.getCourse);
 app.put('/v1/course/:id',routeAuth,api.course.updateCourse);
 app.delete('/v1/course/:id',routeAuth,api.course.removeCourse);
-app.put('/v1/course/:courseId/lesson/:lessonId',routeAuth,api.course.addLesson);
-app.delete('/v1/course/:courseId/lesson/:lessonId',routeAuth,api.course.removeLesson);
+app.put('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.addLesson);
+app.delete('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.removeLesson);
+app.post('/v1/course/:courseId/section/',routeAuth,api.course.addSection);
+
 
 //Announcements
 app.post('/v1/announcement',routeAuth,api.announcement.createAnnouncement);

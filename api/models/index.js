@@ -7,5 +7,6 @@ module.exports = {
 	course: require('./course.js'),
 	lesson: require('./lesson.js'),
 	announcement: require('./announcement.js'),
-	user: require('./user.js')
+	user: require('./user.js'),
+	section: require('./section.js')
 };

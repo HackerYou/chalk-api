@@ -13,6 +13,7 @@ describe('Courses', () => {
 	let lessonId;
 	let template;
 	let templateId;
+	let sectionId;
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
 		lesson.createLesson({
@@ -111,7 +112,7 @@ describe('Courses', () => {
 				mockCourse = data.course;
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('course');
-				expect(data.course.lessons).to.be.an('array');
+				expect(data.course.sections).to.be.an('array');
 				expect(data.course.students).to.be.an('array');
 				expect(data.course.template).to.be.eql(false);
 				done();
@@ -154,17 +155,34 @@ describe('Courses', () => {
 		});
 	});
 
-	it('should add a lesson', (done) => {
+	it('should add a section', (done) => {
+		course.addSection({
+			params: {
+				courseId: mockCourse._id
+			},
+			body: {
+				title: 'New section'	
+			}
+		}, {
+			send(data) {
+				sectionId = data.course.sections[0];
+				expect(data.course.sections).to.have.length(1);
+				done();
+			}
+		});
+	});
+
+	it('should add a lesson to a section', (done) => {
 		course.addLesson({
 			params: {
 				lessonId: lessonId,
-				courseId: mockCourse._id
+				sectionId: sectionId
 			}
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data).to.have.key('course');
-				expect(data.course.lessons).to.have.length(1);
+				expect(data).to.have.key('section');
+				expect(data.section.lessons).to.have.length(1);
 				done();
 			}
 		});
@@ -174,12 +192,12 @@ describe('Courses', () => {
 		course.removeLesson({
 			params: {
 				lessonId: lessonId,
-				courseId: mockCourse._id
+				sectionId: sectionId
 			}
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.course.lessons).to.have.length(0);
+				expect(data.section.lessons).to.have.length(0);
 				done();
 			}
 		});

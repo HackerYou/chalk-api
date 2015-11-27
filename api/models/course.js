@@ -5,12 +5,12 @@ let Schema = mongoose.Schema;
 let mixin = require('./modelMixin.js');
 
 let model = Object.assign({
-	lessons: [{type: String, ref: 'Lesson'}],
+	sections: [{ type: String, ref: 'Section' }],
 	template: Boolean,
 	term: String,
 	instructor: String,
 	description: String,
-	students: []
+	students: [{type: String, ref: 'User'}]
 }, mixin);
 
 let courseSchema = new Schema(model);
