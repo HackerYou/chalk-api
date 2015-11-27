@@ -126,7 +126,7 @@ course.getCourse = (req,res) => {
 				course: doc
 			});
 		}
-	}).populate('lessons students');
+	}).populate('sections students');
 };
 
 course.updateCourse = (req,res) => {
@@ -177,20 +177,40 @@ course.removeCourse = (req,res) => {
 	});
 };
 
+course.addSection = (req,res) => {
+	let courseId = req.params.courseId;
+	let model = req.body;
+	new models.section(model).save((err,sectionDoc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		models.course.findOne({_id: courseId},{__v:0},(err,doc) => {
+			doc.sections.push(sectionDoc._id);
+			doc.save((err, savedDoc) => {
+				res.send({
+					course: savedDoc
+				});
+			});
+		});
+	});
+};
+
 course.addLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
-	let courseId = req.params.courseId;
-	models.course.find({_id: courseId}, (err,doc) => {
-		let course = doc[0];
-		course.updated_at = +new Date();
+	let sectionId = req.params.sectionId;
+	models.section.findOne({_id: sectionId}, (err,doc) => {
+		let section = doc;
+		section.updated_at = +new Date();
 		if(err) {
 			res.send({
 				error: err
 			});
 		}
 		else {
-			course.lessons.push(lessonId);
-			course.save((err,doc) => {
+			section.lessons.push(lessonId);
+			section.save((err,doc) => {
 				if(err) {
 					res.send({
 						error: err
@@ -198,7 +218,7 @@ course.addLesson = (req,res) => {
 				}
 				else {
 					res.send({
-						course: doc
+						section: doc
 					});
 				}
 			});
@@ -207,22 +227,22 @@ course.addLesson = (req,res) => {
 };
 
 course.removeLesson = (req,res) => {
-	let courseId = req.params.courseId;
+	let sectionId = req.params.sectionId;
 	let lessonId = req.params.lessonId;
-	models.course.findOne({_id:courseId}, (err,doc) => {
-		let course = doc;     
-		course.updated_at = +new Date();
+	models.section.findOne({_id:sectionId}, (err,doc) => {
+		let section = doc;     
+		section.updated_at = +new Date();
 		if(err) {
 			res.send({
 				error: err
 			});
 		}
 		else {
-			let lessonIndex = course.lessons.indexOf(lessonId);
-			course.lessons.splice(lessonIndex,1);
-			course.save((err,doc) => { 
+			let lessonIndex = section.lessons.indexOf(lessonId);
+			section.lessons.splice(lessonIndex,1);
+			section.save((err,doc) => { 
 				res.send({
-					course: doc
+					section: doc
 				});
 			})
 		}
