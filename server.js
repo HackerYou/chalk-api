@@ -45,7 +45,7 @@ function routeAuth(req,res,next) {
 }
  
 app.get('/', (req,res) => {
-	res.send('Notes Api Test Again');
+	res.send('Notes Api');
 });
 
 //Topics
