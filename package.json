@@ -12,8 +12,10 @@
   "author": "Ryan Christiani",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.2.19",
     "bcryptjs": "^2.3.0",
     "body-parser": "^1.14.1",
+    "busboy": "^0.2.12",
     "express": "^4.13.3",
     "jsonwebtoken": "^5.4.1",
     "mongoose": "^4.2.3",

@@ -88,6 +88,9 @@ lesson.updateLesson = (req,res) => {
 				error: err
 			});
 		}
+		if(model.revisions === undefined) {
+			model.revisions = [];
+		}
 		model.revisions.push(olddoc.toObject());
 		models.lesson.findOneAndUpdate(
 			{_id:lessonId},

@@ -10,7 +10,7 @@ let config = require('./config.js');
 app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', true);
-  	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-access-token');
+  	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Content-length, Accept, x-access-token');
   	res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
     next();
 }); 
@@ -104,6 +104,10 @@ app.get('/v1/user',routeAuth,api.user.getUsers)
 app.get('/v1/user/:id',routeAuth,api.user.getUser);
 app.put('/v1/user/:id',routeAuth,api.user.updateUser);
 app.delete('/v1/user/:id',routeAuth,api.user.removeUser);
+
+//Media
+app.post('/v1/media',api.media.uploadFile);
+app.delete('/v1/media/:key',api.media.removeFile);
 
 app.listen('3200');
 console.log('App listening on port 3200');
