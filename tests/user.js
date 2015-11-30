@@ -6,10 +6,13 @@ let mongoose = require('mongoose');
 let models = require('../api/models/index.js');
 let bcrypt = require('bcryptjs');
 
-describe("User", () => {
+describe("User", function() {
 	let mockUser;
 	let password = 'test';
 	let userEmail = 'ryan@test.com';
+	//Emails take to long!
+	//Have to disable timeout
+	this.timeout(0);
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
 		let userPassword = bcrypt.hashSync('test',10);
@@ -18,7 +21,8 @@ describe("User", () => {
 			lastName: 'Christiani',
 			email: userEmail,
 			password: userPassword,
-			admin: true
+			admin: true,
+			first_sign_up: true
 		};
 		models.user(userModel).save((err) => {
 			if(err) {
@@ -35,7 +39,7 @@ describe("User", () => {
 		user.createUser({
 			params:{},
 			body:  {
-				emails: 'test@test.com'
+				emails: 'ryan@hackeryou.com'
 			}
 		}, {
 			send(data) {
@@ -51,7 +55,7 @@ describe("User", () => {
 		user.createUser({
 			params: {},
 			body: {
-				emails: 'test@hackeryou.com,ryan@hackeryou.com'
+				emails: 'ryan@hackeryou.com,ryan@hackeryou.com'
 			}
 		}, {
 			send(data) {

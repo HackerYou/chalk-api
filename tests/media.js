@@ -41,7 +41,12 @@ describe('Media', () => {
 			.end((err,res) => {
 				expect(res.body.media).to.be.an('array');
 				expect(res.body.media).to.have.length(0);
-				done();
+				request
+					.get('/v1/media')
+					.end((err,res) => {
+						expect(res.body.media).to.have.length(0);
+						done();
+					})
 			});
 	});
 });

@@ -80,8 +80,22 @@ media.removeFile = (req,res) => {
 			});
 			return;
 		}
-		res.send({
-			media: []
+		models.media.findOne({name:key}, (err,doc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+			}
+			doc.remove((err) => {
+				if(err) {
+					res.send({
+						error: err
+					})
+				}
+				res.send({
+					media: []
+				});			
+			});
 		});
 	});
 };

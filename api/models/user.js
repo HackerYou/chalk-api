@@ -13,7 +13,8 @@ let model = {
 	password: String,
 	courses: [{type: String, ref: 'Course'}],
 	updated_at: Number,
-	created_at: Number
+	created_at: Number,
+	first_sign_up: Boolean
 };
 
 let userSchema = new Schema(model);

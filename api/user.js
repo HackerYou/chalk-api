@@ -6,9 +6,10 @@ let bcrypt = require('bcryptjs');
 let config = require('../config.js');
 let jwt = require('jsonwebtoken');
 let mandrill = require('mandrill-api');
+let mandrill_client = new mandrill.Mandrill(config.mandrillKey);
 
 let simplePassword = (length) => {
-	let chars = 'abcdefghijklmnopqrstuvwxyz01234567890!@#$%^&*()';
+	let chars = 'abcdefghijklmnopqrstuvwxyz01234567890';
 	let password = '';
 
 	for(let i = 0; i < length; i++) {
@@ -25,7 +26,6 @@ let sendEmail = (templateName,options) => {
 			"from_name": "HackerYou",
 			"to": [{
 				"email": options.email,
-				"name": options.firstName + ' ' + options.lastName,
 				"type": "to"
 			}]
 		},
@@ -43,25 +43,34 @@ let sendEmail = (templateName,options) => {
 				"content" : options.url
 			}
 		],
-		templateName: templateName
+		templateName: config.mandrillTemplate.signup
 	};
 	return new Promise((resolve, reject) => {
-		mandrill.messages.sendTemplate({
-			"template_name" : email.templateName,
-			"template_content" : email.messageContent,
-			"message": email.message,
+		mandrill_client.messages.sendTemplate({
+			"template_name" : emailOptions.templateName,
+			"template_content" : emailOptions.messageContent,
+			"message": emailOptions.message,
 			"async": false,
 			"ip_pool": 'Main Pool'
 		}, 
 		function(result) {
 			if(result[0].status === 'sent') {
-				resolve('Email Sent');
+				resolve({
+					status: 'success',
+					message: 'Email Sent'
+				});
 			}
 			else {
-				reject('Error', result[0].reject_reason);
+				reject({
+					status: 'failed',
+					message: `Error ${result[0].reject_reason}`
+				});
 			}
 		}, function(err) {
-			console.log(err);
+			reject({
+				status: 'failed',
+				message: err
+			});
 		});	
 	});
 };
@@ -69,7 +78,6 @@ let sendEmail = (templateName,options) => {
 user.createUser = (req,res) => {
 	let emails = req.body.emails;
 	emails = emails.split(',');
-
 	let users = emails.map((email) => {
 		let password = simplePassword(10);
 		let model = {
@@ -77,9 +85,18 @@ user.createUser = (req,res) => {
 			password: (() => {
 				return bcrypt.hashSync(password,10);
 			})(),
-			created_at: +new Date()
+			created_at: +new Date(),
+			first_sign_up: true
 		};
-		return new models.user(model).save();
+	 	return sendEmail('hackeryou-chalk-signup',{
+			email: email,
+			password: password,
+			url: config.site_url
+		}).then((data) => {
+			return new models.user(model).save();
+		}, (emailError) => {
+			console.log(emailError);
+		});
 	});
 	Promise.all(users).then((data) => {
 		res.send({
@@ -128,6 +145,9 @@ user.updateUser = (req,res) => {
 	let id = req.params.id;
 	let model = req.body;
 	model.updated_at = +new Date();
+	if(model.password !== undefined) {
+		model.password = bcrypt.hashSync(model.password, 10);
+	}
 	models.user.findOne({_id:id},(err,doc) => {
 		doc.update({$set: model.toObject()}, (err) =>{
 			if(err) {
