@@ -7,7 +7,8 @@ let media = require('../api/media.js');
 let request = require('supertest')('http://localhost:3200');
 
 
-describe('Media', () => {
+describe('Media', function() {
+	this.timeout(0);
 	let fileName;
 	it('should upload a file', (done) => {
 		request
