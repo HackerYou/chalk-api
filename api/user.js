@@ -145,11 +145,13 @@ user.updateUser = (req,res) => {
 	let id = req.params.id;
 	let model = req.body;
 	model.updated_at = +new Date();
+	model.first_sign_up = false;
 	if(model.password !== undefined) {
 		model.password = bcrypt.hashSync(model.password, 10);
 	}
 	models.user.findOne({_id:id},(err,doc) => {
-		doc.update({$set: model.toObject()}, (err) =>{
+
+		doc.update({$set: model}, (err) =>{
 			if(err) {
 				res.send({
 					error: err
