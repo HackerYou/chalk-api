@@ -21,7 +21,7 @@ let simplePassword = (length) => {
 let sendEmail = (templateName,options) => {
 	let emailOptions = {
 		message : {
-			"subject": "Welcome to HackerYou!",
+			"subject": options.subject,
 			"from_email": "info@hackeryou.com",
 			"from_name": "HackerYou",
 			"to": [{
@@ -43,7 +43,7 @@ let sendEmail = (templateName,options) => {
 				"content" : options.url
 			}
 		],
-		templateName: config.mandrillTemplate.signup
+		templateName: templateName
 	};
 	return new Promise((resolve, reject) => {
 		mandrill_client.messages.sendTemplate({
@@ -88,10 +88,11 @@ user.createUser = (req,res) => {
 			created_at: +new Date(),
 			first_sign_up: true
 		};
-	 	return sendEmail('hackeryou-chalk-signup',{
+	 	return sendEmail(config.mandrillTemplate.signup,{
 			email: email,
 			password: password,
-			url: config.site_url
+			url: config.site_url,
+			subject: 'Welcome to HackerYou!'
 		}).then((data) => {
 			return new models.user(model).save();
 		}, (emailError) => {
@@ -171,6 +172,46 @@ user.updateUser = (req,res) => {
 					}
 				});
 			}
+		});
+	});
+};
+
+user.resetPassword = (req,res) => {
+	let email = req.params.email;
+
+	models.user.findOne({email:email}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		let tempPass = simplePassword(10);
+		sendEmail(config.mandrillTemplate.forgotpassword,{
+			email: doc.email,
+			password: tempPass,
+			url: config.site_url,
+			subject: 'Password reset!'
+		}).then((data) => {
+			doc.password = bcrypt.hashSync(tempPass,10);
+			doc.first_sign_up = true;
+			doc.save((err) => {
+				if(err) {
+					res.send({
+						error: err
+					});
+					return;
+				}
+				res.send({
+					status: 'success',
+					message: 'Email Sent'
+				});
+			});
+		}, (emailError) => {
+			res.send({
+				status: 'failed',
+				message: emailError.message
+			});
 		});
 	});
 };

@@ -116,6 +116,22 @@ describe("User", function() {
 		});
 	});
 
+	it('should send a reset password', (done) => {
+		user.resetPassword({
+			params: {
+				email: 'ryan@hackeryou.com'
+			},
+			body: {}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.status).to.be.eql('success');
+				expect(data.message).to.be.eql('Email Sent');
+				done();
+			}
+		});
+	});
+
 	it('should remove a user', (done) => {
 		user.removeUser({
 			params: {
