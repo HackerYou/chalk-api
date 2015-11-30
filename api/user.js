@@ -5,6 +5,8 @@ let models = require('./models/index.js');
 let bcrypt = require('bcryptjs');
 let config = require('../config.js');
 let jwt = require('jsonwebtoken');
+let mandrill = require('mandrill-api');
+
 let simplePassword = (length) => {
 	let chars = 'abcdefghijklmnopqrstuvwxyz01234567890!@#$%^&*()';
 	let password = '';
@@ -13,6 +15,55 @@ let simplePassword = (length) => {
 		password += chars.charAt(Math.floor(Math.random() * chars.length));
 	}
 	return password;
+};
+
+let sendEmail = (templateName,options) => {
+	let emailOptions = {
+		message : {
+			"subject": "Welcome to HackerYou!",
+			"from_email": "info@hackeryou.com",
+			"from_name": "HackerYou",
+			"to": [{
+				"email": options.email,
+				"name": options.firstName + ' ' + options.lastName,
+				"type": "to"
+			}]
+		},
+		messageContent : [
+			{
+				"name": "email",
+				"content": options.email
+			},
+			{
+				"name" : "password",
+				"content" : options.password
+			},
+			{
+				"name" : "url",
+				"content" : options.url
+			}
+		],
+		templateName: templateName
+	};
+	return new Promise((resolve, reject) => {
+		mandrill.messages.sendTemplate({
+			"template_name" : email.templateName,
+			"template_content" : email.messageContent,
+			"message": email.message,
+			"async": false,
+			"ip_pool": 'Main Pool'
+		}, 
+		function(result) {
+			if(result[0].status === 'sent') {
+				resolve('Email Sent');
+			}
+			else {
+				reject('Error', result[0].reject_reason);
+			}
+		}, function(err) {
+			console.log(err);
+		});	
+	});
 };
 
 user.createUser = (req,res) => {
