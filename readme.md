@@ -11,3 +11,6 @@ When running this in development use `nodemon`.
 ###Tests
 Should test with supertest to test the actual endpoints as apposed to methods. 
 
+###TODO
+In `v2` make API follow [`json:api`](http://jsonapi.org/) spec, to make it more adaptable to future clients. It will create a standardized interface.
+

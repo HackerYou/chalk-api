@@ -25,6 +25,16 @@ describe('Media', () => {
 			});
 	});
 
+	it('should return all files', (done) => {
+		request
+			.get('/v1/media')
+			.end((err,res) => {
+				expect(res.body.media).to.be.an('object');
+				expect(res.body.media).to.have.length(1);
+				done();
+			});
+	});
+
 	it('should remove a file', (done) => {
 		request
 			.delete('/v1/media/' + fileName )

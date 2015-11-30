@@ -57,7 +57,6 @@ app.delete('/v1/topic/:topicId',routeAuth,api.topic.removeTopic);
 app.put('/v1/topic/:topicId/exercise/:exerciseId',routeAuth,api.topic.addExercise);
 app.delete('/v1/topic/:topicId/exercise/:exerciseId',routeAuth,api.topic.removeExercise);
 
-
 //Exercises
 app.get('/v1/exercise',routeAuth,api.exercise.getExercises);
 app.post('/v1/exercise',routeAuth,api.exercise.createExercise);
@@ -89,7 +88,6 @@ app.put('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.ad
 app.delete('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.removeLesson);
 app.post('/v1/course/:courseId/section/',routeAuth,api.course.addSection);
 
-
 //Announcements
 app.post('/v1/announcement',routeAuth,api.announcement.createAnnouncement);
 app.get('/v1/announcement',routeAuth,api.announcement.getAnnouncements);
@@ -106,6 +104,7 @@ app.put('/v1/user/:id',routeAuth,api.user.updateUser);
 app.delete('/v1/user/:id',routeAuth,api.user.removeUser);
 
 //Media
+app.get('/v1/media',api.media.getFiles);
 app.post('/v1/media',api.media.uploadFile);
 app.delete('/v1/media/:key',api.media.removeFile);
 

@@ -33,7 +33,7 @@ topic.getTopics = (req,res) => {
 				topic: docs
 			});
 		}
-	});
+	}).sort({created_at: 1});
 };
 
 topic.getTopic = (req,res) => {
