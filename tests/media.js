@@ -8,7 +8,7 @@ let request = require('supertest')('http://localhost:3200');
 
 
 describe('Media', function() {
-	this.timeout(0);
+	this.timeout(6000);
 	let fileName;
 	it('should upload a file', (done) => {
 		request
@@ -16,6 +16,7 @@ describe('Media', function() {
 			.attach('image', __dirname + '/imgs/unnamed.png')
 			.end((err,res) => {
 				let data = res.body.media;
+				console.log(res.body);
 				if(err) {
 					throw err;
 				}

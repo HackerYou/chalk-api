@@ -173,7 +173,6 @@ describe('Courses', () => {
 					body: {}
 				}, {
 					send(data) {
-						console.log(data);
 						expect(data.course.sections).to.be.an('array');
 						expect(data.course.sections[0]).to.be.an('object');
 						done();
