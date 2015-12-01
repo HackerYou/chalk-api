@@ -178,7 +178,6 @@ user.updateUser = (req,res) => {
 
 user.resetPassword = (req,res) => {
 	let email = req.params.email;
-
 	models.user.findOne({email:email}, (err,doc) => {
 		if(err) {
 			res.send({
