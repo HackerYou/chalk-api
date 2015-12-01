@@ -197,6 +197,34 @@ course.addSection = (req,res) => {
 	});
 };
 
+course.removeSection = (req,res) => {
+	let courseId = req.params.courseId;
+	let sectionId = req.params.sectionId;
+
+	models.course.findOne({_id:courseId},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		let sectionIndex = doc.sections.indexOf(sectionId);
+		doc.sections.splice(sectionIndex,1);
+		doc.save((err,newDoc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+				return;
+			}
+			res.send({
+				course: doc
+			});
+		});
+ 
+	});
+};
+
 course.addLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let sectionId = req.params.sectionId;

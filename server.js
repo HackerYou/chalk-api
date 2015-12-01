@@ -84,9 +84,10 @@ app.post('/v1/course',routeAuth,api.course.createCourse);
 app.get('/v1/course/:id',routeAuth,api.course.getCourse);
 app.put('/v1/course/:id',routeAuth,api.course.updateCourse);
 app.delete('/v1/course/:id',routeAuth,api.course.removeCourse);
+app.post('/v1/course/:courseId/section/',routeAuth,api.course.addSection);
+app.delete('/v1/course/:courseId/section/:sectionId',routeAuth,api.course.removeSection);
 app.put('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.addLesson);
 app.delete('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.removeLesson);
-app.post('/v1/course/:courseId/section/',routeAuth,api.course.addSection);
 
 //Announcements
 app.post('/v1/announcement',routeAuth,api.announcement.createAnnouncement);
@@ -102,6 +103,7 @@ app.get('/v1/user',routeAuth,api.user.getUsers)
 app.get('/v1/user/:id',routeAuth,api.user.getUser);
 app.put('/v1/user/:id',routeAuth,api.user.updateUser);
 app.delete('/v1/user/:id',routeAuth,api.user.removeUser);
+app.put('/v1/user/reset/:email',api.user.resetPassword);
 
 //Media
 app.get('/v1/media',api.media.getFiles);

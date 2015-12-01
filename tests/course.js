@@ -188,7 +188,7 @@ describe('Courses', () => {
 		});
 	});
 
-	it('should remove a lesson', (done) => {
+	it('should remove a lesson from a section', (done) => {
 		course.removeLesson({
 			params: {
 				lessonId: lessonId,
@@ -198,6 +198,22 @@ describe('Courses', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.section.lessons).to.have.length(0);
+				done();
+			}
+		});
+	});
+
+	it('should remove a section', (done) => {
+		course.removeSection({
+			params: {
+				courseId: mockCourse._id,
+				sectionId: sectionId
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.course.sections).to.be.an('array');
+				expect(data.course.sections).to.have.length(0);
 				done();
 			}
 		});
