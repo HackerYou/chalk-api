@@ -135,7 +135,6 @@ describe('Courses', () => {
 		course.getCourse({params: { id: mockCourse._id } }, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.course.length).to.be.eql(1);
 				done();
 			}
 		});
@@ -167,7 +166,19 @@ describe('Courses', () => {
 			send(data) {
 				sectionId = data.course.sections[0];
 				expect(data.course.sections).to.have.length(1);
-				done();
+				course.getCourse({
+					params: {
+						id: mockCourse._id
+					},
+					body: {}
+				}, {
+					send(data) {
+						console.log(data);
+						expect(data.course.sections).to.be.an('array');
+						expect(data.course.sections[0]).to.be.an('object');
+						done();
+					}
+				});
 			}
 		});
 	});
