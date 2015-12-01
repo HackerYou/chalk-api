@@ -106,9 +106,9 @@ app.delete('/v1/user/:id',routeAuth,api.user.removeUser);
 app.put('/v1/user/reset/:email',api.user.resetPassword);
 
 //Media
-app.get('/v1/media',api.media.getFiles);
-app.post('/v1/media',api.media.uploadFile);
-app.delete('/v1/media/:key',api.media.removeFile);
+app.get('/v1/media',routeAuth,api.media.getFiles);
+app.post('/v1/media',routeAuth,api.media.uploadFile);
+app.delete('/v1/media/:key',routeAuth,api.media.removeFile);
 
 app.listen('3200');
 console.log('App listening on port 3200');

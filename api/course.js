@@ -115,7 +115,7 @@ course.getCourses = (req,res) => {
 
 course.getCourse = (req,res) => {
 	let id = req.params.id;
-	models.course.find({_id:id}, {'__v': 0},(err,doc) => {
+	models.course.findOne({_id:id}, {'__v': 0},(err,doc) => {
 		if(err) {
 			res.send({
 				error: err
