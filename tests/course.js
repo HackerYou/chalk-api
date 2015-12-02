@@ -193,6 +193,7 @@ describe('Courses', () => {
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('section');
 				expect(data.section.lessons).to.have.length(1);
+				expect(data.section.lessons[0]).to.be.an('object');
 				done();
 			}
 		});

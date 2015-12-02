@@ -254,8 +254,10 @@ course.addLesson = (req,res) => {
 					});
 				}
 				else {
-					res.send({
-						section: doc
+					models.section.populate(doc,{path:'lessons'},(err, sectionWLesson) => {
+						res.send({
+							section: sectionWLesson
+						});
 					});
 				}
 			});
