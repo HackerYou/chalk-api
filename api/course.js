@@ -2,6 +2,7 @@
 
 let course = {};
 let models = require('./models/index.js');
+let user = require('./user.js');
 //TODO: Some duplication in methods
 //Maybe we don't need a method for courses and templates
 //Some required, not all.
@@ -285,6 +286,47 @@ course.removeLesson = (req,res) => {
 				});
 			})
 		}
+	});
+};
+
+course.addUser = (req,res) => {
+	let userId = req.params.userId;
+	let courseId = req.params.courseId;
+
+	models.course.findOne({_id: courseId},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		doc.students.push(userId);
+		doc.save((err) => {
+			if(err) {
+				res.send({
+					error: err
+				})
+				return;
+			}
+			user.addCourse(userId, courseId).then((res) => {
+				models.course.populate(doc, {path: 'students'},(err,courseWStudents) => {
+					if(err) {
+						res.send({
+							error: err
+						});
+						return;
+					}
+					res.send({
+						course: courseWStudents
+					});
+				});
+			},(err) => {
+				res.send({
+					error: err
+				});
+			});
+		});
+
 	});
 };
 

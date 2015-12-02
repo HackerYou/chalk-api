@@ -82,14 +82,16 @@ lesson.updateLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let model = req.body;
 	model.updated_at = +new Date();	
-	model.topics = model.topics.map((topic) => {
-		if(topic._id) {
-			return topic._id;
-		}
-		else {
-			return topic;
-		}
-	});
+	if(model.topics !== undefined) {
+		model.topics = model.topics.map((topic) => {
+			if(topic._id) {
+				return topic._id;
+			}
+			else {
+				return topic;
+			}
+		});
+	}
 	models.lesson.findOne({_id:lessonId}, (err,olddoc) => {
 		if(err) {
 			res.send({
