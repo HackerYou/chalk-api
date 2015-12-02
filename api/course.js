@@ -71,7 +71,7 @@ course.getTemplate = (req,res) => {
 				course: doc
 			});
 		}
-	}).populate('lessons');
+	}).populate('sections');
 };
 
 course.updateTemplate = (req,res) => {
@@ -254,8 +254,10 @@ course.addLesson = (req,res) => {
 					});
 				}
 				else {
-					res.send({
-						section: doc
+					models.section.populate(doc,{path:'lessons'},(err, sectionWLesson) => {
+						res.send({
+							section: sectionWLesson
+						});
 					});
 				}
 			});
