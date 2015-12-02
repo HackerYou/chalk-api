@@ -90,7 +90,7 @@ describe('Topics', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.topic.exercises).to.have.length(1);
-				expect(data.topic.exercises[0].toString()).to.be.a('string');
+				expect(data.topic.exercises[0]).to.be.an('object');
 				models.exercise.findOne({_id:data.topic.exercises[0]}, (err,doc) => {
 					expect(doc.topics).to.have.length(1)
 					done();

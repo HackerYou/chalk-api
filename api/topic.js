@@ -158,8 +158,16 @@ topic.addExercise = (req,res) => {
 						});
 					}
 					else {
-						res.send({
-							topic: newDoc
+						models.topic.populate(newDoc,{path: 'exercises'},(err,exerciseDoc) => {
+							if(err) {
+								res.send({
+									error: err
+								});
+								return;
+							}
+							res.send({
+								topic: exerciseDoc
+							});
 						});
 					}
 				});
