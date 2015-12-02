@@ -284,6 +284,25 @@ user.authenticate = (req,res) => {
 	});
 };
 
+user.addCourse = (userId, courseId) => {
+	return new Promise((resolve,reject) => {
+		models.user.find({_id:userId},(err,doc) =>{
+			if(err){
+				reject(err);
+				return;
+			}
+			doc.courses.push(courseId);
+			doc.save((err) => {
+				if(err) {
+					reject(err);
+					return;
+				}
+				resolve();
+			});
+
+		});
+	});
+};
 
 
 module.exports = user;

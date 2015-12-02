@@ -33,19 +33,6 @@ describe('Courses', () => {
 
 
 	it('should create a template', (done) => {
-		// request
-		// 	.post('/v1/course/template')
-		// 	.send({
-		// 		"title": "New Template"
-		// 	})
-		// 	.end((err,res) => {
-		// 		if(err) {
-		// 			throw err;
-		// 		}
-		// 		res.to.be.an('object');
-		// 		res.course.template.to.be(true);
-		// 		done();
-		// 	});
 		course.createTemplate({
 			body: {
 				"title": "New Template"
@@ -152,6 +139,25 @@ describe('Courses', () => {
 				done();
 			}
 		});
+	});
+
+	it('should add a user to a course', (done) => {
+		course.addUser({
+			params: {
+				userId: '',
+				courseId: ''
+			},
+			body: {}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				done();
+			}
+		})
+	});
+
+	it('should remove a user from a course', (done) => {
+		done();
 	});
 
 	it('should add a section', (done) => {
