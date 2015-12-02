@@ -208,6 +208,7 @@ describe('Courses', () => {
 				expect(data.section.lessons[0]).to.be.an('object');
 				course.getCourse({params: { id: mockCourse._id } }, {
 					send(data) {
+						console.log(data);
 						expect(data.course.sections).to.be.an('array');
 						expect(data.course.sections[0].lessons).to.be.an('array');
 						expect(data.course.sections[0].lessons[0]).to.be.an('object');
