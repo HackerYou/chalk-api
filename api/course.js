@@ -71,7 +71,7 @@ course.getTemplate = (req,res) => {
 				course: doc
 			});
 		}
-	}).populate('lessons');
+	}).populate('sections');
 };
 
 course.updateTemplate = (req,res) => {
