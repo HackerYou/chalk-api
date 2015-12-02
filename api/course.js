@@ -123,11 +123,32 @@ course.getCourse = (req,res) => {
 			});
 		}
 		else {
-			res.send({
-				course: doc
+			models.course.populate(doc,{
+				path: 'sections students',
+			},(err,populatedDocs) => {
+				if(err) {
+					res.send({
+						error: err
+					});
+					return;
+				}
+				models.section.populate(populatedDocs.sections,{
+					path: 'lessons'
+				},(err,populatedLesson) => {
+					if(err) {
+						res.send({
+							error: err
+						});
+						return;
+					}
+					res.send({
+						course: populatedDocs
+					});
+				});
+				
 			});
 		}
-	}).populate('sections students');
+	});
 };
 
 course.updateCourse = (req,res) => {
