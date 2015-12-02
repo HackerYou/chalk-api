@@ -189,8 +189,17 @@ course.addSection = (req,res) => {
 		models.course.findOne({_id: courseId},{__v:0},(err,doc) => {
 			doc.sections.push(sectionDoc._id);
 			doc.save((err, savedDoc) => {
-				res.send({
-					course: savedDoc
+				models.section.populate(savedDoc, {path: 'sections'}, (err,courseWSections) => {
+					if(err) {
+						res.send({
+							error: err
+						});
+						return;
+					}
+					res.send({
+						course: savedDoc
+					});
+
 				});
 			});
 		});

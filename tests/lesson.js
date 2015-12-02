@@ -98,6 +98,7 @@ describe('Lessons', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.lesson.topics).to.have.length(1);
+				expect(data.lesson.topics[0]).to.be.an('object');
 				done();
 			}
 		});

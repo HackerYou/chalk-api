@@ -134,8 +134,10 @@ lesson.addTopic = (req,res) => {
 			topic.addLesson(topicId,lessonId).then((result) => {
 				lesson.topics.push(topicId);
 				lesson.save((err,doc) => {
-					res.send({
-						lesson: doc
+					models.lesson.populate(doc,{path: 'topics'},(err,lessonWTopics) => {
+						res.send({
+							lesson: lessonWTopics
+						});
 					});
 				});
 			});
