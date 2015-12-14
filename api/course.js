@@ -330,8 +330,8 @@ course.removeLesson = (req,res) => {
 };
 
 course.addUser = (req,res) => {
-	let userId = req.params.userId;
 	let courseId = req.params.courseId;
+	let emails = req.body.emails;
 
 	models.course.findOne({_id: courseId},(err,doc) => {
 		if(err) {
@@ -340,16 +340,84 @@ course.addUser = (req,res) => {
 			});
 			return;
 		}
-		doc.students.push(userId);
+		if(!doc.students) {
+			doc.students = [];
+		}
+
+		let users = emails.split(',').map((email) => {
+			return new Promise((resolve,reject) => {
+				models.user.findOne({email: email}, (err,user) => {
+					if(user) {
+						doc.students.push(user._id);
+						resolve(user._id);
+					}
+					else {
+						user.createUser(email).then(data => {
+							doc.students.push(data.students);
+							resolve(data.students[0]);
+						});
+					}
+				});
+			});
+		});
+
+		Promise.all(users).then(data => {
+			doc.save((err) => {
+				if(err) {
+					res.send({
+						error: err
+					})
+					return;
+				}
+				let students = data.map((student) => {
+					return user.addCourse(student,courseId);
+				});
+				Promise.all(students).then((data) => {
+					models.course.populate(doc, {path: 'students', select: 'firstName lastName email'},(err,courseWStudents) => {
+						if(err) {
+							res.send({
+								error: err
+							});
+							return;
+						}
+						res.send({
+							course: courseWStudents
+						});
+					});
+				},(err) => {
+					res.send({
+						error: err
+					});
+				});
+			});
+		});
+	});
+};
+
+course.removeUser = (req,res) => {
+	let userId = req.params.userId;
+	let courseId = req.params.courseId;
+
+	models.course.findOne({_id: courseId}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		let studentIndex = doc.students.indexOf(userId);
+		doc.students.splice(studentIndex,1);
 		doc.save((err) => {
 			if(err) {
 				res.send({
 					error: err
-				})
+				});
 				return;
 			}
-			user.addCourse(userId, courseId).then((res) => {
-				models.course.populate(doc, {path: 'students'},(err,courseWStudents) => {
+			models.course.populate(
+				doc, 
+				{path: 'students', select: 'firstName lastName email'}, 
+				(err,courseWStudents) => {
 					if(err) {
 						res.send({
 							error: err
@@ -360,13 +428,7 @@ course.addUser = (req,res) => {
 						course: courseWStudents
 					});
 				});
-			},(err) => {
-				res.send({
-					error: err
-				});
-			});
 		});
-
 	});
 };
 

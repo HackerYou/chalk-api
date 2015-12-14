@@ -88,6 +88,8 @@ app.post('/v1/course/:courseId/section/',routeAuth,api.course.addSection);
 app.delete('/v1/course/:courseId/section/:sectionId',routeAuth,api.course.removeSection);
 app.put('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.addLesson);
 app.delete('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth,api.course.removeLesson);
+app.post('/v1/course/:courseId/user',routeAuth,api.course.addUser);
+app.delete('/v1/course/:courseId/user/:userId',routeAuth,api.course.removeUser);
 
 //Announcements
 app.post('/v1/announcement',routeAuth,api.announcement.createAnnouncement);

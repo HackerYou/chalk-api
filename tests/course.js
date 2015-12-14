@@ -146,25 +146,43 @@ describe('Courses', () => {
 		});
 	});
 
-	// it('should add a user to a course', (done) => {
-	// 	course.addUser({
-	// 		params: {
-	// 			userId: user._id,
-	// 			courseId: mockCourse._id
-	// 		},
-	// 		body: {}
-	// 	}, {
-	// 		send(data) {
-	// 			expect(data).to.be.an('object');
-	// 			expect(data.course.students).to.have.length(1)
-	// 			done();
-	// 		}
-	// 	})
-	// });
+	it('should add a user to a course', (done) => {
+		course.addUser({
+			params: {
+				courseId: mockCourse._id,
+			},
+			body: {
+				emails: 'ryan@hackeryou.com'
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.course.students).to.have.length(1)
+				expect(data.course.students[0]).to.not.have.key('password');
+				done();
+			}
+		})
+	});
 
-	// it('should remove a user from a course', (done) => {
-	// 	done();
-	// });
+	it('should remove a user from a course', (done) => {
+		models.course.findOne({_id: mockCourse._id}, (err,doc) => {
+			let student = doc.students[0];
+			course.removeUser({
+				params: {
+					userId: student._id,
+					courseId: mockCourse._id
+				},
+				body: {}
+			}, {
+				send(data) {
+					expect(data).to.be.an('object');
+					expect(data.course.students).to.be.an('array');
+					expect(data.course.students).to.have.length(0); 
+					done();
+				}
+			});
+		});
+	});
 
 	it('should add a section', (done) => {
 		course.addSection({
@@ -208,7 +226,6 @@ describe('Courses', () => {
 				expect(data.section.lessons[0]).to.be.an('object');
 				course.getCourse({params: { id: mockCourse._id } }, {
 					send(data) {
-						console.log(data);
 						expect(data.course.sections).to.be.an('array');
 						expect(data.course.sections[0].lessons).to.be.an('array');
 						expect(data.course.sections[0].lessons[0]).to.be.an('object');
