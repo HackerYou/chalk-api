@@ -315,6 +315,19 @@ user.addCourse = (id, courseId) => {
 	});
 };
 
+user.getInstructors = (req,res) => {
+	models.user.find({instructor: true}, {__v:0, password: 0},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+		}
+		res.send({
+			user: doc
+		});
+	});
+};
+
 
 module.exports = user;
 

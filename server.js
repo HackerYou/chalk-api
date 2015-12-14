@@ -106,6 +106,7 @@ app.get('/v1/user/:id',routeAuth,api.user.getUser);
 app.put('/v1/user/:id',routeAuth,api.user.updateUser);
 app.delete('/v1/user/:id',routeAuth,api.user.removeUser);
 app.put('/v1/user/reset/:email',api.user.resetPassword);
+app.get('/v1/user/instructor',routeAuth,api.user.getInstructors);
 
 //Media
 app.get('/v1/media',routeAuth,api.media.getFiles);
