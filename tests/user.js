@@ -36,7 +36,7 @@ describe("User", function() {
 		done();
 	});
 	it('should create a user', (done) => {
-		user.createUser({
+		user.addUser({
 			params:{},
 			body:  {
 				emails: 'ryan@hackeryou.com'
@@ -52,7 +52,7 @@ describe("User", function() {
 	});
 
 	it('should add multiple users', (done) => {
-		user.createUser({
+		user.addUser({
 			params: {},
 			body: {
 				emails: 'ryan@hackeryou.com,ryan@hackeryou.com'
@@ -62,6 +62,7 @@ describe("User", function() {
 				expect(data).to.be.an('object');
 				expect(data.message).to.be.eql('success');
 				expect(data.usersAdded).to.be.eql(2);
+				expect(data.students).to.have.length(2);
 				done();
 			}
 		});

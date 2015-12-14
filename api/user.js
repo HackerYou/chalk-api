@@ -75,8 +75,7 @@ let sendEmail = (templateName,options) => {
 	});
 };
 
-user.createUser = (req,res) => {
-	let emails = req.body.emails;
+user.createUser = (emails) => {
 	emails = emails.split(',');
 	let users = emails.map((email) => {
 		let password = simplePassword(10);
@@ -99,10 +98,19 @@ user.createUser = (req,res) => {
 			console.log(emailError);
 		});
 	});
-	Promise.all(users).then((data) => {
+	return users;
+};
+
+user.addUser = (req,res) => {
+	let emails = req.body.emails;
+	Promise.all(user.createUser(emails)).then((data) => {
+		let students = data.map((student) => {
+			return student._id;
+		});
 		res.send({
 			message: 'success',
-			usersAdded: data.length 
+			usersAdded: students.length,
+			students: students
 		});
 	},(err) => {
 		res.send({
@@ -284,12 +292,15 @@ user.authenticate = (req,res) => {
 	});
 };
 
-user.addCourse = (userId, courseId) => {
+user.addCourse = (id, courseId) => {
 	return new Promise((resolve,reject) => {
-		models.user.find({_id:userId},(err,doc) =>{
+		models.user.findOne({_id:id},(err,doc) =>{
 			if(err){
 				reject(err);
 				return;
+			}
+			if(!doc.courses) {
+				doc.courses = [];
 			}
 			doc.courses.push(courseId);
 			doc.save((err) => {

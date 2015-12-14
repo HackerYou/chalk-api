@@ -10,7 +10,9 @@ let model = Object.assign({
 	term: String,
 	instructor: String,
 	description: String,
-	students: [{type: String, ref: 'User'}]
+	students: [{type: String, ref: 'User'}],
+	start_date: Number,
+	end_date: Number
 }, mixin);
 
 let courseSchema = new Schema(model);
