@@ -100,7 +100,7 @@ app.delete('/v1/announcement/:id',routeAuth,api.announcement.removeAnnouncement)
 
 //Users
 app.get('/v1/user/authenticate',api.user.authenticate);
-app.post('/v1/user',routeAuth,api.user.createUser);
+app.post('/v1/user',routeAuth,api.user.addUser);
 app.get('/v1/user',routeAuth,api.user.getUsers)
 app.get('/v1/user/:id',routeAuth,api.user.getUser);
 app.put('/v1/user/:id',routeAuth,api.user.updateUser);
