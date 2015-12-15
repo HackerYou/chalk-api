@@ -120,7 +120,9 @@ user.addUser = (req,res) => {
 };
 
 user.getUsers = (req,res) => {
-	models.user.find({},{password:0,__v:0},(err,docs) => {
+	let query = req.query ? req.query: {};
+
+	models.user.find(query,{password:0,__v:0},(err,docs) => {
 		if(err) {
 			res.send({
 				error: err
@@ -136,6 +138,7 @@ user.getUsers = (req,res) => {
 
 user.getUser = (req,res) => {
 	let id = req.params.id;
+
 	models.user.findOne({_id:id},{__v:0,password:0},(err,doc) => {
 		if(err) {
 			res.send({
@@ -318,18 +321,14 @@ user.addCourse = (id, courseId) => {
 	});
 };
 
-user.getInstructors = (req,res) => {
-	models.user.find({instructor: true}, {__v:0, password: 0},(err,doc) => {
-		if(err) {
-			res.send({
-				error: err
-			});
-		}
-		res.send({
-			user: doc
-		});
-	});
-};
+
+
+// user.favoriteLesson = (req,res) => {
+// 	let lessonId = req.params.lessonId;
+// 	let courseId = req.params.courseId;
+// 	let userId = req.
+// 	models.
+// };
 
 
 module.exports = user;

@@ -123,12 +123,11 @@ app.delete('/v1/announcement/:id',routeAuth, adminRoute ,api.announcement.remove
 //Users
 app.get('/v1/user/authenticate',api.user.authenticate);
 app.post('/v1/user',routeAuth, adminRoute ,api.user.addUser);
-app.get('/v1/user',routeAuth,api.user.getUsers)
+app.get('/v1/user',routeAuth, instructorRoute ,api.user.getUsers)
 app.get('/v1/user/:id',routeAuth, adminRoute ,api.user.getUser);
 app.put('/v1/user/:id',routeAuth, adminRoute ,api.user.updateUser);
 app.delete('/v1/user/:id',routeAuth, adminRoute ,api.user.removeUser);
 app.put('/v1/user/reset/:email',api.user.resetPassword);
-app.get('/v1/user/instructor',routeAuth, adminRoute ,api.user.getInstructors);
 
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);
