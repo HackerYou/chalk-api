@@ -22,7 +22,8 @@ describe("User", function() {
 			email: userEmail,
 			password: userPassword,
 			admin: true,
-			first_sign_up: true
+			first_sign_up: true,
+			instructor: true
 		};
 		models.user(userModel).save((err) => {
 			if(err) {
@@ -113,6 +114,19 @@ describe("User", function() {
 				expect(data.user.updated_at).to.be.a('number');
 				done();
 
+			}
+		});
+	});
+
+	it('should get instructors', (done) => {
+		user.getInstructors({
+			params: {},
+			body: {}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.user[0].instructor).to.be.eql(true);
+				done();
 			}
 		});
 	});
