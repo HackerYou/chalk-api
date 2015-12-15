@@ -274,6 +274,9 @@ user.authenticate = (req,res) => {
 						name: `${doc.firstName} ${doc.lastName}`,
 						admin: (() => {
 							return doc.admin !== undefined ? doc.admin : false
+						})(),
+						instructor: (() => {
+							return doc.instructor !== undefined ? doc.instructor : false
 						})()
 					}, 
 					config.secret, 
