@@ -119,9 +119,11 @@ describe("User", function() {
 	});
 
 	it('should get instructors', (done) => {
-		user.getInstructors({
+		user.getUsers({
 			params: {},
-			body: {}
+			query: {
+				instructor: true
+			}
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
@@ -142,6 +144,21 @@ describe("User", function() {
 				expect(data).to.be.an('object');
 				expect(data.status).to.be.eql('success');
 				expect(data.message).to.be.eql('Email Sent');
+				done();
+			}
+		});
+	});
+
+	it('should favorite a lesson', (done) => {
+		user.favoriteLesson({
+			params: {
+				courseId: '',
+				lessonId: ''
+			},
+			body: {}
+		},{
+			send(data) {
+				expect(data).to.be.an('object');
 				done();
 			}
 		});
