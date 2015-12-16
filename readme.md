@@ -9,7 +9,8 @@ For information about the available endpoints check out the [wiki](https://githu
 When running this in development use `nodemon`.
 
 ###Tests
-Should test with supertest to test the actual endpoints as apposed to methods. 
+To run tests, make sure you have a `mongod` instance running and the `server.js` file. Start up script to come!
+
 
 ###TODO
 In `v2` make API follow [`json:api`](http://jsonapi.org/) spec, to make it more adaptable to future clients. It will create a standardized interface.
