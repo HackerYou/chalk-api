@@ -5,11 +5,15 @@ let user = require('../api/user.js');
 let mongoose = require('mongoose');
 let models = require('../api/models/index.js');
 let bcrypt = require('bcryptjs');
+let request = require('supertest')('http://localhost:3200');
 
 describe("User", function() {
 	let mockUser;
 	let password = 'test';
 	let userEmail = 'ryan@test.com';
+	let token;
+	let course;
+	let lesson;
 	//Emails take to long!
 	//Have to disable timeout
 	this.timeout(0);
@@ -30,6 +34,12 @@ describe("User", function() {
 				throw err;
 			}
 			done();
+		});
+		models.course.findOne({},(err,courseDoc) => {
+			course = courseDoc;
+			models.lesson.findOne({},(err,lessonDoc) => {
+				lesson = lessonDoc;
+			});
 		});
 	});
 	after((done) => {
@@ -149,21 +159,7 @@ describe("User", function() {
 		});
 	});
 
-	it('should favorite a lesson', (done) => {
-		user.favoriteLesson({
-			params: {
-				courseId: '',
-				lessonId: ''
-			},
-			body: {}
-		},{
-			send(data) {
-				expect(data).to.be.an('object');
-				done();
-			}
-		});
-	});
-
+	
 	it('should remove a user', (done) => {
 		user.removeUser({
 			params: {
@@ -190,6 +186,7 @@ describe("User", function() {
 			body: {}
 		}, {
 			send(data) {
+				token = data.token;
 				expect(data).to.be.an('object');
 				expect(data.success).to.be.eql(true);
 				expect(data.token).to.be.a('string');
@@ -197,6 +194,30 @@ describe("User", function() {
 			}
 		});
 	});
+
+	it('should favorite a lesson', (done) => {
+		request
+			.post(`/v1/user/course/${course._id}/lesson/${lesson._id}/favorite`)
+			.set('x-access-token', token)
+			.end((err, res) => {
+				expect(res.body.user).to.be.an('object');
+				expect(res.body.user.favorites).to.be.an('object');
+				expect(res.body.user.favorites[course._id].lessons[0]._id).to.be.eql(lesson._id.toString());
+				done();
+			});
+	});
+
+	it('should remove a favorite lesson', (done) => {
+		request
+			.delete(`/v1/user/course/${course._id}/lesson/${lesson._id}/favorite`)
+			.set('x-access-token', token)
+			.end((err,res) => {
+				expect(res.body.user).to.be.an('object');
+				expect(res.body.user.favorites[course._id].lessons).to.have.length(0);
+				done();
+			});
+	});
+
 
 	it('should not exist', (done) => {
 		user.authenticate({
