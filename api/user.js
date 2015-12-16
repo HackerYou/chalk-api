@@ -280,7 +280,8 @@ user.authenticate = (req,res) => {
 						})(),
 						instructor: (() => {
 							return doc.instructor !== undefined ? doc.instructor : false
-						})()
+						})(),
+						user_id: doc._id
 					}, 
 					config.secret, 
 					{
@@ -321,14 +322,90 @@ user.addCourse = (id, courseId) => {
 	});
 };
 
+user.favoriteLesson = (req,res) => {
+	let lessonId = req.params.lessonId;
+	let courseId = req.params.courseId;
+	let userId = req.decodedUser.user_id;
+	models.user.findOne({ _id: userId}, { password: 0,__v:0} , (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		if(!doc.favorites) {
+			doc.favorites = {};
+		}
+		if(!doc.favorites[courseId]) {
+			doc.favorites[courseId] = {
+				lessons: []
+			};
+		}
+		models.lesson.findOne({_id:lessonId},{__v:0,revisions: 0},(err,lessonDoc) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+				return;
+			}
 
+			doc.favorites[courseId].lessons.push(lessonDoc);
+			doc.save((err,newUser) => {
+				if(err) {
+					res.send({
+						error: err
+					});
+					return;
+				}
+				res.send({
+					user: newUser
+				});
+			});
+		});
+	});
+};
 
-// user.favoriteLesson = (req,res) => {
-// 	let lessonId = req.params.lessonId;
-// 	let courseId = req.params.courseId;
-// 	let userId = req.
-// 	models.
-// };
+user.removeFavoriteLesson = (req,res) => {
+	let lessonId = req.params.lessonId;
+	let courseId = req.params.courseId;
+	let userId = req.decodedUser.user_id;
+
+	models.user.findOne({_id: userId},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+
+		let lessonIndex = ((userDoc) => {
+			let index;
+			userDoc.favorites[courseId].lessons.forEach((lesson,i) => {
+				if(lesson._id === lessonId) {
+					index = i;
+				}
+			});
+			return index;
+		})(doc);
+
+		doc.favorites[courseId].lessons.splice(lessonIndex,1);
+		//Because it is a Mixed type you need to prompt mongoose 
+		//that it has changed
+		doc.markModified('favorites');
+		
+		doc.save((err,savedUser,affected) => {
+			if(err) {
+				res.send({
+					error: err
+				});
+				return;
+			}
+			res.send({
+				user: savedUser
+			});
+		});
+	});
+};
 
 
 module.exports = user;

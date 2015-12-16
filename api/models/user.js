@@ -14,7 +14,8 @@ let model = {
 	courses: [{type: String, ref: 'Course'}],
 	updated_at: Number,
 	created_at: Number,
-	first_sign_up: Boolean
+	first_sign_up: Boolean,
+	favorites: Schema.Types.Mixed
 };
 
 let userSchema = new Schema(model);
