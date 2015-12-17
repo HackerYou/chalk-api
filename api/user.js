@@ -350,6 +350,9 @@ user.favoriteLesson = (req,res) => {
 			}
 
 			doc.favorites[courseId].lessons.push(lessonDoc);
+
+			doc.markModified('favorites');
+			
 			doc.save((err,newUser) => {
 				if(err) {
 					res.send({
