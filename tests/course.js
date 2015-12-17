@@ -5,7 +5,7 @@ let models = require('../api/models/index.js');
 let course = require('../api/course.js');
 let lesson = require('../api/lesson.js');
 let mongoose = require('mongoose');
-let request = require('supertest');
+let request = require('supertest')('http://localhost:3200');
 
 
 describe('Courses', () => {
@@ -159,6 +159,7 @@ describe('Courses', () => {
 				expect(data).to.be.an('object');
 				expect(data.course.students).to.have.length(1)
 				expect(data.course.students[0]).to.not.have.key('password');
+
 				done();
 			}
 		})

@@ -143,9 +143,15 @@ course.getCourse = (req,res) => {
 			});
 		}
 		else {
-			models.course.populate(doc,{
-				path: 'sections students',
-			},(err,populatedDocs) => {
+			models.course.populate(doc,[
+				{
+					path: 'sections'
+				},
+				{
+					path: 'students',
+					select: 'firstName lastName email'
+				}
+			],(err,populatedDocs) => {
 				if(err) {
 					res.send({
 						error: err
