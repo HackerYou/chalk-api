@@ -384,7 +384,7 @@ user.removeFavoriteLesson = (req,res) => {
 		let lessonIndex = ((userDoc) => {
 			let index;
 			userDoc.favorites[courseId].lessons.forEach((lesson,i) => {
-				if(lesson._id === lessonId.toString()) {
+				if(lesson._id.toString() === lessonId.toString()) {
 					index = i;
 				}
 			});
