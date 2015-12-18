@@ -352,10 +352,10 @@ course.addUser = (req,res) => {
 
 		let users = emails.split(',').map((email) => {
 			return new Promise((resolve,reject) => {
-				models.user.findOne({email: email}, (err,user) => {
-					if(user) {
-						doc.students.push(user._id);
-						resolve(user._id);
+				models.user.findOne({email: email}, (err,userDoc) => {
+					if(userDoc) {
+						doc.students.push(userDoc._id);
+						resolve(userDoc._id);
 					}
 					else {
 						user.createUser(email).then(data => {
