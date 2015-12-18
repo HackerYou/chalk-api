@@ -56,13 +56,13 @@ function adminRoute(req,res,next) {
 };
 
 function instructorRoute(req,res,next) {
-	if(!req.decodedUser.admin || !req.decodedUser.instructor) {
+	if(req.decodedUser.admin || req.decodedUser.instructor) {
+		next();
+	}
+	else {
 		res.send({
 			message: 'You must be an admin or instructor user to access this route'
 		});
-	}
-	else {
-		next();
 	}
 }
  
