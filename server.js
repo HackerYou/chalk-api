@@ -6,6 +6,7 @@ let app = express();
 let api = require('./api/index.js');
 let jwt = require('jsonwebtoken');
 let config = require('./config.js');
+let helmet = require('helmet');
 
 app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,6 +15,8 @@ app.use(function(req, res, next) {
   	res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
     next();
 }); 
+
+app.use(helmet());
 
 app.use(bodyParser.json());
 
