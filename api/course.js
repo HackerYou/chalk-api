@@ -359,10 +359,10 @@ course.addUser = (req,res) => {
 						resolve(userDoc._id);
 					}
 					else {
-						// Else create new users and add to talk
+						// Else create new users and add to course
 						Promise.all( user.createUser(email) ).then(data => {
-							doc.students.push(data.students);
-							resolve(data.students[0]);
+							doc.students.push(data[0]._id);
+							resolve(data[0]._id);
 						});
 					}
 				});
