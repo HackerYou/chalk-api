@@ -78,6 +78,7 @@ let sendEmail = (templateName,options) => {
 user.createUser = (emails) => {
 	emails = emails.split(',');
 	let users = emails.map((email) => {
+		email = email.trim();
 		let password = simplePassword(10);
 		let model = {
 			email: email,
