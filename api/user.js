@@ -254,7 +254,7 @@ user.removeUser = (req,res) => {
 };	
 
 user.authenticate = (req,res) => {
-	let email = req.query.email;
+	let email = req.query.email.toLowerCase();
 	let password = req.query.password;
 
 	models.user.findOne({email:email},(err,doc) => {
@@ -286,7 +286,7 @@ user.authenticate = (req,res) => {
 					}, 
 					config.secret, 
 					{
-						expiresIn: "2 days"
+						expiresIn: "2 days"	
 					});
 					res.send({
 						success: true,
