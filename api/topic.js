@@ -22,6 +22,12 @@ topic.createTopic = (req,res) => {
 };
 
 topic.getTopics = (req,res) => {
+	let options = req.body;
+
+	options = Object.assign({
+		offset:0,
+		limit: 0 
+	}, options);
 	models.topic.find({},{'__v': 0}, (err,docs) => {
 		if(err) {
 			res.send({
@@ -29,11 +35,17 @@ topic.getTopics = (req,res) => {
 			});
 		}
 		else {
-			res.send({
-				topic: docs
+			models.topic.count((err,count) => {
+				res.send({
+					topic: docs,
+					totalCount: count
+				});
 			});
 		}
-	}).sort({created_at: 1});
+	})
+	.sort({created_at: 1})
+	.limit(options.limit)
+	.skip(options.offset);
 };
 
 topic.getTopic = (req,res) => {

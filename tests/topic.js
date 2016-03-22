@@ -47,6 +47,36 @@ describe('Topics', () => {
 		});
 	});
 
+	it('should return a paginated list of topics', (done) => {
+		topic.getTopics({
+			body: {
+				offset: 0,
+				limit: 25
+			}
+		}, {
+			send(data) {
+				expect(data.topic.length).to.be.above(0);
+				expect(data.topic.length).to.be.below(26);
+				expect(data.totalCount).to.be.above(0);
+				done();
+			}
+		})
+	});
+
+	it('should return a specific list of topics, offset by 10, limit of 10',(done) => {
+		topic.getTopics({
+			body: {
+				offset: 10,
+				limit: 10
+			}
+		}, {
+			send(data) {
+				expect(data.topic.length).to.be.eql(10);
+				done();
+			}
+		})
+	});
+	
 	it('should a specific topic', (done) => {
 		topic.getTopic({
 			params: {
@@ -61,6 +91,7 @@ describe('Topics', () => {
 			}
 		});
 	});
+
 
 	it('should update a topic', (done) => {
 		newTopic.title = "New Topic update";
