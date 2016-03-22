@@ -49,7 +49,7 @@ describe('Topics', () => {
 
 	it('should return a paginated list of topics', (done) => {
 		topic.getTopics({
-			body: {
+			query: {
 				offset: 0,
 				limit: 25
 			}
@@ -65,7 +65,7 @@ describe('Topics', () => {
 
 	it('should return a specific list of topics, offset by 10, limit of 10',(done) => {
 		topic.getTopics({
-			body: {
+			query: {
 				offset: 10,
 				limit: 10
 			}

@@ -8,6 +8,24 @@ let mongoose = require('mongoose');
 let request = require('supertest')('http://localhost:3200');
 
 
+function addThreeSections(mockCourse,cb) {
+	for(let i = 0; i < 3; i++) {
+		course.addSection({
+			params: {
+				courseId: mockCourse._id
+			},
+			body: {
+				title: `New section ${i}`
+			}
+		}, {
+			send(data) {
+				console.log(data);
+			}
+		});
+	}
+	cb();
+}
+
 describe('Courses', () => {
 	let mockCourse;
 	let lessonId;
@@ -212,6 +230,40 @@ describe('Courses', () => {
 			}
 		});
 	});
+
+	// it('should add three sections', (done) => {
+	// 	addThreeSections(mockCourse,() => {
+	// 		course.getCourse({
+	// 			params: {
+	// 				id: mockCourse._id
+	// 			},
+	// 			body: {}
+	// 		}, {
+	// 			send(data) {
+	// 				console.log(data.course.sections.length);
+	// 				expect(data.course.sections).to.be.an('array');
+	// 				expect(data.course.sections).to.have.length(4);
+	// 				done();
+	// 			}
+	// 		})
+	// 	});
+	// });
+
+	// it('should reorder the sections', (done) => {
+	// 	course.getCourse({
+	// 		params: {
+	// 			courseId: mockCourse._id
+	// 		}, 
+	// 		body: {}
+	// 	},
+	// 	{	
+	//  		send(data) {
+	// 			console.log(data);
+	// 			done();
+	// 		}
+	// 	});
+			
+	// });
 
 	it('should add a lesson to a section', (done) => {
 		course.addLesson({
