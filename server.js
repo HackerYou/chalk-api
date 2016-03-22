@@ -21,7 +21,7 @@ app.use(helmet());
 app.use(bodyParser.json());
 
 app.use((req,res,next) => {
-	console.log(`${req.method}: ${req.url} at ${new Date()}`);
+	console.log(`${req.method}: ${req.url} on ${new Date()}`);
 	next();
 });
 

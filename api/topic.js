@@ -22,8 +22,7 @@ topic.createTopic = (req,res) => {
 };
 
 topic.getTopics = (req,res) => {
-	let options = req.body;
-
+	let options = req.query || {};
 	options = Object.assign({
 		offset:0,
 		limit: 0 
