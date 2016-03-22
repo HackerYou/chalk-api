@@ -19,11 +19,12 @@ function addThreeSections(mockCourse,cb) {
 			}
 		}, {
 			send(data) {
-				console.log(data);
+				if(i == 2) {
+					cb();
+				}
 			}
 		});
 	}
-	cb();
 }
 
 describe('Courses', () => {
@@ -231,39 +232,64 @@ describe('Courses', () => {
 		});
 	});
 
-	// it('should add three sections', (done) => {
-	// 	addThreeSections(mockCourse,() => {
-	// 		course.getCourse({
-	// 			params: {
-	// 				id: mockCourse._id
-	// 			},
-	// 			body: {}
-	// 		}, {
-	// 			send(data) {
-	// 				console.log(data.course.sections.length);
-	// 				expect(data.course.sections).to.be.an('array');
-	// 				expect(data.course.sections).to.have.length(4);
-	// 				done();
-	// 			}
-	// 		})
-	// 	});
-	// });
+	it('should add three sections', (done) => {
+		addThreeSections(mockCourse,() => {
+			course.getCourse({
+				params: {
+					id: mockCourse._id
+				},
+				body: {}
+			}, {
+				send(data) {
+					expect(data.course.sections).to.be.an('array');
+					expect(data.course.sections).to.have.length(4);
+					done();
+				}
+			})
+		});
+	});
 
-	// it('should reorder the sections', (done) => {
-	// 	course.getCourse({
-	// 		params: {
-	// 			courseId: mockCourse._id
-	// 		}, 
-	// 		body: {}
-	// 	},
-	// 	{	
-	//  		send(data) {
-	// 			console.log(data);
-	// 			done();
-	// 		}
-	// 	});
+	it('should reorder the sections', (done) => {
+		course.getCourse({
+			params: {
+				id: mockCourse._id
+			}, 
+			body: {}
+		},
+			{	
+	 		send(data) {
+	 			//Move a section around
+	 			let sections = data.course.sections;
+	 			let secondSection = data.course.sections.splice(1,1);
+	 			let sectionTitle = secondSection[0].title;
+	 			sections.push(secondSection[0]);
+
+	 			data.course.sections = sections;
+	 			course.updateCourse({
+	 				params: {id: mockCourse._id },
+	 				body: data.course
+	 			}, {
+	 				send(updatedCourse) {
+	 					course.getCourse({
+	 						params: {
+	 							id: mockCourse._id
+	 						},
+	 						body: {}
+	 					}, {
+	 						send(data) {
+	 							expect(data.course.sections).to.be.an('array');
+	 							expect(data.course.sections).to.have.length(4);
+	 							expect(data.course.sections[3].title).to.be.eql(sectionTitle);
+								done();
+	 						}
+	 					});
+	 				}
+	 			})
+				// console.log(data);
+			}
+		});
 			
-	// });
+	});
 
 	it('should add a lesson to a section', (done) => {
 		course.addLesson({
@@ -314,7 +340,7 @@ describe('Courses', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.course.sections).to.be.an('array');
-				expect(data.course.sections).to.have.length(0);
+				expect(data.course.sections).to.have.length(3);
 				done();
 			}
 		});

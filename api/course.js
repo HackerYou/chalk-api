@@ -180,22 +180,31 @@ course.updateCourse = (req,res) => {
 	let model = req.body;
 	let id = req.params.id;
 
-	model.updated_at = +new Date();
-	models.course.findOneAndUpdate(
-		{ _id:id },
-		model,
-		{ new: true },
+	
+	models.course.findOne({ _id:id },
 		(err,doc) => {
-		if(err){
-			res.send({
-				error: err
-			});
-		}
-		else {
-			res.send({
-				course: doc
-			});
-		}
+			delete model._id;
+
+			if(doc.sections) {
+				model.sections = model.sections.map((obj) => obj._id);
+			}
+
+			model.updated_at = +new Date();
+			
+			Object.assign(doc,model);
+
+			doc.save(err => {
+				if(err){
+					res.send({
+						error: err
+					});
+				}
+				else {
+					res.send({
+						course: doc
+					});
+				}
+			})
 	});
 };
 
