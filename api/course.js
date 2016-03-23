@@ -262,6 +262,53 @@ course.addSection = (req,res) => {
 	});
 };
 
+course.getSection = (req,res) => {
+	let sectionId = req.params.sectionId;
+	models.section.findOne({_id: sectionId}, (err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		res.send({
+			section: doc
+		});
+	}).populate('lessons');
+};
+
+course.updateSection = (req,res) => {
+	let sectionId = req.params.sectionId;
+	let model = req.body;
+	
+	delete model._id;
+
+	models.section.findOne({_id:sectionId},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+
+		doc.lessons = model.lessons.map(lesson => lesson._id);
+
+		doc.save((err,savedDoc) => {
+			models.section.populate(savedDoc,{path: 'lessons'}, (err,populatedDoc) => {
+				if(err) {
+					res.send({
+						error:err
+					});
+					return;
+				}
+				res.send({
+					section: populatedDoc
+				});
+			});
+		});
+	});
+};
+
 course.removeSection = (req,res) => {
 	let courseId = req.params.courseId;
 	let sectionId = req.params.sectionId;

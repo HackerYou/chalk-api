@@ -109,6 +109,8 @@ app.post('/v1/course',routeAuth, adminRoute ,api.course.createCourse);
 app.get('/v1/course/:id',routeAuth, api.course.getCourse);
 app.put('/v1/course/:id',routeAuth, adminRoute ,api.course.updateCourse);
 app.delete('/v1/course/:id',routeAuth, adminRoute ,api.course.removeCourse);
+app.get('/v1/course/:sectionId',routeAuth, adminRoute, api.course.getSection);
+app.put('/v1/course/:sectionId',routeAuth,adminRoute,api.course.updateSection);
 app.post('/v1/course/:courseId/section/',routeAuth, adminRoute ,api.course.addSection);
 app.delete('/v1/course/:courseId/section/:sectionId',routeAuth, adminRoute ,api.course.removeSection);
 app.put('/v1/course/section/:sectionId/lesson/:lessonId',routeAuth, adminRoute ,api.course.addLesson);
