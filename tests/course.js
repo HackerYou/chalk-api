@@ -27,6 +27,18 @@ function addThreeSections(mockCourse,cb) {
 	}
 }
 
+function addLesson(cb) {
+	lesson.createLesson({
+		body: {
+			title: `Course add lesson 1`
+		}
+	}, {
+		send(data) {
+			cb(data);
+		}
+	});
+}
+
 describe('Courses', () => {
 	let mockCourse;
 	let lessonId;
@@ -285,7 +297,6 @@ describe('Courses', () => {
 	 					});
 	 				}
 	 			})
-				// console.log(data);
 			}
 		});
 			
@@ -315,6 +326,62 @@ describe('Courses', () => {
 		});
 	});
 
+	it('should get a section', (done) => {
+		course.getSection({
+			params: {
+				sectionId: sectionId
+			}
+		}, {
+			send(data) {
+				expect(data.section).to.be.an('object');
+				done();
+			}
+		})
+	});
+
+	it('should add extra lesson to a section', (done) => {
+		addLesson((data) => {
+			course.addLesson({
+				params: {
+					lessonId: data.lesson._id,
+					sectionId: sectionId
+				}
+			}, {
+				send(sectionWithLessons) {
+					expect(sectionWithLessons.section.lessons).to.have.length(2);
+					done();
+				}
+			});
+		});
+	});
+
+	it('should reorder the lessons in a section', (done) => {
+		course.getSection({
+			params: {
+				sectionId: sectionId
+			}
+		}, {
+			send(data) {
+				let lastLesson = data.section.lessons.splice(1,1)[0];
+				let lessonTitle = lastLesson.title;
+				data.section.lessons.unshift(lastLesson);
+
+				course.updateSection({
+					params: {
+						sectionId: sectionId
+					},
+					body: data.section
+				},{
+					send(updatedSection) {
+						expect(updatedSection.section.lessons[0].title).to.be.eql(lessonTitle);
+						done();
+					}
+				})
+
+			}
+		});
+	});
+
 	it('should remove a lesson from a section', (done) => {
 		course.removeLesson({
 			params: {
@@ -324,7 +391,7 @@ describe('Courses', () => {
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.section.lessons).to.have.length(0);
+				expect(data.section.lessons).to.have.length(1);
 				done();
 			}
 		});
