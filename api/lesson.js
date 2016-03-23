@@ -81,43 +81,59 @@ lesson.getLesson = (req,res) => {
 lesson.updateLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let model = req.body;
-	model.updated_at = +new Date();	
-	if(model.topics !== undefined) {
-		model.topics = model.topics.map((topic) => {
-			if(topic._id) {
-				return topic._id;
-			}
-			else {
-				return topic;
-			}
-		});
-	}
-	models.lesson.findOne({_id:lessonId}, (err,olddoc) => {
+	
+	delete model._id;
+
+	models.lesson.findOne({_id:lessonId}, (err,doc) => {
 		if(err) {
 			res.send({
 				error: err
 			});
 		}
+		//Store old version of the doc first
 		if(model.revisions === undefined) {
-			model.revisions = [];
+			mdoel.revisions = [];
 		}
-		model.revisions.push(olddoc.toObject());
-		models.lesson.findOneAndUpdate(
-			{_id:lessonId},
-			model,
-			{new:true}, 
-			(err,doc) => {
+
+		model.revisions.push(doc.toObject());
+
+		//Set it as updated
+		model.updated_at = +new Date();	
+		
+		Object.assign(doc,model);
+
+		//Flatten the topics to be the _id
+		if(model.topics !== undefined) {
+			doc.topics = model.topics.map( (t) => {
+				return t._id.toString();
+			});
+		}
+		//Merge new model with old doc
+
+		//Save the old doc
+		doc.save((err,savedLesson) => {
+
 			if(err) {
 				res.send({
 					error: err
 				});
+				return;
 			}
-			else {
+			//Populate the document with the topics
+			models.lesson.populate(savedLesson,{path: 'topics'}, (err, populatedDoc) =>{
+				if(err) {
+					res.send({
+						error: err
+					});
+					return;
+				}
+				//Send it on its way.
 				res.send({
-					lesson: doc
+					lesson: populatedDoc
 				});
-			}
+			});
 		});
+
 	});
 };
 

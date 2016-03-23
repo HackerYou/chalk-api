@@ -6,6 +6,18 @@ let topic = require('../api/topic.js');
 let models = require('../api/models/index.js');
 let mongoose = require('mongoose');
 
+function createTopic(cb) {
+	topic.createTopic({
+		body: {
+			title: 'Test Topic 1'
+		}
+	}, {
+		send(data) {
+			cb(data);
+		}
+	})
+}
+
 describe('Lessons', () => {
 	let lessonId;
 	let topicId;
@@ -75,7 +87,7 @@ describe('Lessons', () => {
 			params: {
 				lessonId: lessonId
 			},
-			body: mockLesson.toJSON()
+			body: mockLesson
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
@@ -104,6 +116,49 @@ describe('Lessons', () => {
 		});
 	});
 
+	it('should add another topic', (done) => {
+		createTopic((data) => {
+			lesson.addTopic({
+				params: {
+					topicId: data.topic._id,
+					lessonId: lessonId
+				}
+			}, {
+				send(lessonData) {
+
+					expect(lessonData.lesson.topics).to.have.length(2);
+					done();
+				}
+			});
+		});
+	});
+
+	it('should reorder topics in lesson', (done) => {
+		lesson.getLesson({
+			params: {
+				lessonId: lessonId
+			}
+		}, {
+			send(data) {
+				let lastTopic = data.lesson.topics.splice(1,1);
+				let topicTitle = lastTopic[0].title;
+				data.lesson.topics.unshift(lastTopic[0]);
+
+				lesson.updateLesson({
+					params: {
+						lessonId: lessonId
+					},
+					body: data.lesson
+				}, {
+					send(lessonData) {
+						expect(lessonData.lesson.topics[0].title).to.be.eql(topicTitle);
+						done();
+					}
+				});
+			}
+		});
+	});
+
 	it('should remove a topic', (done) => {
 		lesson.removeTopic({
 			params: {
@@ -113,7 +168,7 @@ describe('Lessons', () => {
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.lesson.topics).to.have.length(0);
+				expect(data.lesson.topics).to.have.length(1);
 				models.topic.findOne({_id:topicId},(err,doc) => {
 					expect(doc.lessons).to.have.length(0);	
 					done();
