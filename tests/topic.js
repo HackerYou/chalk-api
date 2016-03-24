@@ -6,6 +6,17 @@ let expect = require('expect.js');
 let models = require('../api/models/index.js');
 let exercise = require('../api/exercise.js');
 
+
+function createTestTopic(cb) {
+	topic.createTopic({
+		body: {title:'This is a test'}
+	},{
+		send(data) {
+			cb(data);
+		}
+	})
+}
+
 describe('Topics', () => {
 	let topicId;
 	let newTopic;
@@ -77,7 +88,7 @@ describe('Topics', () => {
 		})
 	});
 	
-	it('should a specific topic', (done) => {
+	it('should get a specific topic', (done) => {
 		topic.getTopic({
 			params: {
 				topicId: topicId
@@ -108,6 +119,23 @@ describe('Topics', () => {
 				expect(data.topic.revisions).to.have.length(1);
 				done();
 			}
+		})
+	});
+
+	it('should search for a specific topic based on title', (done) => {
+		createTestTopic(() => {
+			topic.searchTopics({
+				query: {
+					term: 'New'
+				}
+			}, {
+				send(data) {
+					data.topics.forEach((single) => {
+						expect(single.title).to.contain('New');
+					});
+					done();
+				}
+			});
 		})
 	});
 
