@@ -76,6 +76,7 @@ app.get('/', (req,res) => {
 //Topics
 app.get('/v1/topic',routeAuth,api.topic.getTopics);
 app.post('/v1/topic',routeAuth,adminRoute,api.topic.createTopic);
+app.get('/v1/topic/search',routeAuth,adminRoute,api.topic.searchTopics);
 app.get('/v1/topic/:topicId',routeAuth,api.topic.getTopic);
 app.put('/v1/topic/:topicId',routeAuth,adminRoute,api.topic.updateTopic);
 app.delete('/v1/topic/:topicId',routeAuth,adminRoute,api.topic.removeTopic);

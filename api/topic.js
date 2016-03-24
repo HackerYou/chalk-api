@@ -212,6 +212,23 @@ topic.removeExercise = (req,res) => {
 	});
 };
 
+topic.searchTopics = (req,res) => {
+	const term = req.query.term;
+	const regexTerm = new RegExp(term,'ig');
+
+	models.topic.find({title: {$regex: regexTerm}},(err,doc) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		res.send({
+			topics: doc
+		});
+	});
+};
+
 module.exports = topic;
 
 
