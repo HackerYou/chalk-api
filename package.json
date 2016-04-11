@@ -21,7 +21,8 @@
     "jsonwebtoken": "^5.4.1",
     "mandrill-api": "^1.0.45",
     "mongoose": "^4.2.3",
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+    "sendgrid": "^2.0.0"
   },
   "repository": {
     "type": "git",

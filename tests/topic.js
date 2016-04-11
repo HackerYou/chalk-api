@@ -123,7 +123,7 @@ describe('Topics', () => {
 	});
 
 	it('should search for a specific topic based on title', (done) => {
-		createTestTopic(() => {
+		createTestTopic((testTopic) => {
 			topic.searchTopics({
 				query: {
 					term: 'New'
