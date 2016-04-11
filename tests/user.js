@@ -6,6 +6,7 @@ let mongoose = require('mongoose');
 let models = require('../api/models/index.js');
 let bcrypt = require('bcryptjs');
 let request = require('supertest')('http://localhost:3200');
+const courseApi = require('../api/course.js');
 
 describe("User", function() {
 	let mockUser;
@@ -33,13 +34,21 @@ describe("User", function() {
 			if(err) {
 				throw err;
 			}
-			done();
 		});
-		models.course.findOne({},(err,courseDoc) => {
-			course = courseDoc;
-			models.lesson.findOne({},(err,lessonDoc) => {
-				lesson = lessonDoc;
-			});
+		courseApi.createTemplate({
+			body: {
+				"title": "New Template"
+			}
+		}, {
+			send(data) {
+				models.course.findOne({},(err,courseDoc) => {
+					course = courseDoc;
+					models.lesson.findOne({},(err,lessonDoc) => {
+						lesson = lessonDoc;
+						done();
+					});
+				});
+			}
 		});
 	});
 	after((done) => {

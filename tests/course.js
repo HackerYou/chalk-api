@@ -8,6 +8,7 @@ let mongoose = require('mongoose');
 let request = require('supertest')('http://localhost:3200');
 
 
+
 function addThreeSections(mockCourse,cb) {
 	for(let i = 0; i < 3; i++) {
 		course.addSection({

@@ -5,8 +5,7 @@ let models = require('./models/index.js');
 let bcrypt = require('bcryptjs');
 let config = require('../config.js');
 let jwt = require('jsonwebtoken');
-let mandrill = require('mandrill-api');
-let mandrill_client = new mandrill.Mandrill(config.mandrillKey);
+const sendgrid = require('sendgrid')(config.sendGridKey);
 
 let simplePassword = (length) => {
 	let chars = 'abcdefghijklmnopqrstuvwxyz01234567890';
@@ -19,59 +18,39 @@ let simplePassword = (length) => {
 };
 
 let sendEmail = (templateName,options) => {
-	let emailOptions = {
-		message : {
-			"subject": options.subject,
-			"from_email": "info@hackeryou.com",
-			"from_name": "HackerYou",
-			"to": [{
-				"email": options.email,
-				"type": "to"
-			}]
-		},
-		messageContent : [
-			{
-				"name": "email",
-				"content": options.email
-			},
-			{
-				"name" : "password",
-				"content" : options.password
-			},
-			{
-				"name" : "url",
-				"content" : options.url
-			}
-		],
-		templateName: templateName
-	};
-	return new Promise((resolve, reject) => {
-		mandrill_client.messages.sendTemplate({
-			"template_name" : emailOptions.templateName,
-			"template_content" : emailOptions.messageContent,
-			"message": emailOptions.message,
-			"async": false,
-			"ip_pool": 'Main Pool'
-		}, 
-		function(result) {
-			if(result[0].status === 'sent') {
-				resolve({
-					status: 'success',
-					message: 'Email Sent'
-				});
-			}
-			else {
+	const newEmail = new sendgrid.Email();
+	newEmail.addTo(options.email);
+	newEmail.subject = options.subject;
+	newEmail.from = 'info@hackeryou.com';
+	newEmail.setFromName('HackerYou');
+
+	newEmail.setSubstitutions({
+		'-url-': ["https://notes.hackeryou.com"],
+		'-email-': [options.email],
+		'-password-': [options.password]
+	});
+
+	newEmail.body = 'Enjoy!';
+	newEmail.text = 'Enjoy!';
+
+	newEmail.addFilter('templates', 'enable', 1);
+	newEmail.addFilter('templates', 'template_id', templateName);
+
+
+	return new Promise((resolve,reject) => {
+		sendgrid.send(newEmail,(err,data) => {
+			if(err) {
 				reject({
 					status: 'failed',
-					message: `Error ${result[0].reject_reason}`
+					message: `Error: ${err}`
 				});
+				return;
 			}
-		}, function(err) {
-			reject({
-				status: 'failed',
-				message: err
+			resolve({
+				status: 'success',
+				message: 'Email Sent'
 			});
-		});	
+		});
 	});
 };
 
@@ -88,7 +67,7 @@ user.createUser = (emails) => {
 			created_at: +new Date(),
 			first_sign_up: true
 		};
-	 	return sendEmail(config.mandrillTemplate.signup,{
+	 	return sendEmail('0e47535b-3c02-4f75-a13f-533b461f885d',{
 			email: email,
 			password: password,
 			url: config.site_url,
@@ -198,7 +177,7 @@ user.resetPassword = (req,res) => {
 			return;
 		}
 		let tempPass = simplePassword(10);
-		sendEmail(config.mandrillTemplate.forgotpassword,{
+		sendEmail('3fa5a4f6-aca9-4cff-9294-dbb1fe20490b',{
 			email: doc.email,
 			password: tempPass,
 			url: config.site_url,
