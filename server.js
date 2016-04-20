@@ -20,8 +20,10 @@ app.use(helmet());
 
 app.use(bodyParser.json());
 
-app.use((req,res,next) => {
-	console.log(`${req.method}: ${req.url} on ${new Date()}`);
+app.use((err, req,res,next) => {
+	if(err) {
+		console.error(`${err} on ${new Date()}`)
+	}
 	next();
 });
 

@@ -55,6 +55,7 @@ let sendEmail = (templateName,options) => {
 };
 
 user.createUser = (emails) => {
+	// TODO: Add check to make sure user email does not exist already.
 	emails = emails.split(',');
 	let users = emails.map((email) => {
 		email = email.trim();

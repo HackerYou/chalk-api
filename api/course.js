@@ -407,6 +407,8 @@ course.addUser = (req,res) => {
 		}
 
 		let users = emails.split(',').map((email) => {
+			//Normalize email.
+			email = email.toLowerCase();
 			return new Promise((resolve,reject) => {
 				models.user.findOne({email: email}, (err,userDoc) => {
 					// If user exists, add to class
