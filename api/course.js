@@ -463,7 +463,6 @@ course.addUser = (req,res) => {
 course.removeUser = (req,res) => {
 	let userId = req.params.userId;
 	let courseId = req.params.courseId;
-
 	models.course.findOne({_id: courseId}, (err,doc) => {
 		if(err) {
 			res.send({
@@ -472,29 +471,37 @@ course.removeUser = (req,res) => {
 			return;
 		}
 		let studentIndex = doc.students.indexOf(userId);
-		doc.students.splice(studentIndex,1);
-		doc.save((err) => {
-			if(err) {
-				res.send({
-					error: err
-				});
-				return;
-			}
-			models.course.populate(
-				doc, 
-				{path: 'students', select: 'firstName lastName email'}, 
-				(err,courseWStudents) => {
+		user.removeCourse(userId,courseId)
+			.then(() => {
+				doc.students.splice(studentIndex,1);
+				doc.save((err) => {
 					if(err) {
 						res.send({
 							error: err
 						});
 						return;
 					}
-					res.send({
-						course: courseWStudents
-					});
+					models.course.populate(
+						doc, 
+						{path: 'students', select: 'firstName lastName email'}, 
+						(err,courseWStudents) => {
+							if(err) {
+								res.send({
+									error: err
+								});
+								return;
+							}
+							res.send({
+								course: courseWStudents
+							});
+						});
 				});
-		});
+			})
+			.catch((error) => {
+				res.send({
+					error: err
+				});
+			});
 	});
 };
 

@@ -303,6 +303,21 @@ user.addCourse = (id, courseId) => {
 	});
 };
 
+user.removeCourse = (studentId,courseId) => {
+	return new Promise((resolve,reject) => {
+		models.user.findOne({_id: studentId}, (err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			let courseIndex = doc.courses.indexOf(courseId);
+			doc.courses.splice(courseIndex,1);
+			doc.save((err) => {
+				resolve();
+			});
+		});
+	});
+}
+
 user.favoriteLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let courseId = req.params.courseId;
