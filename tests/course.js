@@ -197,6 +197,24 @@ describe('Courses', () => {
 		})
 	});
 
+	it('should not add the same user to a course', (done) => {
+		course.addUser({
+			params: {
+				courseId: mockCourse._id,
+			},
+			body: {
+				emails: 'ryan@hackeryou.com'
+			}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.course.students).to.have.length(1)
+				expect(data.course.students[0]).to.not.have.key('password');
+				done();
+			}
+		})
+	});
+
 	it('should remove a user from a course', (done) => {
 		models.course.findOne({_id: mockCourse._id}, (err,doc) => {
 			let student = doc.students[0];

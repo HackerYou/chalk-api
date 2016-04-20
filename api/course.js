@@ -412,7 +412,12 @@ course.addUser = (req,res) => {
 			return new Promise((resolve,reject) => {
 				models.user.findOne({email: email}, (err,userDoc) => {
 					// If user exists, add to class
-					if(userDoc) {
+					let studentExists = doc.students.indexOf(userDoc._id);
+					if(studentExists >= 0) {
+						//Return false if the student is already in the class.
+						resolve(false);
+					}
+					else if(userDoc) {
 						doc.students.push(userDoc._id);
 						resolve(userDoc._id);
 					}
@@ -435,8 +440,10 @@ course.addUser = (req,res) => {
 					})
 					return;
 				}
-				let students = data.map((student) => {
-					return user.addCourse(student,courseId);
+				let students = data.filter((student) => {
+					if(student) {
+						return user.addCourse(student,courseId);
+					}
 				});
 				Promise.all(students).then((data) => {
 					models.course.populate(doc, {path: 'students', select: 'firstName lastName email'},(err,courseWStudents) => {
