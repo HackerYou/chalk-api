@@ -92,7 +92,7 @@ lesson.updateLesson = (req,res) => {
 		}
 		//Store old version of the doc first
 		if(model.revisions === undefined) {
-			mdoel.revisions = [];
+			model.revisions = [];
 		}
 
 		model.revisions.push(doc.toObject());
