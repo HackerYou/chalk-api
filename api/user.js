@@ -57,6 +57,7 @@ let sendEmail = (templateName,options) => {
 user.createUser = (emails) => {
 	// TODO: Add check to make sure user email does not exist already.
 	emails = emails.split(',');
+	
 	let users = emails.map((email) => {
 		email = email.trim();
 		let password = simplePassword(10);
@@ -266,7 +267,7 @@ user.authenticate = (req,res) => {
 					}, 
 					config.secret, 
 					{
-						expiresIn: "2 days"	
+						expiresIn: "5 days"	
 					});
 					res.send({
 						success: true,
