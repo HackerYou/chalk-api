@@ -11,7 +11,7 @@ const courseApi = require('../api/course.js');
 describe("User", function() {
 	let mockUser;
 	let password = 'test';
-	let userEmail = 'ryan@test.com';
+	let userEmail = `ryan+${+new Date()}@hackeryou.com`;
 	let token;
 	let course;
 	let lesson;
@@ -32,23 +32,23 @@ describe("User", function() {
 		};
 		models.user(userModel).save((err) => {
 			if(err) {
-				throw err;
+				console.error(err);
 			}
-		});
-		courseApi.createTemplate({
-			body: {
-				"title": "New Template"
-			}
-		}, {
-			send(data) {
-				models.course.findOne({},(err,courseDoc) => {
-					course = courseDoc;
-					models.lesson.findOne({},(err,lessonDoc) => {
-						lesson = lessonDoc;
-						done();
+			courseApi.createTemplate({
+				body: {
+					"title": "New Template"
+				}
+			}, {
+				send(data) {
+					models.course.findOne({},(err,courseDoc) => {
+						course = courseDoc;
+						models.lesson.findOne({},(err,lessonDoc) => {
+							lesson = lessonDoc;
+							done();
+						});
 					});
-				});
-			}
+				}
+			});
 		});
 	});
 	after((done) => {
@@ -75,7 +75,7 @@ describe("User", function() {
 		user.addUser({
 			params: {},
 			body: {
-				emails: 'ryan@hackeryou.com,ryan@hackeryou.com'
+				emails: 'ryan@hackeryou.com,ryan@testingahackeryouwebsite.com'
 			}
 		}, {
 			send(data) {
