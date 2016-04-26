@@ -412,7 +412,8 @@ course.addUser = (req,res) => {
 			return new Promise((resolve,reject) => {
 				models.user.findOne({email: email}, (err,userDoc) => {
 					// If user exists, add to class
-					let studentExists = doc.students.indexOf(userDoc._id);
+					let studentExists = userDoc ? doc.students.indexOf(userDoc._id) : -1;
+
 					if(studentExists >= 0) {
 						//Return false if the student is already in the class.
 						resolve(false);
