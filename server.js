@@ -145,6 +145,7 @@ app.delete('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.u
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);
 app.post('/v1/media',routeAuth, adminRoute ,api.media.uploadFile);
+app.get('/v1/media/search', routeAuth, adminRoute, api.media.searchFiles);
 app.delete('/v1/media/:key',routeAuth, adminRoute ,api.media.removeFile);
 
 app.listen('3200');

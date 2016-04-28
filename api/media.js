@@ -13,6 +13,12 @@ AWS.config.secretAccessKey = config.aws_secret_access_key;
 let s3 = new AWS.S3({params: {Bucket: config.aws_bucket}});
 
 media.getFiles = (req,res) => {
+	let options = {
+		offset: 0,
+		limit: 25
+	};
+
+	Object.assign(options, req.query);
 	models.media.find({},{__v:0},(err,docs) => {
 		if(err) {
 			res.send({
@@ -23,7 +29,9 @@ media.getFiles = (req,res) => {
 		res.send({
 			media: docs
 		});
-	});
+	})
+	.limit(options.limit)
+	.skip(options.offset);
 };
 
 media.uploadFile = (req,res) => {
@@ -70,6 +78,7 @@ media.uploadFile = (req,res) => {
 
 media.removeFile = (req,res) => {
 	let key = req.params.key;
+
 	s3.deleteObject({
 		Bucket: config.aws_bucket,
 		Key: key
@@ -86,6 +95,11 @@ media.removeFile = (req,res) => {
 					error: err
 				});
 			}
+			else if(doc === null) {
+				res.send({
+					error: 'File does not exist'
+				});
+			}
 			doc.remove((err) => {
 				if(err) {
 					res.send({
@@ -96,6 +110,23 @@ media.removeFile = (req,res) => {
 					media: []
 				});			
 			});
+		});
+	});
+};
+
+media.searchFiles = (req,res) => {
+	let term = req.query.name;
+	term = new RegExp(term,'ig');
+	
+	models.media.find({name: term}, (err,docs) => {
+		if(err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+		res.send({
+			media: docs
 		});
 	});
 };
