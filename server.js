@@ -18,7 +18,9 @@ app.use(function(req, res, next) {
 
 app.use(helmet());
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+	limit: '10mb'
+}));
 
 app.use((err, req,res,next) => {
 	if(err) {

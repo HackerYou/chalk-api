@@ -77,7 +77,10 @@ user.createUser = (emails) => {
 		}).then((data) => {
 			return new models.user(model).save();
 		}, (emailError) => {
-			console.log(emailError);
+			console.log({
+				message: `Failed to send email to ${email}`,
+				mailerErrorMsg: emailError
+			});
 		});
 	});
 	return users;
@@ -145,7 +148,7 @@ user.updateUser = (req,res) => {
 	}
 	models.user.findOne({_id:id},(err,doc) => {
 
-		doc.update({$set: model}, (err) =>{
+		doc.update({$set: model.toObject()}, (err) =>{
 			if(err) {
 				res.send({
 					error: err
