@@ -148,7 +148,7 @@ user.updateUser = (req,res) => {
 	}
 	models.user.findOne({_id:id},(err,doc) => {
 
-		doc.update({$set: model.toObject()}, (err) =>{
+		doc.update({$set: model}, (err) =>{
 			if(err) {
 				res.send({
 					error: err
