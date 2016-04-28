@@ -126,7 +126,7 @@ describe("User", function() {
 			params: {
 				id: mockUser._id
 			},
-			body: mockUser
+			body: mockUser.toObject()
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
