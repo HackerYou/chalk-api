@@ -40,8 +40,13 @@ function addLesson(cb) {
 	});
 }
 
+function cleanUpUser(email) {
+
+}
+
 describe('Courses', () => {
 	let mockCourse;
+	let doubleTestMockCourse;
 	let lessonId;
 	let template;
 	let templateId;
@@ -215,6 +220,52 @@ describe('Courses', () => {
 		})
 	});
 
+	it('should not create a new user for an existing user', (done) => {
+		//Add a new user to the mock course
+		course.addUser({
+			params: {
+				courseId: mockCourse._id
+			},
+			body: {
+				emails: 'ryan.doubleadd@hackeryou.com'
+			}
+		}, {
+			send(userData) {
+				expect(userData).to.be.an('object');
+				expect(userData.course.students).to.have.length(2);
+				//Then make new course
+				course.createCourse({
+					body: {
+						title: 'Double Test'
+					}
+				}, {
+					send(data) {
+						//And try to add the same user to that.
+						course.addUser({
+							params: {
+								courseId: data.course._id
+							},
+							body: {
+								emails: 'ryan.doubleadd@hackeryou.com'
+							}
+						}, {
+							send(data) {	
+								expect(data).to.be.an('object');
+								expect(data.course.students).to.have.length(1);
+								// Make sure there is no new user created
+								models.user.find({email: 'ryan.doubleadd@hackeryou.com'}, (err,docs) => {
+									expect(docs).to.have.length(1);
+									done();
+								});
+							}
+						})
+					}
+				})
+				
+			}
+		})
+	});
+
 	it('should remove a user from a course', (done) => {
 		models.course.findOne({_id: mockCourse._id}, (err,doc) => {
 			let student = doc.students[0];
@@ -228,7 +279,7 @@ describe('Courses', () => {
 				send(data) {
 					expect(data).to.be.an('object');
 					expect(data.course.students).to.be.an('array');
-					expect(data.course.students).to.have.length(0); 
+					expect(data.course.students).to.have.length(1); 
 					models.user.findOne({_id: student}, (err,doc) => {
 						expect(doc).to.be.an('object');
 						expect(doc.courses).to.have.length(0);

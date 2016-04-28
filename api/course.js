@@ -418,6 +418,7 @@ course.addUser = (req,res) => {
 						//Return false if the student is already in the class.
 						resolve(false);
 					}
+					//If you can find a user in the DB just push them on the course
 					else if(userDoc) {
 						doc.students.push(userDoc._id);
 						resolve(userDoc._id);
