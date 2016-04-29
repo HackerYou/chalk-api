@@ -87,6 +87,7 @@ describe('Media', function() {
 			.query({limit: 10})
 			.end((err, res) => {
 				const body = res.body;
+				expect(body).to.have.key('totalCount');
 				expect(body.media).to.be.an('array');
 				expect(body.media.length).to.be.within(0,10);
 				done();
