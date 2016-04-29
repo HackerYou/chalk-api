@@ -15,7 +15,7 @@ let s3 = new AWS.S3({params: {Bucket: config.aws_bucket}});
 media.getFiles = (req,res) => {
 	let options = {
 		offset: 0,
-		limit: 25
+		limit: 0
 	};
 
 	Object.assign(options, req.query);
@@ -26,9 +26,12 @@ media.getFiles = (req,res) => {
 			});
 			return;
 		}
-		res.send({
-			media: docs
-		});
+		models.media.count((err,count) => {
+			res.send({
+				media: docs,
+				totalCount: count
+			});
+		})
 	})
 	.limit(options.limit)
 	.skip(options.offset);
