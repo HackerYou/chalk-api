@@ -40,9 +40,6 @@ function addLesson(cb) {
 	});
 }
 
-function cleanUpUser(email) {
-
-}
 
 describe('Courses', () => {
 	let mockCourse;
@@ -246,7 +243,8 @@ describe('Courses', () => {
 								courseId: data.course._id
 							},
 							body: {
-								emails: 'ryan.doubleadd@hackeryou.com'
+								//This time with spaces
+								emails: 'ryan.doubleadd@hackeryou.com  '
 							}
 						}, {
 							send(data) {	
@@ -343,34 +341,34 @@ describe('Courses', () => {
 			body: {}
 		},
 			{	
-	 		send(data) {
-	 			//Move a section around
-	 			let sections = data.course.sections;
-	 			let secondSection = data.course.sections.splice(1,1);
-	 			let sectionTitle = secondSection[0].title;
-	 			sections.push(secondSection[0]);
+				send(data) {
+					//Move a section around
+					let sections = data.course.sections;
+					let secondSection = data.course.sections.splice(1,1);
+					let sectionTitle = secondSection[0].title;
+					sections.push(secondSection[0]);
 
-	 			data.course.sections = sections;
-	 			course.updateCourse({
-	 				params: {id: mockCourse._id },
-	 				body: data.course
-	 			}, {
-	 				send(updatedCourse) {
-	 					course.getCourse({
-	 						params: {
-	 							id: mockCourse._id
-	 						},
-	 						body: {}
-	 					}, {
-	 						send(data) {
-	 							expect(data.course.sections).to.be.an('array');
-	 							expect(data.course.sections).to.have.length(4);
-	 							expect(data.course.sections[3].title).to.be.eql(sectionTitle);
+					data.course.sections = sections;
+					course.updateCourse({
+						params: {id: mockCourse._id },
+						body: data.course
+					}, {
+						send(updatedCourse) {
+							course.getCourse({
+								params: {
+									id: mockCourse._id
+								},
+								body: {}
+							}, {
+								send(data) {
+									expect(data.course.sections).to.be.an('array');
+									expect(data.course.sections).to.have.length(4);
+									expect(data.course.sections[3].title).to.be.eql(sectionTitle);
 								done();
-	 						}
-	 					});
-	 				}
-	 			})
+								}
+							});
+						}
+					})
 			}
 		});
 			
