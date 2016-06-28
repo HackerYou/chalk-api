@@ -9,7 +9,8 @@ let model = Object.assign({
 	revisions: [Schema.Types.Mixed],
 	body: String,
 	description: String,
-	catergory: String
+	catergory: String,
+	exercise_link: String
 },mixin);
 
 let lessonSchema = new Schema(model);

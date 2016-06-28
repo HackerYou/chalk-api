@@ -175,10 +175,17 @@ user.updateUser = (req,res) => {
 user.resetPassword = (req,res) => {
 	let email = req.params.email;
 	models.user.findOne({email:email}, (err,doc) => {
-		if(err) {
-			res.send({
-				error: err
-			});
+		if(err || doc === null) {
+			if(doc === null) {
+				res.send({
+					error: 'Email does not exist.'
+				});
+			}
+			else {
+				res.send({
+					error: err
+				});
+			}
 			return;
 		}
 		let tempPass = simplePassword(10);
