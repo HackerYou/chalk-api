@@ -40,15 +40,30 @@ function addLesson(cb) {
 	});
 }
 
+function removeCourse(id) {
+	return new Promise((resolve,reject) => {
+		course.removeCourse({
+			params: {
+				id: id
+			}
+		},
+		{		
+			send() {
+				resolve();
+			}
+		});
+	});
+}
 
 describe('Courses', () => {
 	let mockCourse;
-	let doubleTestMockCourse;
+	let doubleId;
 	let lessonId;
 	let template;
 	let templateId;
 	let sectionId;
 	let user;
+
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -66,8 +81,12 @@ describe('Courses', () => {
 			}
 		});
 	});
-	after(() => {
-		mongoose.disconnect();
+	after((done) => {
+		Promise.all([removeCourse(doubleId)])
+			.then(() => {
+				mongoose.disconnect();
+				done();
+			});
 	});
 
 
@@ -238,6 +257,7 @@ describe('Courses', () => {
 				}, {
 					send(data) {
 						//And try to add the same user to that.
+						doubleId = data.course._id;
 						course.addUser({
 							params: {
 								courseId: data.course._id
@@ -258,8 +278,7 @@ describe('Courses', () => {
 							}
 						})
 					}
-				})
-				
+				});
 			}
 		})
 	});
@@ -364,11 +383,11 @@ describe('Courses', () => {
 									expect(data.course.sections).to.be.an('array');
 									expect(data.course.sections).to.have.length(4);
 									expect(data.course.sections[3].title).to.be.eql(sectionTitle);
-								done();
+									done();
 								}
 							});
 						}
-					})
+					});
 			}
 		});
 			

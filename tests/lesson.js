@@ -177,6 +177,22 @@ describe('Lessons', () => {
 		});
 	});
 
+
+	it('should add an exercise link to a lesson', (done) => {
+		mockLesson.exercise_link = 'http://hackeryou.com';
+		lesson.updateLesson({
+			params: {
+				lessonId: lessonId
+			},
+			body: mockLesson
+		}, {
+			send(data) {
+				expect(data.lesson.exercise_link).to.be.eql('http://hackeryou.com');
+				done();
+			}
+		})
+	});
+
 	it('should remove a lesson', (done) => {
 		lesson.removeLesson({
 			params: {
