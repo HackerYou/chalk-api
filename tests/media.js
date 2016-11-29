@@ -9,7 +9,7 @@ let user = require('../api/user.js');
 let bcrypt = require('bcryptjs');
 
 
-describe('Media', function() {
+xdescribe('Media', function() {
 	this.timeout(6000);
 	let fileName;
 	let token;

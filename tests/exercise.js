@@ -5,7 +5,7 @@ let mongoose = require('mongoose');
 let expect = require('expect.js');
 let models = require('../api/models/index.js');
 
-describe('Exercise', () => {
+xdescribe('Exercise', () => {
 	let exerciseId;
 	let newExercise;
 	before(() => {

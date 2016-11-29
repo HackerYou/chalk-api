@@ -10,5 +10,6 @@ module.exports = {
 	lesson: require('./lesson.js'),
 	announcement: require('./announcement.js'),
 	user: require('./user.js'),
-	media: require('./media.js')
+	media: require('./media.js'),
+	question: require('./question.js')
 };

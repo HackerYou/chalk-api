@@ -141,12 +141,15 @@ app.put('/v1/user/reset/:email',api.user.resetPassword);
 app.post('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.favoriteLesson);
 app.delete('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.removeFavoriteLesson);
 
-
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);
 app.post('/v1/media',routeAuth, adminRoute ,api.media.uploadFile);
 app.get('/v1/media/search', routeAuth, adminRoute, api.media.searchFiles);
 app.delete('/v1/media/:key',routeAuth, adminRoute ,api.media.removeFile);
+
+//Questions
+app.post('/v2/questions', routeAuth,adminRoute,api.question.createQuestion);
+app.delete('/v2/questions/:id',routeAuth,adminRoute,api.question.removeQuestion);
 
 app.listen('3200');
 console.log('App listening on port 3200');

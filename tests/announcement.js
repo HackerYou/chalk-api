@@ -6,7 +6,7 @@ let mongoose = require('mongoose');
 let request = require('supertest')('http://localhost:3200');
 
 
-describe('Announcements', () => {
+xdescribe('Announcements', () => {
 	let aId;
 	let mockAnnouncement;
 	before((done) => {	

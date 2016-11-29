@@ -55,7 +55,8 @@ function removeCourse(id) {
 	});
 }
 
-describe('Courses', () => {
+describe('Courses', function() {
+
 	let mockCourse;
 	let doubleId;
 	let lessonId;

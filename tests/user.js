@@ -8,7 +8,7 @@ let bcrypt = require('bcryptjs');
 let request = require('supertest')('http://localhost:3200');
 const courseApi = require('../api/course.js');
 
-describe("User", function() {
+xdescribe("User", function() {
 	let mockUser;
 	let password = 'test';
 	let userEmail = `ryan+${+new Date()}@hackeryou.com`;

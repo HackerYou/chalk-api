@@ -179,20 +179,18 @@ course.getCourse = (req,res) => {
 course.updateCourse = (req,res) => {
 	let model = req.body;
 	let id = req.params.id;
-
 	
 	models.course.findOne({ _id:id },
 		(err,doc) => {
 			delete model._id;
-
+		
 			if(doc.sections) {
 				model.sections = model.sections.map((obj) => obj._id);
 			}
 
 			model.updated_at = +new Date();
-			
 			Object.assign(doc,model);
-
+			
 			doc.save(err => {
 				if(err){
 					res.send({

@@ -9,5 +9,6 @@ module.exports = {
 	announcement: require('./announcement.js'),
 	user: require('./user.js'),
 	section: require('./section.js'),
-	media: require('./media.js')
+	media: require('./media.js'),
+	question: require('./question.js')
 };
