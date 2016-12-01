@@ -7,6 +7,7 @@ let models = require('../api/models/index.js');
 let request = require('supertest')('http://localhost:3200');
 let user = require('../api/user.js');
 let bcrypt = require('bcryptjs');
+let fs = require('fs');
 
 describe('Questions', () => {
 	let token;
@@ -61,7 +62,7 @@ describe('Questions', () => {
 			.post('/v2/questions')
 			.send({
 				title: 'Sample test',
-				type: 'Code',
+				type: 'Multiple Choice',
 				category: 'JS',
 				body: 'This is a sample test, can you do the test?!'
 			})
@@ -74,9 +75,37 @@ describe('Questions', () => {
 				expect(res.status).to.be(200);
 				expect(data.question).to.be.an('object');
 				expect(data.question.title).to.be.eql('Sample test');
-				expect(data.question.type).to.be.eql('Code');
+				expect(data.question.type).to.be.eql('Multiple Choice');
 				expect(data.question.category).to.be.eql('JS');
 				expect(data.question.body).to.be.eql('This is a sample test, can you do the test?!');
+				done();
+			});
+	});
+
+	it('should get all the questions', (done) => {
+		request
+			.get('/v2/questions')
+			.set('x-access-token', token)
+			.end((err, res) => {
+				expect(err).to.be.eql(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.status).to.be(200);
+				expect(res.body.questions).to.be.an('array');
+				done();
+			});
+	});
+
+	it('should get a specific question', (done) => {
+		request
+			.get(`/v2/questions/${questionId}`)
+			.set('x-access-token', token)
+			.end((err,res) => {
+				expect(err).to.be.eql(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question).to.be.an('object');
+				expect(res.body.question.title).to.be.eql('Sample test');
 				done();
 			});
 	});
@@ -89,7 +118,7 @@ describe('Questions', () => {
 				title: 'Muti choice test',
 				type: 'Multiple Choice',
 				body: 'What is 1 + 1?',
-				answer: '2',
+				multiAnswer: '2',
 				multiChoice: [
 					{
 						value: '2',
@@ -113,6 +142,48 @@ describe('Questions', () => {
 				expect(res.body.question.multiChoice).to.have.length(3);
 				done();
 			})
+	});
+
+	it('should update a question', (done) => {
+		request
+			.put(`/v2/questions/${questionId}`)
+			.set('x-access-token', token)
+			.send({
+				title: "Updated sample test title"
+			})
+			.end((err,res) => {
+				expect(err).to.be.eql(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question.title).to.be.eql("Updated sample test title");
+				expect(res.body.question.type).to.be.eql("Multiple Choice");
+				expect(res.body.question.category).to.be.eql("JS");
+				done();
+			});
+	});
+
+	it('should add code and a unit test', (done) => {
+		request
+			.post('/v2/questions')
+			.set('x-access-token', token)
+			.send({
+				title: "Code Test",
+				type: "Code",
+				category: "JavaScript", 
+				body: "Create a function called add that takes two parameters and returns the value of them added together",
+				unitTest: `
+					assert(add(1,2) === 5)
+				`
+			})
+			.end((err,res) => {
+				const fileFound = fs.readdirSync('testCenter');
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question.title).to.be.eql("Code Test");
+				expect(fileFound.includes(`test_${res.body.question._id}.js`)).to.be.ok();
+				done();
+			});
 	});
 
 	it('should remove a question', (done) => {

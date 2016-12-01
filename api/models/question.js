@@ -7,13 +7,14 @@ let mixin = require('./modelMixin.js');
 let model = Object.assign({
 	type: 'string',
 	category: 'string',
-	difficulity: 'string',
+	difficulty: 'string',
 	body: 'string',
-	answer: 'string',
+	multiAnswer: 'string',
 	multiChoice: [{
 		label: 'string',
 		value: 'string'
-	}]
+	}],
+	unitTest: 'string'
 }, mixin);
 
 let questionnSchema = new Schema(model);
