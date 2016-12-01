@@ -103,16 +103,32 @@ question.updateQuestion = (req,res) => {
 
 question.removeQuestion = (req,res) => {
 	const id = req.params.id;
-	models.question.findOneAndRemove({_id: req.id }, (err,doc) => {
+	models.question.findOneAndRemove({_id: id }, (err,doc) => {
 		if(err) {
 			res.status(400).send({
 				error: err
 			});
 			return;
 		}
-		res.status(200).send({
-			question: doc
-		});
+		removeTestFile(id)
+			.then(_ => res.status(200).send({
+				success: true
+			}))
+			.catch(console.log);
+
+	});
+}
+
+function removeTestFile(id) {
+	return new Promise((resolve,reject) => {
+		fs.unlink(`testCenter/test_${id}.js`, (err) => {
+			if(err) {
+				reject(err)
+				return;
+			}
+			resolve();
+
+		})
 	});
 }
 

@@ -9,10 +9,11 @@ let user = require('../api/user.js');
 let bcrypt = require('bcryptjs');
 let fs = require('fs');
 
-describe('Questions', () => {
+describe('Questions', function() {
 	let token;
 	let length;
 	let questionId;
+	let codeQuestionId;
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -129,7 +130,7 @@ describe('Questions', () => {
 						label: '5'
 					},
 					{
-						lable: '9',
+						label: '9',
 						value: '9'
 					}
 				]
@@ -171,30 +172,31 @@ describe('Questions', () => {
 				type: "Code",
 				category: "JavaScript", 
 				body: "Create a function called add that takes two parameters and returns the value of them added together",
-				unitTest: `
-					assert(add(1,2) === 5)
-				`
+				unitTest: `assert(add(1,2) === 5)`
 			})
 			.end((err,res) => {
 				const fileFound = fs.readdirSync('testCenter');
+				codeQuestionId = res.body.question._id;
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
 				expect(res.body.question.title).to.be.eql("Code Test");
-				expect(fileFound.includes(`test_${res.body.question._id}.js`)).to.be.ok();
+				expect(fileFound.includes(`test_${codeQuestionId}.js`)).to.be.ok();
 				done();
 			});
 	});
 
 	it('should remove a question', (done) => {
 		request
-			.delete(`/v2/questions/${questionId}`)
+			.delete(`/v2/questions/${codeQuestionId}`)
 			.set('x-access-token', token)
 			.end((err,res) => {
+				const testFiles = fs.readdirSync('testCenter');
 				expect(err).to.be.eql(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
-				expect(res.body.question).to.be.eql(null);
+				expect(testFiles.includes(`test_${codeQuestionId}.js`)).to.be.eql(false);
+				expect(res.status).to.be(200);
 				done();
 			});
 	});
