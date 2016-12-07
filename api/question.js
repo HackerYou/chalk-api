@@ -122,8 +122,8 @@ question.removeQuestion = (req,res) => {
 function removeTestFile(id) {
 	return new Promise((resolve,reject) => {
 		const fileName = `testCenter/test_${id}.js`;
-		const checkFile = fs.statSync(fileName);
-		if(checkFile.isFile()) {
+		const checkFile = fs.existsSync(fileName);
+		if(checkFile) {
 			fs.unlink(fileName, (err) => {
 				if(err) {
 					reject(err)
