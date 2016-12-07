@@ -121,14 +121,20 @@ question.removeQuestion = (req,res) => {
 
 function removeTestFile(id) {
 	return new Promise((resolve,reject) => {
-		fs.unlink(`testCenter/test_${id}.js`, (err) => {
-			if(err) {
-				reject(err)
-				return;
-			}
+		const fileName = `testCenter/test_${id}.js`;
+		const checkFile = fs.statSync(fileName);
+		if(checkFile.isFile()) {
+			fs.unlink(fileName, (err) => {
+				if(err) {
+					reject(err)
+					return;
+				}
+				resolve();
+			});
+		}
+		else {
 			resolve();
-
-		})
+		}
 	});
 }
 

@@ -10,5 +10,6 @@ module.exports = {
 	user: require('./user.js'),
 	section: require('./section.js'),
 	media: require('./media.js'),
-	question: require('./question.js')
+	question: require('./question.js'),
+	test: require('./test.js')
 };

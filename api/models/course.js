@@ -12,7 +12,8 @@ let model = Object.assign({
 	description: String,
 	students: [{type: String, ref: 'User'}],
 	start_date: Number,
-	end_date: Number
+	end_date: Number,
+	test: String
 }, mixin);
 
 let courseSchema = new Schema(model);

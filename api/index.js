@@ -12,5 +12,6 @@ module.exports = {
 	announcement: require('./announcement.js'),
 	user: require('./user.js'),
 	media: require('./media.js'),
-	question: require('./question.js')
+	question: require('./question.js'),
+	tests: require('./tests.js')
 };

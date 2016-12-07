@@ -154,6 +154,14 @@ app.post('/v2/questions', routeAuth,adminRoute,api.question.createQuestion);
 app.put('/v2/questions/:id',routeAuth,adminRoute, api.question.updateQuestion);
 app.delete('/v2/questions/:id',routeAuth,adminRoute,api.question.removeQuestion);
 
+//Tests
+app.get('/v2/tests',routeAuth,adminRoute,api.tests.getTests);
+app.get('/v2/tests/:id', routeAuth,api.tests.getSingleTest);
+app.post('/v2/tests',routeAuth,adminRoute,api.tests.createTest);
+app.put('/v2/tests/:id',routeAuth, adminRoute, api.tests.updateTest);
+app.put('/v2/tests/:id/question',routeAuth,adminRoute,api.tests.addQuestion);
+app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
+
 app.listen('3200');
 console.log('App listening on port 3200');
 

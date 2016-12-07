@@ -512,6 +512,7 @@ course.removeUser = (req,res) => {
 	});
 };
 
+
 module.exports = course;
 
 
