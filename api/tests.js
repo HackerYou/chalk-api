@@ -143,6 +143,40 @@ tests.updateTest = (req,res) => {
 	});
 };
 
+tests.removeQuestionFromTest = (req,res) => {
+	const testId = req.params.id;
+	const questionId = req.body.questionId;
+	models.test.findOneAndUpdate({_id: testId}, {
+		$pull: {questions: questionId}
+	}, 
+	{
+		new: true
+	},
+	(err,doc) => {
+		if(err) {
+			res.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		models.test.populate(doc,{path: 'questions'},
+			(err, testWithQuestions) => {
+				if(err) {
+					res.status(400)
+						.send({
+							error: err
+						});
+					return
+				}
+				res.status(200)
+					.send({
+						test: testWithQuestions
+					});
+			});
+	});
+};
+
 tests.removeTest = (req,res) => {
 	const id = req.params.id;
 	models.test.findOneAndRemove({_id: id},(err,doc) => {

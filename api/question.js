@@ -115,7 +115,6 @@ question.removeQuestion = (req,res) => {
 				success: true
 			}))
 			.catch(console.log);
-
 	});
 }
 

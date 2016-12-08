@@ -160,6 +160,7 @@ app.get('/v2/tests/:id', routeAuth,api.tests.getSingleTest);
 app.post('/v2/tests',routeAuth,adminRoute,api.tests.createTest);
 app.put('/v2/tests/:id',routeAuth, adminRoute, api.tests.updateTest);
 app.put('/v2/tests/:id/question',routeAuth,adminRoute,api.tests.addQuestion);
+app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
 
 app.listen('3200');

@@ -13,6 +13,7 @@ describe('Tests', function() {
 	let length;
 	let courseId;
 	let testId;
+	let questionId;
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -46,8 +47,7 @@ describe('Tests', function() {
 							courseId = courses.course[0]._id;
 							done();
 						}
-					})
-
+					});
 				}
 			});
 		});
@@ -63,7 +63,7 @@ describe('Tests', function() {
 			.post(`/v2/tests`)
 			.set(`x-access-token`,token)
 			.send({
-				courseId: courseId,
+				courseId,
 				data: {
 					title: "Test added to a course"
 				}
@@ -133,11 +133,12 @@ describe('Tests', function() {
 			.set(`x-access-token`,token)
 			.end((err,res) => {
 				const question = res.body.questions[0];
+				questionId = question._id;
 				request
 					.put(`/v2/tests/${testId}/question`)
 					.set(`x-access-token`,token)
 					.send({
-						questionId: question._id
+						questionId
 					})
 					.end((err,res) => {
 						expect(err).to.be(null);
@@ -147,6 +148,37 @@ describe('Tests', function() {
 						expect(res.body.test.questions[0]._id).to.be.eql(question._id);
 						done();
 					});
+			});
+	});
+
+	it('should not remove a single question if the id is wrong', (done) => {
+		request
+			.delete(`/v2/tests/${testId}/question`)
+			.set(`x-access-token`,token)
+			.send({
+				questionId: '141fh1h3174891'
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.be(400);
+				done();
+			});
+	});
+
+	it('should remove a single question', (done) => {
+		request
+			.delete(`/v2/tests/${testId}/question`)
+			.set(`x-access-token`,token)
+			.send({
+				questionId
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.test.questions).to.have.length(0);
+				done();
 			});
 	});
 
