@@ -143,6 +143,122 @@ tests.updateTest = (req,res) => {
 	});
 };
 
+tests.addUser = (req,res) => {
+	const testId = req.params.id;
+	const userId = req.body.userId;
+
+	models.test.findOneAndUpdate({_id: testId},{
+		$push: {users:userId}
+	}, {
+		new: true
+	},(err,doc) => {
+		if(err) {
+			res.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		addTestToUser(testId,userId)
+			.then(() => {
+				res.status(200)
+					.send({
+						test: doc
+					});
+			})
+			.catch((err) => {
+				res.status(400)
+					.send({
+						error: err
+					});
+			});
+	});
+};
+
+tests.evaluate = (req,res) => {
+	const testId = req.params.id;
+	const userId = req.body.userId;
+	const answers = req.body.answers;
+	//Check if user is part of test
+	models.test.findOne({_id:testId},(err,doc) => {
+		if(err) {
+			res.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		if(doc.users.includes(userId)) {
+			//start going through the questions
+			//compare against their answer
+			//If code test, run unit test
+			//else check multiple choice
+			//Add results to user object
+			const userAnswers = doc.questions.map((question,i) => {
+				if(question.type === 'Multiple Choice') {
+					return {
+						id: question._id,
+						type: 'Multiple Choice',
+						expected: question.multiAnswer,
+						actual: answers[i].answer,
+						correct: (_ => {
+							return question.multiAnswer === answers[i].answer
+						})()
+					}
+				}
+			});
+
+			models.user.findOne({_id: userId},(err,userDoc) => {
+				if(err) {
+					res.status(400)
+						.send({
+							error: err
+						});
+					return;
+				}
+				//search test_results key,
+				//if test exists do nothing
+				//else add test and results
+				if(doesTestExist(testId,userDoc.test_results)) {
+					res.status(400)
+						.send({
+							error: "User has already taken test"
+						});
+					return
+				}
+				if(!userDoc.test_results) {
+					userDoc.test_results = [];
+				}
+				userDoc.test_results.push({
+					id: testId,
+					answers: userAnswers
+				});
+				userDoc.save((err,newUserDoc) => {
+					if(err) {
+						res.status(400)
+							.send({
+								error: err
+							});
+						return
+					}
+					res.status(200)
+						.send({
+							user: newUserDoc
+						});
+				});
+			});
+
+		}
+		else {
+			res.status(401)
+				.send({
+					error: err
+				});
+		}
+
+	}).populate('questions');
+};
+
 tests.removeQuestionFromTest = (req,res) => {
 	const testId = req.params.id;
 	const questionId = req.body.questionId;
@@ -230,6 +346,35 @@ function removeTestFromCourse(courseId) {
 			resolve(doc);
 		});
 	});
+}
+
+function addTestToUser(testId,userId) {
+	return new Promise((resolve,reject) => {
+		models.user.findOneAndUpdate({
+			_id: userId
+		},{
+			$push: {tests: testId}
+		},{
+			new: true
+		}, (err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			resolve(doc);
+		});
+	});
+}
+
+function doesTestExist(testId,userResults) {
+	if(userResults === undefined) {
+		return false;
+	}
+	for(result of userResults) {
+		if(result.id === testId) {
+			return true;
+		}
+	}
+	return false;
 }
 
 

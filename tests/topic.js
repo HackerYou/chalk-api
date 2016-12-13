@@ -74,7 +74,7 @@ describe('Topics', () => {
 		})
 	});
 
-	xit('should return a specific list of topics, offset by 10, limit of 10',(done) => {
+	it('should return a specific list of topics, offset by 10, limit of 10',(done) => {
 		topic.getTopics({
 			query: {
 				offset: 10,

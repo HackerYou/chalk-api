@@ -7,7 +7,8 @@ let mixin = require('./modelMixin.js');
 let model = Object.assign({
 	title: 'string',
 	questions: [{ref:'Question', type: 'ObjectId'}],
-	course: {ref: "Course", type: 'ObjectId'}
+	course: {ref: "Course", type: 'ObjectId'},
+	users: [{type: 'String', ref: 'User'}]
 }, mixin);
 
 let testSchema = new Schema(model);

@@ -15,7 +15,9 @@ let model = {
 	updated_at: Number,
 	created_at: Number,
 	first_sign_up: Boolean,
-	favorites: Schema.Types.Mixed
+	favorites: Schema.Types.Mixed,
+	tests: [{type: String, ref: 'Test'}],
+	test_results: Schema.Types.Mixed
 };
 
 let userSchema = new Schema(model);

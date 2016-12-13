@@ -38,7 +38,8 @@ question.createQuestion = (req,res) => {
 };
 
 question.getQuestions = (req,res) => {
-	models.question.find({},(err,docs) => {
+	const query = req.query;
+	models.question.find(query,(err,docs) => {
 		if(err) {
 			res.status(400)
 				.send({

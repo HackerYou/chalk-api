@@ -129,13 +129,12 @@ user.getUser = (req,res) => {
 			res.send({
 				error: err
 			});
+			return;
 		}
-		else {
-			res.send({
-				user: doc
-			});
-		}
-	}).populate('courses');
+		res.send({
+			user: doc
+		});
+	}).populate('courses tests');
 };
 
 user.updateUser = (req,res) => {

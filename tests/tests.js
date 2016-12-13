@@ -11,9 +11,11 @@ let course = require('../api/course.js');
 describe('Tests', function() {
 	let token;
 	let length;
+	let userId;
 	let courseId;
 	let testId;
 	let questionId;
+	let questionObj;
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -27,8 +29,8 @@ describe('Tests', function() {
 			first_sign_up: true,
 			instructor: true
 		};
-		new models.user(userModel).save((err) => {
-
+		new models.user(userModel).save((err,doc) => {
+			userId = doc._id;
 			if(err) {
 				throw err;
 			}
@@ -54,8 +56,17 @@ describe('Tests', function() {
 	});
 
 	after((done) => {
-		mongoose.disconnect();
-		done();
+		user.removeUser({
+			params: {
+				id: userId
+			},
+			body: {}
+		}, {
+			send(data) {
+				mongoose.disconnect();
+				done();
+			}
+		})
 	});
 
 	it('should create a test and add it to a course', (done) => {
@@ -133,6 +144,7 @@ describe('Tests', function() {
 			.set(`x-access-token`,token)
 			.end((err,res) => {
 				const question = res.body.questions[0];
+				questionObj = question;
 				questionId = question._id;
 				request
 					.put(`/v2/tests/${testId}/question`)
@@ -151,6 +163,90 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should add a code question', (done) => {
+		request
+			.get(`/v2/questions?type=Code`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(400);
+				const question = res.body.questions[0];
+				request
+					.put(`/v2/tests/${testId}/question`)
+					.set(`x-access-token`,token)
+					.send({
+						questionId: question._id
+					})
+					.end((err,res) => {
+						expect(err).to.be(null);
+						expect(res.status).to.not.be(400);
+						expect(res.body.test.questions).to.be.an('array');
+						expect(res.body.test.questions.length).to.be.eql(2);
+						done();
+					});
+			});
+	});
+
+	it('should get a single test', (done) => {
+		request
+			.get(`/v2/tests/${testId}`)
+			.set(`x-access-token`, token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.test).to.be.an('object');
+				done();
+			});
+	});
+
+	it('should add a test to a user', (done) => {
+		request
+			.put(`/v2/tests/${testId}/user`)
+			.set(`x-access-token`, token)
+			.send({
+				userId
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.test.users).to.have.length(1);
+				request
+					.get(`/v1/user/${res.body.test.users[0]}`)
+					.set(`x-access-token`,token)
+					.end((err,res) => {
+						expect(err).to.be(null);
+						expect(res.body.user.tests).to.be.an('array');
+						expect(res.body.user.tests[0]).to.be.an('object');
+						expect(res.body.user.tests[0]._id).to.be.eql(testId);
+						done();
+					})
+			});
+	});
+
+	it('should allow a user to take a test', (done) => {
+		request
+			.post(`/v2/tests/${testId}/evaluate`)
+			.set(`x-access-token`,token)
+			.send({
+				userId,
+				answers: [
+					{
+						questionId: questionId,
+						answer: questionObj.multiAnswer
+					}
+				]
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(401);
+				expect(res.status).to.not.be(400);
+				done();
+			});
+	});
+	
 	it('should not remove a single question if the id is wrong', (done) => {
 		request
 			.delete(`/v2/tests/${testId}/question`)
@@ -177,20 +273,7 @@ describe('Tests', function() {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
-				expect(res.body.test.questions).to.have.length(0);
-				done();
-			});
-	});
-
-	it('should get a single test', (done) => {
-		request
-			.get(`/v2/tests/${testId}`)
-			.set(`x-access-token`, token)
-			.end((err,res) => {
-				expect(err).to.be(null);
-				expect(res.status).to.not.be(404);
-				expect(res.status).to.not.be(400);
-				expect(res.body.test).to.be.an('object');
+				expect(res.body.test.questions).to.have.length(1);
 				done();
 			});
 	});

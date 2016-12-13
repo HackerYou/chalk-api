@@ -65,7 +65,8 @@ describe('Questions', function() {
 				title: 'Sample test',
 				type: 'Multiple Choice',
 				category: 'JS',
-				body: 'This is a sample test, can you do the test?!'
+				body: 'This is a sample test, can you do the test?!',
+				multiAnswer: 2
 			})
 			.set('x-access-token', token)
 			.end((err,res) => {
@@ -182,6 +183,18 @@ describe('Questions', function() {
 				expect(res.status).to.not.be(400);
 				expect(res.body.question.title).to.be.eql("Code Test");
 				expect(fileFound.includes(`test_${codeQuestionId}.js`)).to.be.ok();
+				done();
+			});
+	});
+
+	it('should get questions by type', (done) => {
+		request
+			.get(`/v2/questions?type=Code`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(400);
+				expect(res.body.questions[0].type).to.be.eql('Code');
 				done();
 			});
 	});
