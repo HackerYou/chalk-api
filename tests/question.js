@@ -181,13 +181,11 @@ describe('Questions', function() {
 				`
 			})
 			.end((err,res) => {
-				const fileFound = fs.readdirSync('testCenter');
 				codeQuestionId = res.body.question._id;
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
 				expect(res.body.question.title).to.be.eql("Code Test");
-				expect(fileFound.includes(`test_${codeQuestionId}.js`)).to.be.ok();
 				done();
 			});
 	});
@@ -209,11 +207,9 @@ describe('Questions', function() {
 			.delete(`/v2/questions/${codeQuestionId}`)
 			.set('x-access-token', token)
 			.end((err,res) => {
-				const testFiles = fs.readdirSync('testCenter');
 				expect(err).to.be.eql(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
-				expect(testFiles.includes(`test_${codeQuestionId}.js`)).to.be.eql(false);
 				expect(res.status).to.be(200);
 				done();
 			});

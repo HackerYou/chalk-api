@@ -263,8 +263,6 @@ tests.evaluate = (req,res) => {
 						});
 					});
 				});
-
-
 		}
 		else {
 			res.status(401)

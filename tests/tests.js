@@ -32,12 +32,13 @@ describe('Tests', function() {
 					body: "Create a function called add that takes two parameters and returns the value of them added together",
 					unitTest: `
 						describe("Add", () => {
-							expect(add(1,2)).toBe(3);
+							it('should add 1 and 2 and return 3', () => {
+								expect(add(1,2)).toBe(3);
+							});
 						});
 					`
 				})
 				.end((err,res) => {
-					console.log(err,res);
 					resolve(res)
 				});
 		});
@@ -192,7 +193,7 @@ describe('Tests', function() {
 	it('should add a code question', (done) => {
 		makeCodeQuestion()
 			.then((res) => {
-				const question = res.body.questions[0];
+				const question = res.body.question;
 				codeTestId = question._id;
 				request
 					.put(`/v2/tests/${testId}/question`)
@@ -210,7 +211,7 @@ describe('Tests', function() {
 			});
 	});
 
-	xit('should get a single test', (done) => {
+	it('should get a single test', (done) => {
 		request
 			.get(`/v2/tests/${testId}`)
 			.set(`x-access-token`, token)
@@ -223,7 +224,7 @@ describe('Tests', function() {
 			});
 	});
 
-	xit('should add a test to a user', (done) => {
+	it('should add a test to a user', (done) => {
 		request
 			.put(`/v2/tests/${testId}/user`)
 			.set(`x-access-token`, token)
@@ -248,7 +249,7 @@ describe('Tests', function() {
 			});
 	});
 
-	xit('should allow a user to take a test', function(done) {
+	it('should allow a user to take a test', function(done) {
 		this.timeout(4000);
 		request
 			.post(`/v2/tests/${testId}/evaluate`)
@@ -274,12 +275,13 @@ describe('Tests', function() {
 				expect(res.body.user.test_results[0].answers[0]).to.not.be(null);
 				expect(res.body.user.test_results[0].answers[0].correct).to.be.ok();
 				expect(res.body.user.test_results[0].answers[1]).to.not.be(null);
+				console.log(res.body.user.test_results[0].answers[1]);
 				expect(res.body.user.test_results[0].answers[1].correct).to.be.ok();
 				done();
 			});
 	});
 	
-	xit('should not remove a single question if the id is wrong', (done) => {
+	it('should not remove a single question if the id is wrong', (done) => {
 		request
 			.delete(`/v2/tests/${testId}/question`)
 			.set(`x-access-token`,token)
@@ -290,12 +292,11 @@ describe('Tests', function() {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.be(400);
-				expect(res.body.test.questions.length).to.be.eql(2);
 				done();
 			});
 	});
 
-	xit('should remove a single question', (done) => {
+	it('should remove a single question', (done) => {
 		request
 			.delete(`/v2/tests/${testId}/question`)
 			.set(`x-access-token`,token)
@@ -311,7 +312,7 @@ describe('Tests', function() {
 			});
 	});
 
-	xit('should remove a test', (done) => {
+	it('should remove a test', (done) => {
 		request
 			.delete(`/v2/tests/${testId}`)
 			.set(`x-access-token`, token)

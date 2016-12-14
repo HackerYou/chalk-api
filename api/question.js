@@ -13,28 +13,10 @@ question.createQuestion = (req,res) => {
 			});
 			return;
 		}
-		if(doc.type === "Code") {
-
-			fs.writeFile(`testCenter/test_${doc._id.toString()}.js`, doc.unitTest, (err) => {
-				if(err) {
-					res.status(400)
-						.send({
-							error: err
-						});
-					return;
-				}
-				res.status(200)
-					.send({
-						question: doc
-					});
-			});
-		}
-		else {
-			res.status(200).send({
-				question: doc
-			});
-		}
-	})
+		res.status(200).send({
+			question: doc
+		});
+	});
 };
 
 question.getQuestions = (req,res) => {
@@ -111,11 +93,9 @@ question.removeQuestion = (req,res) => {
 			});
 			return;
 		}
-		removeTestFile(id)
-			.then(_ => res.status(200).send({
-				success: true
-			}))
-			.catch(console.log);
+		res.status(200).send({
+			success: true
+		});
 	});
 }
 

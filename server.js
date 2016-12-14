@@ -22,7 +22,8 @@ app.use(bodyParser.json({
 	limit: '10mb'
 }));
 
-app.use((err, req,res,next) => {
+app.use((err,req,res,next) => {
+	console.log('HI');
 	if(err) {
 		console.error(`${err} on ${new Date()}`)
 	}
