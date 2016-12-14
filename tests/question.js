@@ -54,8 +54,9 @@ describe('Questions', function() {
 		done();
 	});
 
-	it('should exist', () => {
+	it('should exist', (done) => {
 		expect(question).to.ok();
+		done();
 	});
 
 	it('should create a question', (done) => {
@@ -173,7 +174,11 @@ describe('Questions', function() {
 				type: "Code",
 				category: "JavaScript", 
 				body: "Create a function called add that takes two parameters and returns the value of them added together",
-				unitTest: `assert(add(1,2) === 5)`
+				unitTest: `
+					describe("Add", () => {
+						expect(add(1,2)).toBe(3);
+					});
+				`
 			})
 			.end((err,res) => {
 				const fileFound = fs.readdirSync('testCenter');

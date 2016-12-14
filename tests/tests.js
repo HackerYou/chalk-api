@@ -8,14 +8,40 @@ let user = require('../api/user.js');
 let bcrypt = require('bcryptjs');
 let course = require('../api/course.js');
 
+
+
 describe('Tests', function() {
 	let token;
 	let length;
 	let userId;
 	let courseId;
 	let testId;
+	let codeTestId;
 	let questionId;
 	let questionObj;
+	
+	function makeCodeQuestion() {
+		return new Promise((resolve,reject) => {
+			request
+				.post('/v2/questions')
+				.set('x-access-token', token)
+				.send({
+					title: "Code Test",
+					type: "Code",
+					category: "JavaScript", 
+					body: "Create a function called add that takes two parameters and returns the value of them added together",
+					unitTest: `
+						describe("Add", () => {
+							expect(add(1,2)).toBe(3);
+						});
+					`
+				})
+				.end((err,res) => {
+					console.log(err,res);
+					resolve(res)
+				});
+		});
+	}
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -164,18 +190,15 @@ describe('Tests', function() {
 	});
 
 	it('should add a code question', (done) => {
-		request
-			.get(`/v2/questions?type=Code`)
-			.set(`x-access-token`,token)
-			.end((err,res) => {
-				expect(err).to.be(null);
-				expect(res.status).to.not.be(400);
+		makeCodeQuestion()
+			.then((res) => {
 				const question = res.body.questions[0];
+				codeTestId = question._id;
 				request
 					.put(`/v2/tests/${testId}/question`)
 					.set(`x-access-token`,token)
 					.send({
-						questionId: question._id
+						questionId: codeTestId
 					})
 					.end((err,res) => {
 						expect(err).to.be(null);
@@ -187,7 +210,7 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should get a single test', (done) => {
+	xit('should get a single test', (done) => {
 		request
 			.get(`/v2/tests/${testId}`)
 			.set(`x-access-token`, token)
@@ -200,7 +223,7 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should add a test to a user', (done) => {
+	xit('should add a test to a user', (done) => {
 		request
 			.put(`/v2/tests/${testId}/user`)
 			.set(`x-access-token`, token)
@@ -225,7 +248,8 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should allow a user to take a test', (done) => {
+	xit('should allow a user to take a test', function(done) {
+		this.timeout(4000);
 		request
 			.post(`/v2/tests/${testId}/evaluate`)
 			.set(`x-access-token`,token)
@@ -235,6 +259,10 @@ describe('Tests', function() {
 					{
 						questionId: questionId,
 						answer: questionObj.multiAnswer
+					},
+					{
+						questionId: codeTestId,
+						answer: 'function add(a,b){return a + b;}'
 					}
 				]
 			})
@@ -243,11 +271,15 @@ describe('Tests', function() {
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);
 				expect(res.status).to.not.be(400);
+				expect(res.body.user.test_results[0].answers[0]).to.not.be(null);
+				expect(res.body.user.test_results[0].answers[0].correct).to.be.ok();
+				expect(res.body.user.test_results[0].answers[1]).to.not.be(null);
+				expect(res.body.user.test_results[0].answers[1].correct).to.be.ok();
 				done();
 			});
 	});
 	
-	it('should not remove a single question if the id is wrong', (done) => {
+	xit('should not remove a single question if the id is wrong', (done) => {
 		request
 			.delete(`/v2/tests/${testId}/question`)
 			.set(`x-access-token`,token)
@@ -258,11 +290,12 @@ describe('Tests', function() {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.be(400);
+				expect(res.body.test.questions.length).to.be.eql(2);
 				done();
 			});
 	});
 
-	it('should remove a single question', (done) => {
+	xit('should remove a single question', (done) => {
 		request
 			.delete(`/v2/tests/${testId}/question`)
 			.set(`x-access-token`,token)
@@ -278,7 +311,7 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should remove a test', (done) => {
+	xit('should remove a test', (done) => {
 		request
 			.delete(`/v2/tests/${testId}`)
 			.set(`x-access-token`, token)

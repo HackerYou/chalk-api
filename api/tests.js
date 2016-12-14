@@ -2,6 +2,7 @@
 
 const tests = {};
 const models = require('./models');
+const testRunner = require('./testRunner.js');
 
 tests.createTest = (req,res) => {
 	const model = req.body.data;
@@ -76,7 +77,7 @@ tests.getSingleTest = (req,res) => {
 			.send({
 				test: doc
 			});
-	});
+	}).populate('questions');
 };
 
 tests.addQuestion = (req,res) => {
@@ -196,57 +197,73 @@ tests.evaluate = (req,res) => {
 			//Add results to user object
 			const userAnswers = doc.questions.map((question,i) => {
 				if(question.type === 'Multiple Choice') {
-					return {
-						id: question._id,
-						type: 'Multiple Choice',
-						expected: question.multiAnswer,
-						actual: answers[i].answer,
-						correct: (_ => {
-							return question.multiAnswer === answers[i].answer
-						})()
-					}
+					return new Promise((resolve,reject) => {
+						resolve({
+							id: question._id,
+							type: 'Multiple Choice',
+							expected: question.multiAnswer,
+							actual: answers[i].answer,
+							correct: (_ => {
+								return question.multiAnswer === answers[i].answer
+							})()
+						})
+					});
 				}
+				return new Promise((resolve,reject) => {
+					testRunner
+						.run(question,answers[i].answer)
+						.then(res => resolve({
+								id: question._id,
+								type: 'Code',
+								actual: answers[i].answer,
+								correct: res
+							}));
+				});
 			});
 
-			models.user.findOne({_id: userId},(err,userDoc) => {
-				if(err) {
-					res.status(400)
-						.send({
-							error: err
+			Promise.all(userAnswers)
+				.then(answers => {
+					models.user.findOne({_id: userId},(err,userDoc) => {
+						if(err) {
+							res.status(400)
+								.send({
+									error: err
+								});
+							return;
+						}
+						//search test_results key,
+						//if test exists do nothing
+						//else add test and results
+						if(doesTestExist(testId,userDoc.test_results)) {
+							res.status(400)
+								.send({
+									error: "User has already taken test"
+								});
+							return
+						}
+						if(!userDoc.test_results) {
+							userDoc.test_results = [];
+						}
+						userDoc.test_results.push({
+							id: testId,
+							answers
 						});
-					return;
-				}
-				//search test_results key,
-				//if test exists do nothing
-				//else add test and results
-				if(doesTestExist(testId,userDoc.test_results)) {
-					res.status(400)
-						.send({
-							error: "User has already taken test"
+						userDoc.save((err,newUserDoc) => {
+							if(err) {
+								res.status(400)
+									.send({
+										error: err
+									});
+								return
+							}
+							res.status(200)
+								.send({
+									user: newUserDoc
+								});
 						});
-					return
-				}
-				if(!userDoc.test_results) {
-					userDoc.test_results = [];
-				}
-				userDoc.test_results.push({
-					id: testId,
-					answers: userAnswers
+					});
 				});
-				userDoc.save((err,newUserDoc) => {
-					if(err) {
-						res.status(400)
-							.send({
-								error: err
-							});
-						return
-					}
-					res.status(200)
-						.send({
-							user: newUserDoc
-						});
-				});
-			});
+
 
 		}
 		else {

@@ -7,7 +7,7 @@
     "test": "gulp test"
   },
   "engines": {
-    "node": "4.2.1"
+    "node": "7.2.1"
   },
   "author": "Ryan Christiani",
   "license": "ISC",
