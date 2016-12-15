@@ -275,8 +275,7 @@ describe('Tests', function() {
 				expect(res.body.user.test_results[0].answers[0]).to.not.be(null);
 				expect(res.body.user.test_results[0].answers[0].correct).to.be.ok();
 				expect(res.body.user.test_results[0].answers[1]).to.not.be(null);
-				console.log(res.body.user.test_results[0].answers[1]);
-				expect(res.body.user.test_results[0].answers[1].correct).to.be.ok();
+				expect(res.body.user.test_results[0].answers[1].correct.numFailedTests).to.be.eql(0);
 				done();
 			});
 	});

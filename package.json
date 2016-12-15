@@ -23,7 +23,7 @@
     "request": "^2.65.0",
     "sendgrid": "^2.0.0"
   },
-  "jest":{
+  "jest": {
     "testRegex": "testCenter"
   },
   "repository": {
@@ -31,6 +31,7 @@
     "url": "https://github.com/HackerYou/chalk-api.git"
   },
   "devDependencies": {
+    "babel-plugin-external-helpers": "^6.18.0",
     "expect.js": "^0.3.1",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.0.0",

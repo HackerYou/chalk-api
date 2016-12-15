@@ -216,7 +216,7 @@ tests.evaluate = (req,res) => {
 								id: question._id,
 								type: 'Code',
 								actual: answers[i].answer,
-								correct: res
+								correct: JSON.parse(res)
 							}));
 				});
 			});

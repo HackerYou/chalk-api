@@ -176,7 +176,9 @@ describe('Questions', function() {
 				body: "Create a function called add that takes two parameters and returns the value of them added together",
 				unitTest: `
 					describe("Add", () => {
-						expect(add(1,2)).toBe(3);
+						it('should add your numbers together', () => {
+							expect(add(1,2)).toBe(3);
+						});
 					});
 				`
 			})
@@ -198,6 +200,24 @@ describe('Questions', function() {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(400);
 				expect(res.body.questions[0].type).to.be.eql('Code');
+				done();
+			});
+	});
+
+	it('should let you dry run a question', function(done) {
+		request
+			.post(`/v2/questions/${codeQuestionId}/dryrun`)
+			.set(`x-access-token`,token)
+			.set(`Content-Type`, `application/json`)
+			.set(`Accept`,`application/json`)
+			.send({
+				answer: `function add(a,b) {return a + b}`
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(400);
+				expect(res.status).to.not.be(404);
+				expect(res.body.results).to.be.an('object');
 				done();
 			});
 	});

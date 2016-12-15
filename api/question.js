@@ -2,7 +2,7 @@
 
 const question = {};
 const models = require('../api/models/index.js');
-const fs = require('fs');
+const testRunner = require('./testRunner.js');
 
 question.createQuestion = (req,res) => {
 	const model = req.body;
@@ -97,24 +97,26 @@ question.removeQuestion = (req,res) => {
 			success: true
 		});
 	});
-}
+};
 
-function removeTestFile(id) {
-	return new Promise((resolve,reject) => {
-		const fileName = `testCenter/test_${id}.js`;
-		const checkFile = fs.existsSync(fileName);
-		if(checkFile) {
-			fs.unlink(fileName, (err) => {
-				if(err) {
-					reject(err)
-					return;
-				}
-				resolve();
+question.dryRun = (req,res) => {
+	const userAnswer = req.body.answer;
+	const questionId = req.params.id;
+	models.question.findOne({_id:questionId},(err,doc) => {
+		if(err) {
+			res.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		testRunner.run(doc,userAnswer)
+			.then((data) => {
+				res.status(200)
+					.send({
+						results: JSON.parse(data)
+					});
 			});
-		}
-		else {
-			resolve();
-		}
 	});
 }
 

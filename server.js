@@ -152,6 +152,7 @@ app.delete('/v1/media/:key',routeAuth, adminRoute ,api.media.removeFile);
 app.get('/v2/questions',routeAuth,adminRoute,api.question.getQuestions);
 app.get('/v2/questions/:id',routeAuth,adminRoute,api.question.getSingleQuestion);
 app.post('/v2/questions', routeAuth,adminRoute,api.question.createQuestion);
+app.post('/v2/questions/:id/dryrun',routeAuth,api.question.dryRun);
 app.put('/v2/questions/:id',routeAuth,adminRoute, api.question.updateQuestion);
 app.delete('/v2/questions/:id',routeAuth,adminRoute,api.question.removeQuestion);
 
