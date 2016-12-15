@@ -223,7 +223,7 @@ tests.evaluate = (req,res) => {
 
 			Promise.all(userAnswers)
 				.then(answers => {
-					models.user.findOne({_id: userId},(err,userDoc) => {
+					models.user.findOne({_id: userId},{password: 0},(err,userDoc) => {
 						if(err) {
 							res.status(400)
 								.send({
