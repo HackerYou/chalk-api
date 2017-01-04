@@ -46,7 +46,6 @@ tests.createTest = (req,res) => {
 		});
 };
 
-
 tests.getTests = (req,res) => {
 	models.test.find({},(err,docs) => {
 		if(err){
@@ -318,7 +317,7 @@ tests.removeTest = (req,res) => {
 				});
 			return;
 		}
-		removeTestFromCourse(doc.course)
+		removeTestFromCourse(id,doc.course)
 			.then((course) => {
 				res.status(200)
 					.send({
@@ -337,7 +336,7 @@ tests.removeTest = (req,res) => {
 function addTestToCourse(testId,courseId) {
 	return new Promise((resolve,reject) => {
 		models.course.findOneAndUpdate({_id:courseId}, {
-			$set: {test: testId}
+			$push: {tests: testId}
 		},(err,doc) => {
 			if(err) {
 				reject(err)
@@ -347,10 +346,10 @@ function addTestToCourse(testId,courseId) {
 	});
 }
 
-function removeTestFromCourse(courseId) {
+function removeTestFromCourse(testId,courseId) {
 	return new Promise((resolve,reject) => {
 		models.course.findOneAndUpdate({_id: courseId},{
-			$set: {test: null}
+			$pull: {tests: testId}
 		},
 		{
 			new: true

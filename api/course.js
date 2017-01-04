@@ -10,7 +10,7 @@ course.createCourse = (req,res) => {
 	let model = req.body;
 	model.template = false;
 	model.created_at = +new Date();
-
+	model.test = [];
 	new models.course(model).save((err,doc) => {
 		if(err) {
 			res.send({
@@ -150,6 +150,9 @@ course.getCourse = (req,res) => {
 				{
 					path: 'students',
 					select: 'firstName lastName email'
+				}, 
+				{
+					path: 'tests'
 				}
 			],(err,populatedDocs) => {
 				if(err) {

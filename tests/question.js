@@ -9,11 +9,15 @@ let user = require('../api/user.js');
 let bcrypt = require('bcryptjs');
 let fs = require('fs');
 
+
+
 describe('Questions', function() {
 	let token;
 	let length;
 	let questionId;
 	let codeQuestionId;
+	let htmlQuestionId;
+	let reactQuestionId;
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -192,6 +196,62 @@ describe('Questions', function() {
 			});
 	});
 
+	
+	it('should add a HTML test', (done) => {
+		request
+			.post('/v2/questions')
+			.set('x-access-token', token)
+			.send({
+				title: "HTML Test",
+				type: "Code",
+				category: "HTML", 
+				body: "Create an unordered list that has four list elements in it",
+				unitTest: `
+					describe("HTML", () => {
+						it('should contain 4 lis', () => {
+							expect(render(React.createElement(Element)).find('li').length).toBe(4);
+						});
+					});
+				`
+			})
+			.end((err,res) => {
+				htmlQuestionId = res.body.question._id;
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question.title).to.be.eql("HTML Test");
+				done();
+			});
+	});
+
+	xit('should add a React test', (done) => {
+		request
+			.post('/v2/questions')
+			.set('x-access-token', token)
+			.send({
+				title: "React Test",
+				type: "Code",
+				category: "React", 
+				body: "Create an unordered list that has four list elements in it",
+				unitTest: `
+					describe("React", () => {
+						it('should contain 4 lis', () => {
+							expect(render(React.createElement(Element)).find('li').length).toBe(4);
+						});
+					});
+				`
+			})
+			.end((err,res) => {
+				htmlQuestionId = res.body.question._id;
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question.title).to.be.eql("React Test");
+				done();
+			});
+	});
+
+
 	it('should get questions by type', (done) => {
 		request
 			.get(`/v2/questions?type=Code`)
@@ -222,6 +282,31 @@ describe('Questions', function() {
 			});
 	});
 
+	it('should dry run the HTML test', (done) => {
+		request
+			.post(`/v2/questions/${htmlQuestionId}/dryrun`)
+			.set(`x-access-token`,token)
+			.set(`Content-Type`, `application/json`)
+			.send({
+				answer: `
+					<ul>
+						<li>Test List</li>
+						<li>Test List 2</li>
+						<li>Test List 3</li>
+						<li>Test List 4</li>
+					</ul>
+				`
+			})
+			.end((err,res) => {
+				expect(err).to.be.eql(null);
+				expect(res.status).to.not.be(400);
+				expect(res.status).to.be(200);
+				expect(res.body.results).to.be.an('object');
+				expect(res.body.results.success).to.be(true);
+				done();
+			});
+	});
+
 	it('should remove a question', (done) => {
 		request
 			.delete(`/v2/questions/${codeQuestionId}`)
@@ -231,7 +316,14 @@ describe('Questions', function() {
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
 				expect(res.status).to.be(200);
-				done();
+				request
+					.delete(`/v2/questions/${htmlQuestionId}`)
+					.set(`x-access-token`,token)
+					.end((err,res) => {
+						expect(err).to.be.eql(null);
+						expect(res.status).to.be(200);
+						done();
+					});
 			});
 	});
 

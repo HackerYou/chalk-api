@@ -111,7 +111,7 @@ describe('Tests', function() {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
-				expect(res.body.test.course).to.be.a('string');
+				expect(res.body.test.course).to.be.an('string');
 				expect(res.body.test.created_by).to.not.be('string');
 				expect(res.body.test.created_at).to.be.a('number');
 				done();
@@ -245,7 +245,7 @@ describe('Tests', function() {
 						expect(res.body.user.tests[0]).to.be.an('object');
 						expect(res.body.user.tests[0]._id).to.be.eql(testId);
 						done();
-					})
+					});
 			});
 	});
 
