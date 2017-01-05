@@ -20,7 +20,10 @@ function transpile(date,tempContent) {
 function removeFile(file) {
 	return new Promise((resolve,reject) => {
 		fs.unlink(file, (err) => {
-			resolve()
+			if(err) {
+				reject(err);
+			}
+			resolve();
 		});
 	});
 }
@@ -59,14 +62,18 @@ module.exports = {
 				${userAnswer}
 				${question.unitTest}
 			`).then(() => {
+				console.log(file);
 				const context = {
 					spawn,
 					__dirname,
-					file,
+					file: `${file}_transpiled.js`,
 					cb(data) {
 						Promise.all([removeFile(`${file}.js`),removeFile(`${file}_transpiled.js`)])
 							.then(() => {
 								resolve(data)
+							})
+							.catch((err) => {
+								console.log(`${new Date()} - ${err}`);
 							});
 					}
 				};
