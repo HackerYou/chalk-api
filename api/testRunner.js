@@ -7,42 +7,54 @@ const fs = require('fs');
 function transpile(date,tempContent) {
 	return new Promise((resolve,reject) => {
 		const filePath = `testCenter/test_${date}`;
-		fs.writeFile(filePath,tempContent,(err) => {
-			console.log(err);
-			transpiledSrc = spawn('babel',[`${filePath}.js`,'-o',`${filePath}_compiled.js`]);
-			transpiledSrc.stdout.on('data', data => {
-				console.log(data.toString())
-			});
-			transpiledSrc.stdout.on('end',() => {
+		fs.writeFile(`${filePath}.js`,tempContent,(err) => {
+			transpiledSrc = spawn('babel',[`${filePath}.js`,'-o',`${filePath}_transpiled.js`]);
+			transpiledSrc.stdout.pipe(process.stdout)
+			transpiledSrc.on('exit',() => {
 				resolve();
 			});
 		});
 	});
 }
 
+function removeFile(file) {
+	return new Promise((resolve,reject) => {
+		fs.unlink(file, (err) => {
+			resolve()
+		});
+	});
+}
 
 module.exports = {
 	run(question,userAnswer) {
 		return new Promise((resolve,reject) => {
-			const date = +new Date()
-			const file = `testCenter/test_${date}_compiled.js`;
-			// Transpile code
-			if(question.type === 'Code' && question.category === 'HTML') {
-				userAnswer = `
+			const date = +new Date();
+			const file = `testCenter/test_${date}`;
+			const requires = `
 				const enzyme = require('enzyme');
 				const shallow = enzyme.shallow;
 				const mount = enzyme.mount;
 				const render = enzyme.render;
 				const React = require('react');
+			`;
+			// Transpile code
+			if(question.type === 'Code' && question.category === 'HTML') {
+				userAnswer = `
 				class Element extends React.Component {
 					render() {
-						<span>
-							${userAnswer}
-						</span>
+						return (
+							<span>
+								${userAnswer}
+							</span>
+						)
 					}
 				}
 				`;
 			}
+			userAnswer = `
+				${requires}
+				${userAnswer}
+			`;
 			transpile(date,`
 				${userAnswer}
 				${question.unitTest}
@@ -52,9 +64,10 @@ module.exports = {
 					__dirname,
 					file,
 					cb(data) {
-						fs.unlink(file, (err) => {
-							resolve(data)
-						});
+						Promise.all([removeFile(`${file}.js`),removeFile(`${file}_transpiled.js`)])
+							.then(() => {
+								resolve(data)
+							});
 					}
 				};
 

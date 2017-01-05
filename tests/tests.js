@@ -114,7 +114,16 @@ describe('Tests', function() {
 				expect(res.body.test.course).to.be.an('string');
 				expect(res.body.test.created_by).to.not.be('string');
 				expect(res.body.test.created_at).to.be.a('number');
-				done();
+				request
+					.get(`/v1/course/${courseId}`)
+					.set(`x-access-token`,token)
+					.end((err,res) => {
+						expect(err).to.be(null);
+						expect(res.body.course.tests).to.be.an('array');
+						expect(res.body.course.tests.length).to.be.greaterThan(0);
+						expect(res.body.course.tests[0]).to.be.an('object');
+						done();
+					})
 			});
 	});
 

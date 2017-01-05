@@ -224,7 +224,7 @@ describe('Questions', function() {
 			});
 	});
 
-	xit('should add a React test', (done) => {
+	it('should add a React test', (done) => {
 		request
 			.post('/v2/questions')
 			.set('x-access-token', token)
@@ -232,17 +232,18 @@ describe('Questions', function() {
 				title: "React Test",
 				type: "Code",
 				category: "React", 
-				body: "Create an unordered list that has four list elements in it",
+				body: "Create a React Component called Header that is a header with an h1 in it that displays the title from a prop called title",
 				unitTest: `
 					describe("React", () => {
-						it('should contain 4 lis', () => {
-							expect(render(React.createElement(Element)).find('li').length).toBe(4);
+						it('should contain the title "This is a title"', () => {
+							const wrapper = shallow(<Header title={"This is a title"}/>)
+							expect( wrapper.contains([<h1>This is a title</h1>]) ).toBe(true);
 						});
 					});
 				`
 			})
 			.end((err,res) => {
-				htmlQuestionId = res.body.question._id;
+				reactQuestionId = res.body.question._id;
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
@@ -265,6 +266,7 @@ describe('Questions', function() {
 	});
 
 	it('should let you dry run a question', function(done) {
+		this.timeout(5000);
 		request
 			.post(`/v2/questions/${codeQuestionId}/dryrun`)
 			.set(`x-access-token`,token)
@@ -282,7 +284,8 @@ describe('Questions', function() {
 			});
 	});
 
-	it('should dry run the HTML test', (done) => {
+	it('should dry run the HTML test', function(done) {
+		this.timeout(5000);
 		request
 			.post(`/v2/questions/${htmlQuestionId}/dryrun`)
 			.set(`x-access-token`,token)
@@ -300,6 +303,34 @@ describe('Questions', function() {
 			.end((err,res) => {
 				expect(err).to.be.eql(null);
 				expect(res.status).to.not.be(400);
+				expect(res.status).to.be(200);
+				expect(res.body.results).to.be.an('object');
+				expect(res.body.results.success).to.be(true);
+				done();
+			});
+	});
+
+	it('should dry run a React test', function(done) {
+		this.timeout(5000);
+		request
+			.post(`/v2/questions/${reactQuestionId}/dryrun`)
+			.set(`x-access-token`,token)
+			.set(`Content-Type`,`application/json`)
+			.send({
+				answer: `
+					class Header extends React.Component {
+						render() {
+							return (
+								<header>
+									<h1>{this.props.title}</h1>
+								</header>
+							)
+						}
+					}
+				`
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
 				expect(res.status).to.be(200);
 				expect(res.body.results).to.be.an('object');
 				expect(res.body.results.success).to.be(true);
