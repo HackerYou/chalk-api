@@ -8,6 +8,9 @@ function transpile(date,tempContent) {
 	return new Promise((resolve,reject) => {
 		const filePath = `testCenter/test_${date}`;
 		fs.writeFile(`${filePath}.js`,tempContent,(err) => {
+			if(err) {
+				reject(err);
+			}
 			transpiledSrc = spawn('babel',[`${filePath}.js`,'-o',`${filePath}_transpiled.js`]);
 			transpiledSrc.stdout.pipe(process.stdout)
 			transpiledSrc.on('exit',() => {
@@ -74,6 +77,7 @@ module.exports = {
 							})
 							.catch((err) => {
 								console.log(`${new Date()} - ${err}`);
+								reject(err);
 							});
 					}
 				};
@@ -89,6 +93,10 @@ module.exports = {
 						cb(testRes);
 					});
 				`,context);
+			})
+			.catch((err) => {
+				console.log(`${new Date()} - ${err}`);
+				reject(err);
 			});
 		});
 	}
