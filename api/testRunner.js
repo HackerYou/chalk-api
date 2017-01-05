@@ -4,14 +4,13 @@ const fs = require('fs');
 
 
 //Transpile file for HTML tests and React tests
-function transpile(date,tempContent) {
+function transpile(file,tempContent) {
 	return new Promise((resolve,reject) => {
-		const filePath = `testCenter/test_${date}`;
-		fs.writeFile(`${filePath}.js`,tempContent,(err) => {
+		fs.writeFile(`${file}.js`,tempContent,(err) => {
 			if(err) {
 				reject(err);
 			}
-			transpiledSrc = spawn('babel',[`${filePath}.js`,'-o',`${filePath}_transpiled.js`]);
+			transpiledSrc = spawn('babel',[`${file}.js`,'-o',`${file}_transpiled.js`]);
 			transpiledSrc.stdout.pipe(process.stdout)
 			transpiledSrc.on('exit',() => {
 				resolve();
@@ -35,7 +34,7 @@ module.exports = {
 	run(question,userAnswer) {
 		return new Promise((resolve,reject) => {
 			const date = +new Date();
-			const file = `testCenter/test_${date}`;
+			const file = `${__dirname.replace('/api','')}/testCenter/test_${date}`;
 			const requires = `
 				const enzyme = require('enzyme');
 				const shallow = enzyme.shallow;
@@ -61,7 +60,7 @@ module.exports = {
 				${requires}
 				${userAnswer}
 			`;
-			transpile(date,`
+			transpile(file,`
 				${userAnswer}
 				${question.unitTest}
 			`).then(() => {
