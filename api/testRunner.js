@@ -10,6 +10,8 @@ function transpile(file,tempContent) {
 			if(err) {
 				reject(err);
 			}
+			const files = fs.readdirSync('testCenter')
+			console.log(files);
 			transpiledSrc = spawn('babel',[`${file}.js`,'-o',`${file}_transpiled.js`]);
 			transpiledSrc.stdout.pipe(process.stdout)
 			transpiledSrc.on('exit',() => {
