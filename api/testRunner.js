@@ -1,6 +1,7 @@
 const spawn = require('child_process').spawn;
 const vm = require('vm');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 
 //Transpile file for HTML tests and React tests
@@ -35,8 +36,8 @@ function removeFile(file) {
 module.exports = {
 	run(question,userAnswer) {
 		return new Promise((resolve,reject) => {
-			const date = +new Date();
-			const file = `${__dirname.replace('/api','')}/testCenter/test_${date}`;
+			const hash = bcrypt.hashSync(question._id.toString(), 2).replace('/','');
+			const file = `${__dirname.replace('/api','')}/testCenter/test_${hash}`;
 			const requires = `
 				const enzyme = require('enzyme');
 				const shallow = enzyme.shallow;
