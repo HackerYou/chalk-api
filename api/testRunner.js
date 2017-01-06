@@ -73,6 +73,7 @@ module.exports = {
 					__dirname,
 					file: `${file}_transpiled.js`,
 					cb(data) {
+						console.log(data);
 						Promise.all([removeFile(`${file}.js`),removeFile(`${file}_transpiled.js`)])
 							.then(() => {
 								resolve(data)
