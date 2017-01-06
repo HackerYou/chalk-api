@@ -276,6 +276,7 @@ describe('Questions', function() {
 				answer: `function add(a,b) {return a + b}`
 			})
 			.end((err,res) => {
+				console.log(res.body);
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(400);
 				expect(res.status).to.not.be(404);
@@ -301,6 +302,7 @@ describe('Questions', function() {
 				`
 			})
 			.end((err,res) => {
+				console.log(res.body);
 				expect(err).to.be.eql(null);
 				expect(res.status).to.not.be(400);
 				expect(res.status).to.be(200);

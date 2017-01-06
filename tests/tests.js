@@ -18,6 +18,7 @@ describe('Tests', function() {
 	let testId;
 	let codeTestId;
 	let questionId;
+	let htmlQuestionId;
 	let questionObj;
 	
 	function makeCodeQuestion() {
@@ -43,6 +44,32 @@ describe('Tests', function() {
 				});
 		});
 	}
+
+	function makeHTMLQuestion() {
+		return new Promise((resolve,reject) => {
+			request
+			.post('/v2/questions')
+			.set('x-access-token', token)
+			.send({
+				title: "HTML Test",
+				type: "Code",
+				category: "HTML", 
+				body: "Create an unordered list that has four list elements in it",
+				unitTest: `
+					describe("HTML", () => {
+						it('should contain 4 lis', () => {
+							expect(render(React.createElement(Element)).find('li').length).toBe(4);
+						});
+					});
+				`
+			})
+			.end((err,res) => {
+				htmlQuestionId = res.body.question._id;
+				resolve(res)
+			});
+		});
+	}
+
 
 	before((done) => {
 		mongoose.connect('mongodb://localhost/notes');
@@ -220,6 +247,26 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should add an HTML question', (done) => {
+		makeHTMLQuestion()
+			.then((res) => {
+				const question = res.body.question;
+				request
+					.put(`/v2/tests/${testId}/question`)
+					.set(`x-access-token`,token)
+					.send({
+						questionId: htmlQuestionId
+					})
+					.end((err,res) => {
+						expect(err).to.be(null);
+						expect(res.status).to.not.be(400);
+						expect(res.body.test.questions).to.be.an('array');
+						expect(res.body.test.questions.length).to.be.eql(3);
+						done();
+					});
+			});
+	});
+
 	it('should get a single test', (done) => {
 		request
 			.get(`/v2/tests/${testId}`)
@@ -298,10 +345,20 @@ describe('Tests', function() {
 					{
 						questionId: codeTestId,
 						answer: 'function add(a,b){return a + b;}'
+					},
+					{
+						questionId: htmlQuestionId,
+						answer: `<ul>
+						<li>Test List</li>
+						<li>Test List 2</li>
+						<li>Test List 3</li>
+						<li>Test List 4</li>
+					</ul>`
 					}
 				]
 			})
 			.end((err,res) => {
+				console.log(JSON.stringify(res.body.user.test_results));
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);
@@ -340,7 +397,7 @@ describe('Tests', function() {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
-				expect(res.body.test.questions).to.have.length(1);
+				expect(res.body.test.questions).to.have.length(2);
 				done();
 			});
 	});
