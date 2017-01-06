@@ -258,6 +258,31 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should note add a test to a user more than once', (done) => {
+		request
+			.put(`/v2/tests/${testId}/user`)
+			.set(`x-access-token`, token)
+			.send({
+				userId
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.test.users).to.have.length(1);
+				request
+					.get(`/v1/user/${res.body.test.users[0]}`)
+					.set(`x-access-token`,token)
+					.end((err,res) => {
+						expect(err).to.be(null);
+						expect(res.body.user.tests).to.be.an('array');
+						expect(res.body.user.tests[0]).to.be.an('object');
+						expect(res.body.user.tests[0]._id).to.be.eql(testId);
+						done();
+					});
+			});
+	});
+
 	it('should allow a user to take a test', function(done) {
 		this.timeout(4000);
 		request

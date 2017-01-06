@@ -367,7 +367,7 @@ function addTestToUser(testId,userId) {
 		models.user.findOneAndUpdate({
 			_id: userId
 		},{
-			$push: {tests: testId}
+			$addToSet: {tests: testId}
 		},{
 			new: true
 		}, (err,doc) => {
