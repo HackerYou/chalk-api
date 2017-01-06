@@ -162,7 +162,7 @@ app.post('/v2/tests',routeAuth,adminRoute,api.tests.createTest);
 app.post('/v2/tests/:id/evaluate',routeAuth,api.tests.evaluate);
 app.put('/v2/tests/:id',routeAuth, adminRoute, api.tests.updateTest);
 app.put('/v2/tests/:id/question',routeAuth,adminRoute,api.tests.addQuestion);
-app.put('/v2/tests/:id/user',routeAuth,adminRoute,api.tests.addUser);
+app.put('/v2/tests/:id/user',routeAuth,api.tests.addUser);
 app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
 
