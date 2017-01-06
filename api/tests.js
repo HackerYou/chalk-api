@@ -148,7 +148,7 @@ tests.addUser = (req,res) => {
 	const userId = req.body.userId;
 
 	models.test.findOneAndUpdate({_id: testId},{
-		$push: {users:userId}
+		$addToSet: {users:userId}
 	}, {
 		new: true
 	},(err,doc) => {
@@ -184,7 +184,7 @@ tests.evaluate = (req,res) => {
 		if(err) {
 			res.status(400)
 				.send({
-					error: err
+					error: error
 				});
 			return;
 		}

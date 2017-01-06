@@ -23,7 +23,6 @@ app.use(bodyParser.json({
 }));
 
 app.use((err,req,res,next) => {
-	console.log('HI');
 	if(err) {
 		console.error(`${err} on ${new Date()}`)
 	}
