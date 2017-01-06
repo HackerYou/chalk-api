@@ -36,7 +36,7 @@ function removeFile(file) {
 module.exports = {
 	run(question,userAnswer) {
 		return new Promise((resolve,reject) => {
-			const hash = bcrypt.hashSync(question._id.toString(), 2).replace(/\/./ig,'');
+			const hash = bcrypt.hashSync(question._id.toString(), 2).replace(/[\/.]/ig,'');
 			const file = `${__dirname.replace('/api','')}/testCenter/test_${hash}`;
 			const requires = `
 				const enzyme = require('enzyme');
