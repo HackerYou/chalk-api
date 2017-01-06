@@ -166,7 +166,8 @@ app.put('/v2/tests/:id/user',routeAuth,api.tests.addUser);
 app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
 
-app.listen('3200');
+const server = app.listen('3200');
+server.timeout = 1000000;
 console.log('App listening on port 3200');
 
 
