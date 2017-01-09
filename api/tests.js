@@ -266,7 +266,7 @@ tests.evaluate = (req,res) => {
 				.catch((err) => {
 					res.status(400)
 						.send({
-							error: err
+							error: 'Something bad happened...although I don\'t know what.' 
 						});
 				});
 		}
