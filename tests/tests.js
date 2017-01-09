@@ -358,7 +358,6 @@ describe('Tests', function() {
 				]
 			})
 			.end((err,res) => {
-				console.log(JSON.stringify(res.body.user.test_results));
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);

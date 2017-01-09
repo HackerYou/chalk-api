@@ -212,11 +212,12 @@ tests.evaluate = (req,res) => {
 					testRunner
 						.run(question,answers[i].answer)
 						.then(res => resolve({
-								id: question._id,
-								type: 'Code',
-								actual: answers[i].answer,
-								correct: JSON.parse(res)
-							}));
+							id: question._id,
+							type: 'Code',
+							actual: answers[i].answer,
+							correct: JSON.parse(res)
+						}))
+						.catch((err) => reject(err));
 				});
 			});
 
@@ -261,6 +262,12 @@ tests.evaluate = (req,res) => {
 								});
 						});
 					});
+				})
+				.catch((err) => {
+					res.status(400)
+						.send({
+							error: err
+						});
 				});
 		}
 		else {

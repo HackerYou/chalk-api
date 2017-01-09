@@ -12,7 +12,6 @@ function transpile(file,tempContent) {
 				reject(err);
 			}
 			const files = fs.readdirSync('testCenter')
-			console.log(files);
 			transpiledSrc = spawn('babel',[`${file}.js`,'-o',`${file}_transpiled.js`]);
 			transpiledSrc.stdout.pipe(process.stdout)
 			transpiledSrc.on('exit',() => {
@@ -67,13 +66,11 @@ module.exports = {
 				${userAnswer}
 				${question.unitTest}
 			`).then(() => {
-				console.log(file);
 				const context = {
 					spawn,
 					__dirname,
 					file: `${file}_transpiled.js`,
 					cb(data) {
-						console.log(data);
 						Promise.all([removeFile(`${file}.js`),removeFile(`${file}_transpiled.js`)])
 							.then(() => {
 								resolve(data)
