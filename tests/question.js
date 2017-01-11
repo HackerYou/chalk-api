@@ -82,8 +82,8 @@ describe('Questions', function() {
 				expect(res.status).to.be(200);
 				expect(data.question).to.be.an('object');
 				expect(data.question.title).to.be.eql('Sample test');
-				expect(data.question.type).to.be.eql('Multiple Choice');
-				expect(data.question.category).to.be.eql('JS');
+				expect(data.question.type).to.be.eql('multiple choice');
+				expect(data.question.category).to.be.eql('js');
 				expect(data.question.body).to.be.eql('This is a sample test, can you do the test?!');
 				done();
 			});
@@ -124,6 +124,7 @@ describe('Questions', function() {
 			.send({
 				title: 'Muti choice test',
 				type: 'Multiple Choice',
+				category: 'HTML',
 				body: 'What is 1 + 1?',
 				multiAnswer: '2',
 				multiChoice: [
@@ -163,8 +164,8 @@ describe('Questions', function() {
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
 				expect(res.body.question.title).to.be.eql("Updated sample test title");
-				expect(res.body.question.type).to.be.eql("Multiple Choice");
-				expect(res.body.question.category).to.be.eql("JS");
+				expect(res.body.question.type).to.be.eql("multiple choice");
+				expect(res.body.question.category).to.be.eql("js");
 				done();
 			});
 	});
@@ -276,7 +277,6 @@ describe('Questions', function() {
 				answer: `function add(a,b) {return a + b}`
 			})
 			.end((err,res) => {
-				console.log(res.body);
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(400);
 				expect(res.status).to.not.be(404);

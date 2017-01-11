@@ -6,6 +6,8 @@ const testRunner = require('./testRunner.js');
 
 question.createQuestion = (req,res) => {
 	const model = req.body;
+	model.category = model.category.toLowerCase() || '';
+	model.type = model.type.toLowerCase() || '';
 	new models.question(model).save((err,doc) => {
 		if(err) {
 			res.status(400).send({

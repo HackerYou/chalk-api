@@ -217,7 +217,7 @@ tests.evaluate = (req,res) => {
 							actual: answers[i].answer,
 							correct: JSON.parse(res)
 						}))
-						.catch((err) => reject(err));
+						.catch(reject);
 				});
 			});
 
@@ -385,6 +385,7 @@ function addTestToUser(testId,userId) {
 		});
 	});
 }
+
 
 function doesTestExist(testId,userResults) {
 	if(userResults === undefined) {

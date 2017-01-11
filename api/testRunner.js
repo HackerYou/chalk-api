@@ -14,6 +14,7 @@ function transpile(file,tempContent) {
 			const files = fs.readdirSync('testCenter')
 			transpiledSrc = spawn('babel',[`${file}.js`,'-o',`${file}_transpiled.js`]);
 			transpiledSrc.stdout.pipe(process.stdout)
+			transpiledSrc.stderr.pipe(process.stdout)
 			transpiledSrc.on('exit',() => {
 				resolve();
 			});
@@ -45,7 +46,7 @@ module.exports = {
 				const React = require('react');
 			`;
 			// Transpile code
-			if(question.type === 'Code' && question.category === 'HTML') {
+			if(question.type === 'code' && question.category === 'html') {
 				userAnswer = `
 				class Element extends React.Component {
 					render() {
