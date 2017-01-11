@@ -2,6 +2,7 @@
 
 let mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/notes');
+mongoose.Promise = Promise;
 
 module.exports = {
 	topic: require('./topic.js'),
@@ -10,5 +11,7 @@ module.exports = {
 	lesson: require('./lesson.js'),
 	announcement: require('./announcement.js'),
 	user: require('./user.js'),
-	media: require('./media.js')
+	media: require('./media.js'),
+	question: require('./question.js'),
+	tests: require('./tests.js')
 };

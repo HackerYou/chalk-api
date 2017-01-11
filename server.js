@@ -22,7 +22,7 @@ app.use(bodyParser.json({
 	limit: '10mb'
 }));
 
-app.use((err, req,res,next) => {
+app.use((err,req,res,next) => {
 	if(err) {
 		console.error(`${err} on ${new Date()}`)
 	}
@@ -141,14 +141,33 @@ app.put('/v1/user/reset/:email',api.user.resetPassword);
 app.post('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.favoriteLesson);
 app.delete('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.removeFavoriteLesson);
 
-
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);
 app.post('/v1/media',routeAuth, adminRoute ,api.media.uploadFile);
 app.get('/v1/media/search', routeAuth, adminRoute, api.media.searchFiles);
 app.delete('/v1/media/:key',routeAuth, adminRoute ,api.media.removeFile);
 
-app.listen('3200');
+//Questions
+app.get('/v2/questions',routeAuth,adminRoute,api.question.getQuestions);
+app.get('/v2/questions/:id',routeAuth,adminRoute,api.question.getSingleQuestion);
+app.post('/v2/questions', routeAuth,adminRoute,api.question.createQuestion);
+app.post('/v2/questions/:id/dryrun',routeAuth,api.question.dryRun);
+app.put('/v2/questions/:id',routeAuth,adminRoute, api.question.updateQuestion);
+app.delete('/v2/questions/:id',routeAuth,adminRoute,api.question.removeQuestion);
+
+//Tests
+app.get('/v2/tests',routeAuth,adminRoute,api.tests.getTests);
+app.get('/v2/tests/:id', routeAuth,api.tests.getSingleTest);
+app.post('/v2/tests',routeAuth,adminRoute,api.tests.createTest);
+app.post('/v2/tests/:id/evaluate',routeAuth,api.tests.evaluate);
+app.put('/v2/tests/:id',routeAuth, adminRoute, api.tests.updateTest);
+app.put('/v2/tests/:id/question',routeAuth,adminRoute,api.tests.addQuestion);
+app.put('/v2/tests/:id/user',routeAuth,api.tests.addUser);
+app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
+app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
+
+const server = app.listen('3200');
+server.timeout = 1000000;
 console.log('App listening on port 3200');
 
 

@@ -10,7 +10,7 @@ course.createCourse = (req,res) => {
 	let model = req.body;
 	model.template = false;
 	model.created_at = +new Date();
-
+	model.test = [];
 	new models.course(model).save((err,doc) => {
 		if(err) {
 			res.send({
@@ -150,6 +150,9 @@ course.getCourse = (req,res) => {
 				{
 					path: 'students',
 					select: 'firstName lastName email'
+				}, 
+				{
+					path: 'tests'
 				}
 			],(err,populatedDocs) => {
 				if(err) {
@@ -179,20 +182,18 @@ course.getCourse = (req,res) => {
 course.updateCourse = (req,res) => {
 	let model = req.body;
 	let id = req.params.id;
-
 	
 	models.course.findOne({ _id:id },
 		(err,doc) => {
 			delete model._id;
-
+		
 			if(doc.sections) {
 				model.sections = model.sections.map((obj) => obj._id);
 			}
 
 			model.updated_at = +new Date();
-			
 			Object.assign(doc,model);
-
+			
 			doc.save(err => {
 				if(err){
 					res.send({
@@ -210,14 +211,14 @@ course.updateCourse = (req,res) => {
 
 course.removeCourse = (req,res) => {
 	let courseId = req.params.id;
-	models.course.find({_id: courseId},(err,doc) => {
+	models.course.findOne({_id: courseId},(err,doc) => {
 		if(err) {
 			res.send({
 				error: err
 			});
 		}
 		else {
-			doc[0].remove((err) => {
+			doc.remove((err) => {
 				if(err) {
 					res.send({
 						error:err
@@ -413,7 +414,6 @@ course.addUser = (req,res) => {
 				models.user.findOne({email: email}, (err,userDoc) => {
 					// If user exists, add to class
 					let studentExists = userDoc ? doc.students.indexOf(userDoc._id) : -1;
-
 					if(studentExists >= 0) {
 						//Return false if the student is already in the class.
 						resolve(false);
@@ -513,6 +513,7 @@ course.removeUser = (req,res) => {
 			});
 	});
 };
+
 
 module.exports = course;
 

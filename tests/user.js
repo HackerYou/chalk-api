@@ -8,13 +8,14 @@ let bcrypt = require('bcryptjs');
 let request = require('supertest')('http://localhost:3200');
 const courseApi = require('../api/course.js');
 
-describe("User", function() {
+xdescribe("User", function() {
 	let mockUser;
 	let password = 'test';
 	let userEmail = `ryan+${+new Date()}@hackeryou.com`;
 	let token;
 	let course;
 	let lesson;
+	let userId;
 	//Emails take to long!
 	//Have to disable timeout
 	this.timeout(0);
@@ -30,7 +31,7 @@ describe("User", function() {
 			first_sign_up: true,
 			instructor: true
 		};
-		models.user(userModel).save((err) => {
+		models.user(userModel).save((err,doc) => {
 			if(err) {
 				console.error(err);
 			}

@@ -7,7 +7,7 @@ let lesson = require('../api/lesson.js');
 let mongoose = require('mongoose');
 let request = require('supertest')('http://localhost:3200');
 
-
+mongoose.Promise = Promise;
 
 function addThreeSections(mockCourse,cb) {
 	for(let i = 0; i < 3; i++) {
@@ -55,7 +55,8 @@ function removeCourse(id) {
 	});
 }
 
-describe('Courses', () => {
+describe('Courses', function() {
+
 	let mockCourse;
 	let doubleId;
 	let lessonId;
