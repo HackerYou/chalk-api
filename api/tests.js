@@ -95,18 +95,27 @@ tests.addQuestion = (req,res) => {
 				});
 			return;
 		}
-		models.test.populate(doc,{path: 'questions'},
-			(err, testWithQuestions) => {
-				if(err) {
-					res.status(400)
-						.send({
-							error: err
-						});
-					return;
-				}
-				res.status(200)
+		addTestToQuestion(testId,questionId)
+			.then(() => {
+				models.test.populate(doc,{path: 'questions'},
+					(err, testWithQuestions) => {
+						if(err) {
+							res.status(400)
+								.send({
+									error: err
+								});
+							return;
+						}
+						res.status(200)
+							.send({
+								test: testWithQuestions
+							});
+					});
+			})
+			.catch((err) =>{
+				res.status(400)
 					.send({
-						test: testWithQuestions
+						error: err
 					});
 			});
 	})
@@ -297,18 +306,27 @@ tests.removeQuestionFromTest = (req,res) => {
 				});
 			return;
 		}
-		models.test.populate(doc,{path: 'questions'},
-			(err, testWithQuestions) => {
-				if(err) {
-					res.status(400)
-						.send({
-							error: err
-						});
-					return
-				}
-				res.status(200)
+		removeTestFromQuestion(testId,questionId)
+			.then(() => {
+				models.test.populate(doc,{path: 'questions'},
+					(err, testWithQuestions) => {
+						if(err) {
+							res.status(400)
+								.send({
+									error: err
+								});
+							return
+						}
+						res.status(200)
+							.send({
+								test: testWithQuestions
+							});
+					});
+			})
+			.catch((err) =>{
+				res.status(400)
 					.send({
-						test: testWithQuestions
+						error: err
 					});
 			});
 	});
@@ -324,8 +342,9 @@ tests.removeTest = (req,res) => {
 				});
 			return;
 		}
-		removeTestFromCourse(id,doc.course)
-			.then((course) => {
+		const questionsToCleanUp = doc.questions.map((question) => removeTestFromQuestion(id,question))
+		Promise.all([removeTestFromCourse(id,doc.course),...questionsToCleanUp])
+			.then(() => {
 				res.status(200)
 					.send({
 						success: true
@@ -377,6 +396,34 @@ function addTestToUser(testId,userId) {
 			$addToSet: {tests: testId}
 		},{
 			new: true
+		}, (err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			resolve(doc);
+		});
+	});
+}
+
+function addTestToQuestion(testId,questionId) {
+	return new Promise((resolve,reject) => {
+		//Add testid to question
+		models.question.findOneAndUpdate({_id: questionId}, {
+			$addToSet: {tests: testId}
+		},(err,doc) =>{
+			if(err) {
+				reject(err);
+			}
+			resolve(doc);
+		});
+	});
+}
+
+function removeTestFromQuestion(testId,questionId) {
+	return new Promise((resolve,reject) => {
+		//Remove testId from question
+		models.question.findOneAndUpdate({_id: questionId}, {
+			$pull: {tests: testId}
 		}, (err,doc) => {
 			if(err) {
 				reject(err);

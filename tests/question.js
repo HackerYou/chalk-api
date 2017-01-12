@@ -302,7 +302,6 @@ describe('Questions', function() {
 				`
 			})
 			.end((err,res) => {
-				console.log(res.body);
 				expect(err).to.be.eql(null);
 				expect(res.status).to.not.be(400);
 				expect(res.status).to.be(200);

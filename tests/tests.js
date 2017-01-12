@@ -267,6 +267,18 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should save a reference to the test on a question', (done) => {
+		request
+			.get(`/v2/questions/${htmlQuestionId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question.tests).to.contain(testId);
+				done();
+			});
+	});
+
 	it('should get a single test', (done) => {
 		request
 			.get(`/v2/tests/${testId}`)
@@ -401,6 +413,17 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should remove the test from the question', (done) => {
+		request
+			.get(`/v2/questions/${questionId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.body.question.tests).to.not.contain(testId);
+				done();
+			});
+	});
+
 	it('should remove a test', (done) => {
 		request
 			.delete(`/v2/tests/${testId}`)
@@ -411,6 +434,17 @@ describe('Tests', function() {
 				expect(res.status).to.not.be(400);
 				expect(res.body.success).to.be(true);
 				done();
+			});
+	});
+
+	it('should remove the test id from a question when the test is deleted',(done) => {
+		request
+			.get(`/v2/questions/${htmlQuestionId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.body.question.tests).to.not.contain(testId);
+				done();				
 			});
 	});
 });
