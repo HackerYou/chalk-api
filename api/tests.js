@@ -204,7 +204,7 @@ tests.evaluate = (req,res) => {
 			//else check multiple choice
 			//Add results to user object
 			const userAnswers = doc.questions.map((question,i) => {
-				if(question.type === 'Multiple Choice') {
+				if(question.type === 'multiple choice') {
 					return new Promise((resolve,reject) => {
 						resolve({
 							id: question._id,
@@ -217,17 +217,19 @@ tests.evaluate = (req,res) => {
 						})
 					});
 				}
-				return new Promise((resolve,reject) => {
-					testRunner
-						.run(question,answers[i].answer)
-						.then(res => resolve({
-							id: question._id,
-							type: 'Code',
-							actual: answers[i].answer,
-							correct: JSON.parse(res)
-						}))
-						.catch(reject);
-				});
+				else {
+					return new Promise((resolve,reject) => {
+						testRunner
+							.run(question,answers[i].answer)
+							.then(res => resolve({
+								id: question._id,
+								type: 'Code',
+								actual: answers[i].answer,
+								correct: JSON.parse(res)
+							}))
+							.catch(reject);
+					});
+				}
 			});
 
 			Promise.all(userAnswers)
@@ -248,7 +250,7 @@ tests.evaluate = (req,res) => {
 								.send({
 									error: "User has already taken test"
 								});
-							return
+							return;
 						}
 						if(!userDoc.test_results) {
 							userDoc.test_results = [];
@@ -275,7 +277,9 @@ tests.evaluate = (req,res) => {
 				.catch((err) => {
 					res.status(400)
 						.send({
-							error: 'Something bad happened...although I don\'t know what.' 
+							error: (() => {
+								return err || 'Something bad happened...although I don\'t know what.' 
+							})()
 						});
 				});
 		}
@@ -435,6 +439,7 @@ function removeTestFromQuestion(testId,questionId) {
 
 
 function doesTestExist(testId,userResults) {
+	console.log(userResults)
 	if(userResults === undefined) {
 		return false;
 	}
