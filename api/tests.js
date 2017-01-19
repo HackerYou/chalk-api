@@ -155,7 +155,6 @@ tests.updateTest = (req,res) => {
 tests.addUser = (req,res) => {
 	const testId = req.params.id;
 	const userId = req.body.userId;
-
 	models.test.findOneAndUpdate({_id: testId},{
 		$addToSet: {users:userId}
 	}, {
@@ -169,7 +168,8 @@ tests.addUser = (req,res) => {
 			return;
 		}
 		addTestToUser(testId,userId)
-			.then(() => {
+			.then((user) => {
+				console.log(user);
 				res.status(200)
 					.send({
 						test: doc
@@ -208,7 +208,7 @@ tests.evaluate = (req,res) => {
 					return new Promise((resolve,reject) => {
 						resolve({
 							id: question._id,
-							type: 'Multiple Choice',
+							type: 'multiple choice',
 							expected: question.multiAnswer,
 							actual: answers[i].answer,
 							correct: (_ => {
@@ -245,6 +245,7 @@ tests.evaluate = (req,res) => {
 						//search test_results key,
 						//if test exists do nothing
 						//else add test and results
+						console.log('User Doc:',userDoc)
 						if(doesTestExist(testId,userDoc.test_results)) {
 							res.status(400)
 								.send({
@@ -265,7 +266,7 @@ tests.evaluate = (req,res) => {
 									.send({
 										error: err
 									});
-								return
+								return;
 							}
 							res.status(200)
 								.send({
@@ -439,11 +440,13 @@ function removeTestFromQuestion(testId,questionId) {
 
 
 function doesTestExist(testId,userResults) {
-	console.log(userResults)
 	if(userResults === undefined) {
 		return false;
 	}
-	for(result of userResults) {
+	console.log('/-----------/')
+	console.log(userResults);
+	console.log('/-----------/')
+	for(let result of userResults) {
 		if(result.id === testId) {
 			return true;
 		}
