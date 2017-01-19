@@ -167,7 +167,8 @@ app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuesti
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
 
 const server = app.listen('3200');
-server.timeout = 1000000;
+//This is the evaluating the code questions. Will need to figure out a betters way to do that at some point!
+server.timeout = 1000000; 
 console.log('App listening on port 3200');
 
 

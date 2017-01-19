@@ -464,7 +464,6 @@ describe('Tests', function() {
 					.get(`/v1/user/${userId}`)
 					.set(`x-access-token`,token)
 					.end((err,res) => {
-						console.log(res.body.user);
 						expect(err).to.be(null);
 						expect(res.body.user.tests).to.be.an('array');
 						expect(res.body.user.tests[1]).to.be.an('object');
@@ -502,7 +501,6 @@ describe('Tests', function() {
 				]
 			})
 			.end((err,res) => {
-				console.log(err,res); 
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);

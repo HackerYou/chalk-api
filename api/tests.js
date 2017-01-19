@@ -169,7 +169,6 @@ tests.addUser = (req,res) => {
 		}
 		addTestToUser(testId,userId)
 			.then((user) => {
-				console.log(user);
 				res.status(200)
 					.send({
 						test: doc
@@ -183,6 +182,14 @@ tests.addUser = (req,res) => {
 			});
 	});
 };
+
+function fold(array) {
+	return array[0];
+}
+
+function findAnswerWithId(id, answers) {
+	return answers.filter(answer => answer.questionId === id)
+}
 
 tests.evaluate = (req,res) => {
 	const testId = req.params.id;
@@ -204,15 +211,16 @@ tests.evaluate = (req,res) => {
 			//else check multiple choice
 			//Add results to user object
 			const userAnswers = doc.questions.map((question,i) => {
+				const answer = fold(findAnswerWithId(question._id.toString(),answers));
 				if(question.type === 'multiple choice') {
 					return new Promise((resolve,reject) => {
 						resolve({
 							id: question._id,
 							type: 'multiple choice',
 							expected: question.multiAnswer,
-							actual: answers[i].answer,
+							actual: answer.answer,
 							correct: (_ => {
-								return question.multiAnswer === answers[i].answer
+								return question.multiAnswer === answer.answer
 							})()
 						})
 					});
@@ -220,11 +228,11 @@ tests.evaluate = (req,res) => {
 				else {
 					return new Promise((resolve,reject) => {
 						testRunner
-							.run(question,answers[i].answer)
+							.run(question,answer.answer)
 							.then(res => resolve({
 								id: question._id,
 								type: 'Code',
-								actual: answers[i].answer,
+								actual: answer.answer,
 								correct: JSON.parse(res)
 							}))
 							.catch(reject);
@@ -245,7 +253,6 @@ tests.evaluate = (req,res) => {
 						//search test_results key,
 						//if test exists do nothing
 						//else add test and results
-						console.log('User Doc:',userDoc)
 						if(doesTestExist(testId,userDoc.test_results)) {
 							res.status(400)
 								.send({
@@ -443,9 +450,6 @@ function doesTestExist(testId,userResults) {
 	if(userResults === undefined) {
 		return false;
 	}
-	console.log('/-----------/')
-	console.log(userResults);
-	console.log('/-----------/')
 	for(let result of userResults) {
 		if(result.id === testId) {
 			return true;
