@@ -256,12 +256,12 @@ describe('Questions', function() {
 
 	it('should get questions by type', (done) => {
 		request
-			.get(`/v2/questions?type=Code`)
+			.get(`/v2/questions?type=code`)
 			.set(`x-access-token`,token)
 			.end((err,res) => {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(400);
-				expect(res.body.questions[0].type).to.be.eql('Code');
+				expect(res.body.questions[0].type).to.be.eql('code');
 				done();
 			});
 	});
@@ -302,7 +302,6 @@ describe('Questions', function() {
 				`
 			})
 			.end((err,res) => {
-				console.log(res.body);
 				expect(err).to.be.eql(null);
 				expect(res.status).to.not.be(400);
 				expect(res.status).to.be(200);

@@ -8,8 +8,6 @@ let user = require('../api/user.js');
 let bcrypt = require('bcryptjs');
 let course = require('../api/course.js');
 
-
-
 describe('Tests', function() {
 	let token;
 	let length;
@@ -20,6 +18,7 @@ describe('Tests', function() {
 	let questionId;
 	let htmlQuestionId;
 	let questionObj;
+	let test2Id;
 	
 	function makeCodeQuestion() {
 		return new Promise((resolve,reject) => {
@@ -98,9 +97,13 @@ describe('Tests', function() {
 			} , {
 				send(data) {
 					token = data.token;
-					course.getCourses({},{
-						send(courses) {
-							courseId = courses.course[0]._id;
+					course.createCourse({
+						body: {
+							title: 'Test Course'
+						}
+					}, {
+						send(data) {
+							courseId = data.course._id;
 							done();
 						}
 					});
@@ -117,8 +120,16 @@ describe('Tests', function() {
 			body: {}
 		}, {
 			send(data) {
-				mongoose.disconnect();
-				done();
+				course.removeCourse({
+					params: {
+						id: courseId
+					}
+				},{
+					send() {
+						mongoose.disconnect();
+						done();
+					}
+				});
 			}
 		})
 	});
@@ -267,6 +278,18 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should save a reference to the test on a question', (done) => {
+		request
+			.get(`/v2/questions/${htmlQuestionId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(400);
+				expect(res.body.question.tests).to.contain(testId);
+				done();
+			});
+	});
+
 	it('should get a single test', (done) => {
 		request
 			.get(`/v2/tests/${testId}`)
@@ -370,6 +393,138 @@ describe('Tests', function() {
 			});
 	});
 	
+	it('should add to the users test results array',(done) => {
+		request
+			.get(`/v1/user/${userId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.body.user.test_results.length).to.be.greaterThan(0);
+				done();
+			});
+	});
+
+	it('should add a second test to the course', (done) => {
+		request
+			.post(`/v2/tests`)
+			.set(`x-access-token`,token)
+			.send({
+				courseId,
+				data: {
+					title: "Second test added to course"
+				}
+			})
+			.end((err,res) => {
+				test2Id = res.body.test._id;
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(400);
+				expect(res.body.test.course).to.be.an('string');
+				expect(res.body.test.created_by).to.not.be('string');
+				expect(res.body.test.created_at).to.be.a('number');
+				done();
+			});
+	});
+
+	it('should add some questions to that second test',(done) => {
+		const questionAdd = [questionId,codeTestId,htmlQuestionId].map((id) => {
+			return new Promise((resolve,reject) => {
+				request
+					.put(`/v2/tests/${test2Id}/question`)
+					.set(`x-access-token`,token)
+					.send({
+						"questionId": id
+					})
+					.end((err,res) => {
+						if(err) reject(err)
+						resolve(res)
+					});
+			});
+		});
+
+		Promise.all(questionAdd)
+			.then(results => {
+				expect(results[2].body.test.questions.length).to.be(3)
+				done();
+			});
+	});
+
+	it('should add a second test to a user', (done) => {
+		request
+			.put(`/v2/tests/${test2Id}/user`)
+			.set(`x-access-token`, token)
+			.send({
+				userId
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.body.test.users).to.have.length(1);
+				request
+					.get(`/v1/user/${userId}`)
+					.set(`x-access-token`,token)
+					.end((err,res) => {
+						expect(err).to.be(null);
+						expect(res.body.user.tests).to.be.an('array');
+						expect(res.body.user.tests[1]).to.be.an('object');
+						expect(res.body.user.tests[1]._id).to.be.eql(test2Id);
+						done();
+					});
+			});
+	});
+
+	it('should let the user take more than one test', function (done) {
+		this.timeout(4000);
+		request
+			.post(`/v2/tests/${test2Id}/evaluate`)
+			.set(`x-access-token`,token)
+			.send({
+				userId,
+				answers: [
+					{
+						questionId: questionId,
+						answer: questionObj.multiAnswer
+					},
+					{
+						questionId: codeTestId,
+						answer: 'function add(a,b){return a + b;}'
+					},
+					{
+						questionId: htmlQuestionId,
+						answer: `<ul>
+						<li>Test List</li>
+						<li>Test List 2</li>
+						<li>Test List 3</li>
+						<li>Test List 4</li>
+					</ul>`
+					}
+				]
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(401);
+				expect(res.status).to.not.be(400);
+				expect(res.body.user.test_results[0].answers[0]).to.not.be(null);
+				expect(res.body.user.test_results[0].answers[0].correct).to.be.ok();
+				expect(res.body.user.test_results[0].answers[1]).to.not.be(null);
+				expect(res.body.user.test_results[0].answers[1].correct.numFailedTests).to.be.eql(0);
+				done();
+			});
+	});
+
+	it('should now have two test results', (done) => {
+		request
+			.get(`/v1/user/${userId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.body.user.tests.length).to.be(2);
+				expect(res.body.user.test_results.length).to.be(2);
+				done();
+			});
+	});
+
 	it('should not remove a single question if the id is wrong', (done) => {
 		request
 			.delete(`/v2/tests/${testId}/question`)
@@ -401,6 +556,17 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should remove the test from the question', (done) => {
+		request
+			.get(`/v2/questions/${questionId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.body.question.tests).to.not.contain(testId);
+				done();
+			});
+	});
+
 	it('should remove a test', (done) => {
 		request
 			.delete(`/v2/tests/${testId}`)
@@ -411,6 +577,17 @@ describe('Tests', function() {
 				expect(res.status).to.not.be(400);
 				expect(res.body.success).to.be(true);
 				done();
+			});
+	});
+
+	it('should remove the test id from a question when the test is deleted',(done) => {
+		request
+			.get(`/v2/questions/${htmlQuestionId}`)
+			.set(`x-access-token`,token)
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.body.question.tests).to.not.contain(testId);
+				done();				
 			});
 	});
 });

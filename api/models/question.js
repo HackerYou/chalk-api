@@ -14,7 +14,8 @@ let model = Object.assign({
 		label: 'string',
 		value: 'string'
 	}],
-	unitTest: 'string'
+	unitTest: 'string',
+	tests: [{ref:'Test', type: 'String'}]
 }, mixin);
 
 let questionnSchema = new Schema(model);

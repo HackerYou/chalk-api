@@ -14,10 +14,10 @@ function transpile(file,tempContent) {
 			const files = fs.readdirSync('testCenter')
 			transpiledSrc = spawn('babel',[`${file}.js`,'-o',`${file}_transpiled.js`]);
 			transpiledSrc.stdout.pipe(process.stdout)
-			transpiledSrc.stderr.pipe(process.stdout)
-			transpiledSrc.on('exit',() => {
-				resolve();
-			});
+			transpiledSrc.stderr.on('data',(err) => {
+				reject(err.toString());
+			})
+			transpiledSrc.on('exit',resolve);
 		});
 	});
 }

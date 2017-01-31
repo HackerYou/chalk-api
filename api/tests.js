@@ -95,18 +95,27 @@ tests.addQuestion = (req,res) => {
 				});
 			return;
 		}
-		models.test.populate(doc,{path: 'questions'},
-			(err, testWithQuestions) => {
-				if(err) {
-					res.status(400)
-						.send({
-							error: err
-						});
-					return;
-				}
-				res.status(200)
+		addTestToQuestion(testId,questionId)
+			.then(() => {
+				models.test.populate(doc,{path: 'questions'},
+					(err, testWithQuestions) => {
+						if(err) {
+							res.status(400)
+								.send({
+									error: err
+								});
+							return;
+						}
+						res.status(200)
+							.send({
+								test: testWithQuestions
+							});
+					});
+			})
+			.catch((err) =>{
+				res.status(400)
 					.send({
-						test: testWithQuestions
+						error: err
 					});
 			});
 	})
@@ -146,7 +155,6 @@ tests.updateTest = (req,res) => {
 tests.addUser = (req,res) => {
 	const testId = req.params.id;
 	const userId = req.body.userId;
-
 	models.test.findOneAndUpdate({_id: testId},{
 		$addToSet: {users:userId}
 	}, {
@@ -160,7 +168,7 @@ tests.addUser = (req,res) => {
 			return;
 		}
 		addTestToUser(testId,userId)
-			.then(() => {
+			.then((user) => {
 				res.status(200)
 					.send({
 						test: doc
@@ -174,6 +182,14 @@ tests.addUser = (req,res) => {
 			});
 	});
 };
+
+function fold(array) {
+	return array[0];
+}
+
+function findAnswerWithId(id, answers) {
+	return answers.filter(answer => answer.questionId === id)
+}
 
 tests.evaluate = (req,res) => {
 	const testId = req.params.id;
@@ -195,30 +211,33 @@ tests.evaluate = (req,res) => {
 			//else check multiple choice
 			//Add results to user object
 			const userAnswers = doc.questions.map((question,i) => {
-				if(question.type === 'Multiple Choice') {
+				const answer = fold(findAnswerWithId(question._id.toString(),answers));
+				if(question.type === 'multiple choice') {
 					return new Promise((resolve,reject) => {
 						resolve({
 							id: question._id,
-							type: 'Multiple Choice',
+							type: 'multiple choice',
 							expected: question.multiAnswer,
-							actual: answers[i].answer,
+							actual: answer.answer,
 							correct: (_ => {
-								return question.multiAnswer === answers[i].answer
+								return question.multiAnswer === answer.answer
 							})()
 						})
 					});
 				}
-				return new Promise((resolve,reject) => {
-					testRunner
-						.run(question,answers[i].answer)
-						.then(res => resolve({
-							id: question._id,
-							type: 'Code',
-							actual: answers[i].answer,
-							correct: JSON.parse(res)
-						}))
-						.catch(reject);
-				});
+				else {
+					return new Promise((resolve,reject) => {
+						testRunner
+							.run(question,answer.answer)
+							.then(res => resolve({
+								id: question._id,
+								type: 'Code',
+								actual: answer.answer,
+								correct: JSON.parse(res)
+							}))
+							.catch(reject);
+					});
+				}
 			});
 
 			Promise.all(userAnswers)
@@ -239,7 +258,7 @@ tests.evaluate = (req,res) => {
 								.send({
 									error: "User has already taken test"
 								});
-							return
+							return;
 						}
 						if(!userDoc.test_results) {
 							userDoc.test_results = [];
@@ -254,7 +273,7 @@ tests.evaluate = (req,res) => {
 									.send({
 										error: err
 									});
-								return
+								return;
 							}
 							res.status(200)
 								.send({
@@ -266,7 +285,9 @@ tests.evaluate = (req,res) => {
 				.catch((err) => {
 					res.status(400)
 						.send({
-							error: 'Something bad happened...although I don\'t know what.' 
+							error: (() => {
+								return err || 'Something bad happened...although I don\'t know what.' 
+							})()
 						});
 				});
 		}
@@ -297,18 +318,27 @@ tests.removeQuestionFromTest = (req,res) => {
 				});
 			return;
 		}
-		models.test.populate(doc,{path: 'questions'},
-			(err, testWithQuestions) => {
-				if(err) {
-					res.status(400)
-						.send({
-							error: err
-						});
-					return
-				}
-				res.status(200)
+		removeTestFromQuestion(testId,questionId)
+			.then(() => {
+				models.test.populate(doc,{path: 'questions'},
+					(err, testWithQuestions) => {
+						if(err) {
+							res.status(400)
+								.send({
+									error: err
+								});
+							return
+						}
+						res.status(200)
+							.send({
+								test: testWithQuestions
+							});
+					});
+			})
+			.catch((err) =>{
+				res.status(400)
 					.send({
-						test: testWithQuestions
+						error: err
 					});
 			});
 	});
@@ -324,8 +354,9 @@ tests.removeTest = (req,res) => {
 				});
 			return;
 		}
-		removeTestFromCourse(id,doc.course)
-			.then((course) => {
+		const questionsToCleanUp = doc.questions.map((question) => removeTestFromQuestion(id,question))
+		Promise.all([removeTestFromCourse(id,doc.course),...questionsToCleanUp])
+			.then(() => {
 				res.status(200)
 					.send({
 						success: true
@@ -386,12 +417,40 @@ function addTestToUser(testId,userId) {
 	});
 }
 
+function addTestToQuestion(testId,questionId) {
+	return new Promise((resolve,reject) => {
+		//Add testid to question
+		models.question.findOneAndUpdate({_id: questionId}, {
+			$addToSet: {tests: testId}
+		},(err,doc) =>{
+			if(err) {
+				reject(err);
+			}
+			resolve(doc);
+		});
+	});
+}
+
+function removeTestFromQuestion(testId,questionId) {
+	return new Promise((resolve,reject) => {
+		//Remove testId from question
+		models.question.findOneAndUpdate({_id: questionId}, {
+			$pull: {tests: testId}
+		}, (err,doc) => {
+			if(err) {
+				reject(err);
+			}
+			resolve(doc);
+		});
+	});
+}
+
 
 function doesTestExist(testId,userResults) {
 	if(userResults === undefined) {
 		return false;
 	}
-	for(result of userResults) {
+	for(let result of userResults) {
 		if(result.id === testId) {
 			return true;
 		}
