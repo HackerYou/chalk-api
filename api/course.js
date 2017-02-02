@@ -131,6 +131,8 @@ course.getCourses = (req,res) => {
 				course: docs
 			});
 		}
+	}).sort({
+		created_at: -1
 	});
 };
 
