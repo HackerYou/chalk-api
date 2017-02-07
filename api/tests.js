@@ -183,18 +183,10 @@ tests.addUser = (req,res) => {
 	});
 };
 
-function fold(array) {
-	return array[0];
-}
-
-function findAnswerWithId(id, answers) {
-	return answers.filter(answer => answer.questionId === id)
-}
-
 tests.evaluate = (req,res) => {
 	const testId = req.params.id;
 	const userId = req.body.userId;
-	const answers = req.body.answers;
+	const answer = req.body.answer;
 	//Check if user is part of test
 	models.test.findOne({_id:testId},(err,doc) => {
 		if(err) {
@@ -204,44 +196,36 @@ tests.evaluate = (req,res) => {
 				});
 			return;
 		}
-		if(doc.users.includes(userId)) {
-			//start going through the questions
-			//compare against their answer
-			//If code test, run unit test
-			//else check multiple choice
-			//Add results to user object
-			const userAnswers = doc.questions.map((question,i) => {
-				const answer = fold(findAnswerWithId(question._id.toString(),answers));
-				if(question.type === 'multiple choice') {
-					return new Promise((resolve,reject) => {
-						resolve({
-							id: question._id,
-							type: 'multiple choice',
-							expected: question.multiAnswer,
+		models.question.findOne({_id:answer.questionId},(err,doc) => {
+			let userAnswer;
+			if(doc.type === 'multiple choice') {
+				userAnswer = new Promise((resolve,reject) => {
+					resolve({
+						id: doc._id,
+						type: 'multiple choice',
+						expected: doc.multiAnswer,
+						actual: answer.answer,
+						correct: (() => {
+							return doc.multiAnswer === answer.answer
+						})()
+					})
+				});
+			}
+			else {
+				userAnswer = new Promise((resolve,reject) => {
+					testRunner
+						.run(doc,answer.answer)
+						.then(res => resolve({
+							id: doc._id,
+							type: 'Code',
 							actual: answer.answer,
-							correct: (_ => {
-								return question.multiAnswer === answer.answer
-							})()
-						})
-					});
-				}
-				else {
-					return new Promise((resolve,reject) => {
-						testRunner
-							.run(question,answer.answer)
-							.then(res => resolve({
-								id: question._id,
-								type: 'Code',
-								actual: answer.answer,
-								correct: JSON.parse(res)
-							}))
-							.catch(reject);
-					});
-				}
-			});
-
-			Promise.all(userAnswers)
-				.then(answers => {
+							correct: JSON.parse(res)
+						}))
+						.catch(reject);
+				});
+			}
+			userAnswer
+				.then(answer => {
 					models.user.findOne({_id: userId},{password: 0},(err,userDoc) => {
 						if(err) {
 							res.status(400)
@@ -250,23 +234,20 @@ tests.evaluate = (req,res) => {
 								});
 							return;
 						}
-						//search test_results key,
-						//if test exists do nothing
-						//else add test and results
-						if(doesTestExist(testId,userDoc.test_results)) {
-							res.status(400)
-								.send({
-									error: "User has already taken test"
-								});
-							return;
-						}
+						
 						if(!userDoc.test_results) {
-							userDoc.test_results = [];
+							userDoc.test_results = {};
 						}
-						userDoc.test_results.push({
-							id: testId,
-							answers
-						});
+						
+						if(userDoc.test_results[testId] === undefined) {
+							userDoc.test_results[testId] = {
+								answers: []
+							};
+						}
+						
+						userDoc.test_results[testId].answers.push(answer);
+						//Need to add this for Mixed Types to be persisted 
+						userDoc.markModified('test_results');
 						userDoc.save((err,newUserDoc) => {
 							if(err) {
 								res.status(400)
@@ -277,7 +258,8 @@ tests.evaluate = (req,res) => {
 							}
 							res.status(200)
 								.send({
-									user: newUserDoc
+									user: newUserDoc,
+									result: answer
 								});
 						});
 					});
@@ -290,14 +272,7 @@ tests.evaluate = (req,res) => {
 							})()
 						});
 				});
-		}
-		else {
-			res.status(401)
-				.send({
-					error: err
-				});
-		}
-
+		});
 	}).populate('questions');
 };
 

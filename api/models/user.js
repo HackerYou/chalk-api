@@ -17,7 +17,7 @@ let model = {
 	first_sign_up: Boolean,
 	favorites: Schema.Types.Mixed,
 	tests: [{type: String, ref: 'Test'}],
-	test_results: [{type: Schema.Types.Mixed}]
+	test_results: Schema.Types.Mixed
 };
 
 let userSchema = new Schema(model);

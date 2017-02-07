@@ -353,53 +353,62 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should allow a user to take a test', function(done) {
+	it('should evaluate the code question for test one', function(done) {
 		this.timeout(4000);
 		request
 			.post(`/v2/tests/${testId}/evaluate`)
 			.set(`x-access-token`,token)
 			.send({
 				userId,
-				answers: [
-					{
-						questionId: questionId,
-						answer: questionObj.multiAnswer
-					},
-					{
-						questionId: codeTestId,
-						answer: 'function add(a,b){return a + b;}'
-					},
-					{
-						questionId: htmlQuestionId,
-						answer: `<ul>
-						<li>Test List</li>
-						<li>Test List 2</li>
-						<li>Test List 3</li>
-						<li>Test List 4</li>
-					</ul>`
-					}
-				]
+				answer: {
+					questionId: codeTestId,
+					answer: 'function add(a,b){return a + b;}'
+				}
 			})
 			.end((err,res) => {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);
 				expect(res.status).to.not.be(400);
-				expect(res.body.user.test_results[0].answers[0]).to.not.be(null);
-				expect(res.body.user.test_results[0].answers[0].correct).to.be.ok();
-				expect(res.body.user.test_results[0].answers[1]).to.not.be(null);
-				expect(res.body.user.test_results[0].answers[1].correct.numFailedTests).to.be.eql(0);
+				expect(res.body.result.correct.success).to.be(true);
 				done();
 			});
 	});
 	
-	it('should add to the users test results array',(done) => {
+	it('should evaluate the HTML question for test one', function(done) {
+		this.timeout(4000);
+		request
+			.post(`/v2/tests/${testId}/evaluate`)
+			.set(`x-access-token`,token)
+			.send({
+				userId,
+				answer: {
+					questionId: htmlQuestionId,
+					answer: `<ul>
+						<li>Test List</li>
+						<li>Test List 2</li>
+						<li>Test List 3</li>
+						<li>Test List 4</li>
+					</ul>`
+				}
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(401);
+				expect(res.status).to.not.be(400);
+				expect(res.body.result.correct.success).to.be(true);
+				done();
+			});
+	});
+	
+	it('should add to the users test results answers array',(done) => {
 		request
 			.get(`/v1/user/${userId}`)
 			.set(`x-access-token`,token)
 			.end((err,res) => {
 				expect(err).to.be(null);
-				expect(res.body.user.test_results.length).to.be.greaterThan(0);
+				expect(res.body.user.test_results[testId].answers.length).to.be.greaterThan(0);
 				done();
 			});
 	});
@@ -425,7 +434,8 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should add some questions to that second test',(done) => {
+	it('should add some questions to that second test', function(done) {
+		this.timeout(3000);
 		const questionAdd = [questionId,codeTestId,htmlQuestionId].map((id) => {
 			return new Promise((resolve,reject) => {
 				request
@@ -473,42 +483,52 @@ describe('Tests', function() {
 			});
 	});
 
-	it('should let the user take more than one test', function (done) {
+	it('should evaluate the HTML question for test two', function(done) {
 		this.timeout(4000);
 		request
 			.post(`/v2/tests/${test2Id}/evaluate`)
 			.set(`x-access-token`,token)
 			.send({
 				userId,
-				answers: [
-					{
-						questionId: questionId,
-						answer: questionObj.multiAnswer
-					},
-					{
-						questionId: codeTestId,
-						answer: 'function add(a,b){return a + b;}'
-					},
-					{
-						questionId: htmlQuestionId,
-						answer: `<ul>
+				answer: {
+					questionId: htmlQuestionId,
+					answer: `<ul>
 						<li>Test List</li>
 						<li>Test List 2</li>
 						<li>Test List 3</li>
 						<li>Test List 4</li>
 					</ul>`
-					}
-				]
+				}
 			})
 			.end((err,res) => {
 				expect(err).to.be(null);
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);
 				expect(res.status).to.not.be(400);
-				expect(res.body.user.test_results[0].answers[0]).to.not.be(null);
-				expect(res.body.user.test_results[0].answers[0].correct).to.be.ok();
-				expect(res.body.user.test_results[0].answers[1]).to.not.be(null);
-				expect(res.body.user.test_results[0].answers[1].correct.numFailedTests).to.be.eql(0);
+				expect(res.body.result.correct.success).to.be(true);
+				done();
+			});
+	});
+
+	it('should evaluate the code question for test two', function(done) {
+		this.timeout(4000);
+		request
+			.post(`/v2/tests/${test2Id}/evaluate`)
+			.set(`x-access-token`,token)
+			.send({
+				userId,
+				answer: {
+					questionId: codeTestId,
+					answer: 'function add(a,b){return a + b;}'
+				}
+			})
+			.end((err,res) => {
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(401);
+				expect(res.status).to.not.be(400);
+				console.log(res.body.user);
+				expect(res.body.result.correct.success).to.be(true);
 				done();
 			});
 	});
@@ -519,8 +539,13 @@ describe('Tests', function() {
 			.set(`x-access-token`,token)
 			.end((err,res) => {
 				expect(err).to.be(null);
+				let results = [];
+				for(let key in res.body.user.test_results) {
+					results.push(key);
+				}
+				console.log(res.body.user)
 				expect(res.body.user.tests.length).to.be(2);
-				expect(res.body.user.test_results.length).to.be(2);
+				expect(results.length).to.be(2);
 				done();
 			});
 	});
@@ -587,7 +612,7 @@ describe('Tests', function() {
 			.end((err,res) => {
 				expect(err).to.be(null);
 				expect(res.body.question.tests).to.not.contain(testId);
-				done();				
+				done();
 			});
 	});
 });
