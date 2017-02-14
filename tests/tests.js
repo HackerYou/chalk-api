@@ -455,6 +455,10 @@ describe('Tests', function() {
 			.then(results => {
 				expect(results[2].body.test.questions.length).to.be(3)
 				done();
+			})
+			.catch(err => {
+				expect(err).to.be(null);
+				done();
 			});
 	});
 
@@ -527,7 +531,6 @@ describe('Tests', function() {
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(401);
 				expect(res.status).to.not.be(400);
-				console.log(res.body.user);
 				expect(res.body.result.correct.success).to.be(true);
 				done();
 			});
@@ -540,10 +543,10 @@ describe('Tests', function() {
 			.end((err,res) => {
 				expect(err).to.be(null);
 				let results = [];
+				expect(res.body.user.test_results).to.be.an('object');
 				for(let key in res.body.user.test_results) {
 					results.push(key);
 				}
-				console.log(res.body.user)
 				expect(res.body.user.tests.length).to.be(2);
 				expect(results.length).to.be(2);
 				done();

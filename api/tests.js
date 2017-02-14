@@ -192,7 +192,7 @@ tests.evaluate = (req,res) => {
 		if(err) {
 			res.status(400)
 				.send({
-					error: error
+					error: err
 				});
 			return;
 		}
@@ -244,7 +244,6 @@ tests.evaluate = (req,res) => {
 								answers: []
 							};
 						}
-						
 						userDoc.test_results[testId].answers.push(answer);
 						//Need to add this for Mixed Types to be persisted 
 						userDoc.markModified('test_results');
