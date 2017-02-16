@@ -1,7 +1,13 @@
 'use strict';
 
 let mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/notes');
+let config = require('../config.js');
+if(process.env.NODE_ENV === 'production') {
+	mongoose.connect(`mongodb://${config.db_user}:${config.db_pass}@localhost/notes`);
+}
+else {
+	mongoose.connect('mongodb://localhost/notes');
+}
 mongoose.Promise = Promise;
 
 module.exports = {

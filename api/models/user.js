@@ -5,8 +5,8 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let model = {
-	admin: Boolean,
-	instructor: Boolean,
+	admin: {type: Boolean, default: false},
+	instructor: { type: Boolean, default: false },
 	firstName: String,
 	lastName: String,
 	email: String,

@@ -99,6 +99,8 @@ xdescribe("User", function() {
 				expect(data).to.be.an('object');
 				expect(data.user).to.be.an('array');
 				expect(data.user[0].email).to.be.a('string');
+				expect(data.user[0].admin).to.be(false);
+				expect(data.user[0].instructor).to.be(false);
 				done();
 			}
 		});
