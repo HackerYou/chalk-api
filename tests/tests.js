@@ -150,6 +150,8 @@ describe('Tests', function() {
 				expect(res.status).to.not.be(404);
 				expect(res.status).to.not.be(400);
 				expect(res.body.test.course).to.be.an('string');
+				expect(res.body.test.show).to.be.an('string');
+				expect(res.body.test.show).to.be.eql('true');
 				expect(res.body.test.created_by).to.not.be('string');
 				expect(res.body.test.created_at).to.be.a('number');
 				request
