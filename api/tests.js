@@ -14,7 +14,6 @@ tests.createTest = (req,res) => {
 			});
 			return;
 	}
-	model.show = req.body.show; 
 	model.created_at = +new Date();
 	model.created_by = req.decodedUser.user_id;
 	new models.test(model)
