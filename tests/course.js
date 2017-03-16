@@ -146,10 +146,12 @@ describe('Courses', function() {
 		});
 	});
 
-	it('should create a course', (done) => {
+	it('should create a course with 1 user: the instructor', (done) => {
+		let instructor = '58c1ab27f39dfaaeae1e760b'
 		let courseFromTemplate = Object.assign({},template.toJSON(), {
 			'term': 'Summer 2015',
-			'description': 'Test description'
+			'description': 'Test description',
+			'created_by': instructor
 		});
 		course.createCourse({
 			body: courseFromTemplate
@@ -158,6 +160,7 @@ describe('Courses', function() {
 				mockCourse = data.course;
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('course');
+				expect(data.course.students).to.contain(instructor);
 				expect(data.course.sections).to.be.an('array');
 				expect(data.course.students).to.be.an('array');
 				expect(data.course.template).to.be.eql(false);
@@ -200,7 +203,7 @@ describe('Courses', function() {
 		});
 	});
 
-	it('should add a user to a course', (done) => {
+	it('should add the first student (second user) to a course', (done) => {
 		course.addUser({
 			params: {
 				courseId: mockCourse._id,
@@ -211,7 +214,7 @@ describe('Courses', function() {
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.course.students).to.have.length(1)
+				expect(data.course.students).to.have.length(2)
 				expect(data.course.students[0]).to.not.have.key('password');
 
 				done();
@@ -230,14 +233,14 @@ describe('Courses', function() {
 		}, {
 			send(data) {
 				expect(data).to.be.an('object');
-				expect(data.course.students).to.have.length(1)
+				expect(data.course.students).to.have.length(2)
 				expect(data.course.students[0]).to.not.have.key('password');
 				done();
 			}
 		})
 	});
 
-	it('should not create a new user for an existing user', (done) => {
+	it('should add a user to the course but not create a new user for an existing user', (done) => {
 		//Add a new user to the mock course
 		course.addUser({
 			params: {
@@ -249,11 +252,12 @@ describe('Courses', function() {
 		}, {
 			send(userData) {
 				expect(userData).to.be.an('object');
-				expect(userData.course.students).to.have.length(2);
+				expect(userData.course.students).to.have.length(3);
 				//Then make new course
 				course.createCourse({
 					body: {
-						title: 'Double Test'
+						title: 'Double Test',
+						created_by: '58c1ab27f39dfaaeae1e760b'
 					}
 				}, {
 					send(data) {
@@ -270,7 +274,7 @@ describe('Courses', function() {
 						}, {
 							send(data) {	
 								expect(data).to.be.an('object');
-								expect(data.course.students).to.have.length(1);
+								expect(data.course.students).to.have.length(2);
 								// Make sure there is no new user created
 								models.user.find({email: 'ryan.doubleadd@hackeryou.com'}, (err,docs) => {
 									expect(docs).to.have.length(1);
@@ -297,7 +301,7 @@ describe('Courses', function() {
 				send(data) {
 					expect(data).to.be.an('object');
 					expect(data.course.students).to.be.an('array');
-					expect(data.course.students).to.have.length(1); 
+					expect(data.course.students).to.have.length(2); 
 					models.user.findOne({_id: student}, (err,doc) => {
 						expect(doc).to.be.an('object');
 						expect(doc.courses).to.have.length(0);
