@@ -159,7 +159,7 @@ describe('Courses', function() {
 		let courseFromTemplate = Object.assign({},template.toJSON(), {
 			'term': 'Summer 2015',
 			'description': 'Test description',
-			'created_by': instructor
+			instructor
 		});
 		course.createCourse({
 			body: courseFromTemplate
@@ -249,6 +249,7 @@ describe('Courses', function() {
 	});
 
 	it('should add a user to the course but not create a new user for an existing user', (done) => {
+		let instructor = '58c1ab27f39dfaaeae1e760b'
 		//Add a new user to the mock course
 		course.addUser({
 			params: {
@@ -265,7 +266,7 @@ describe('Courses', function() {
 				course.createCourse({
 					body: {
 						title: 'Double Test',
-						created_by: '58c1ab27f39dfaaeae1e760b'
+						instructor
 					}
 				}, {
 					send(data) {
