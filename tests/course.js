@@ -55,6 +55,14 @@ function removeCourse(id) {
 	});
 }
 
+function getStudent(id) {
+	return new Promise((resolve,reject) => {
+		models.user.findOne({_id:id}, (err,doc) => {
+			resolve(doc);
+		});
+	});
+}
+
 describe('Courses', function() {
 
 	let mockCourse;
