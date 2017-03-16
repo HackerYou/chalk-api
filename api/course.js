@@ -12,8 +12,8 @@ course.createCourse = (req,res) => {
 	model.created_at = +new Date();
 	model.test = [];
 
-	if (model.created_by !== undefined) {
-		model.students = [model.created_by];
+	if (model.instructor !== undefined) {
+		model.students = [model.instructor];
 	}
 
 	new models.course(model).save((err,doc) => {
