@@ -299,24 +299,27 @@ describe('Courses', function() {
 	it('should remove a user from a course', (done) => {
 		models.course.findOne({_id: mockCourse._id}, (err,doc) => {
 			let student = doc.students[0];
-			course.removeUser({
-				params: {
-					userId: student,
-					courseId: mockCourse._id
-				},
-				body: {}
-			}, {
-				send(data) {
-					expect(data).to.be.an('object');
-					expect(data.course.students).to.be.an('array');
-					expect(data.course.students).to.have.length(2); 
-					models.user.findOne({_id: student}, (err,doc) => {
-						expect(doc).to.be.an('object');
-						expect(doc.courses).to.have.length(0);
-						done();
+			getStudent(student)
+				.then((studentModel) => {
+					course.removeUser({
+						params: {
+							userId: student,
+							courseId: mockCourse._id
+						},
+						body: {}
+					}, {
+						send(data) {
+							expect(data).to.be.an('object');
+							expect(data.course.students).to.be.an('array');
+							expect(data.course.students).to.have.length(2); 
+							models.user.findOne({_id: student}, (err,doc) => {
+								expect(doc).to.be.an('object');
+								expect(doc.courses).to.have.length(studentModel.courses.length > 0 ? studentModel.courses.length - 1 : 0);
+								done();
+							});
+						}
 					});
-				}
-			});
+				});
 		});
 	});
 
