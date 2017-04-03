@@ -441,7 +441,6 @@ user.removeFavoriteClassroom = (req,res) => {
 		let newFavorites = doc.favoriteClassrooms;
 		const classroomToRemove = newFavorites.indexOf(classroomId);
 
-		console.log(newFavorites);
 		if (classroomToRemove > -1) {
 			newFavorites.splice(classroomToRemove, 1);
 			doc.favoriteClassrooms = newFavorites;
