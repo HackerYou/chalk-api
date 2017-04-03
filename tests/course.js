@@ -72,6 +72,7 @@ describe('Courses', function() {
 	let templateId;
 	let sectionId;
 	let user;
+	let instructor;
 
 
 	before((done) => {
@@ -85,8 +86,11 @@ describe('Courses', function() {
 				lessonId = data.lesson._id;
 				models.user.findOne({},(err,mockUser) => {
 					user = mockUser;
+					models.user.findOne({instructor: true}, (err,instructorUser) => {
+						instructor = instructorUser;
+					});
+					done();				
 				});
-				done();
 			}
 		});
 	});
@@ -155,11 +159,11 @@ describe('Courses', function() {
 	});
 
 	it('should create a course with 1 user: the instructor', (done) => {
-		let instructor = '58c1ab27f39dfaaeae1e760b'
+
 		let courseFromTemplate = Object.assign({},template.toJSON(), {
 			'term': 'Summer 2015',
 			'description': 'Test description',
-			instructor
+			'instructor': instructor._id
 		});
 		course.createCourse({
 			body: courseFromTemplate
@@ -168,7 +172,7 @@ describe('Courses', function() {
 				mockCourse = data.course;
 				expect(data).to.be.an('object');
 				expect(data).to.have.key('course');
-				expect(data.course.students).to.contain(instructor);
+				expect(data.course.students).to.contain(instructor._id.toString());
 				expect(data.course.sections).to.be.an('array');
 				expect(data.course.students).to.be.an('array');
 				expect(data.course.template).to.be.eql(false);
@@ -249,7 +253,6 @@ describe('Courses', function() {
 	});
 
 	it('should add a user to the course but not create a new user for an existing user', (done) => {
-		let instructor = '58c1ab27f39dfaaeae1e760b'
 		//Add a new user to the mock course
 		course.addUser({
 			params: {
@@ -266,7 +269,7 @@ describe('Courses', function() {
 				course.createCourse({
 					body: {
 						title: 'Double Test',
-						instructor
+						instructor: instructor._id
 					}
 				}, {
 					send(data) {

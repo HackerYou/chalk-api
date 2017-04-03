@@ -99,8 +99,6 @@ xdescribe("User", function() {
 				expect(data).to.be.an('object');
 				expect(data.user).to.be.an('array');
 				expect(data.user[0].email).to.be.a('string');
-				expect(data.user[0].admin).to.be(false);
-				expect(data.user[0].instructor).to.be(false);
 				done();
 			}
 		});
@@ -205,6 +203,52 @@ xdescribe("User", function() {
 				done();
 			}
 		});
+	});
+
+	it('should favorite a classroom', (done) => {
+		request
+			.post('/v2/user/favoriteClassroom')
+			.send({ 'classroomId': course._id })
+			.set('x-access-token', token)
+			.end((err,res) => {
+				expect(res.body.user).to.be.an('object');
+				expect(res.body.user.favoriteClassrooms).to.be.an('array');
+				expect(res.body.user.favoriteClassrooms).to.contain(course._id.toString());
+				done();
+			});
+	});
+
+	it('should not favorite a malformed classroom id', (done) => {
+		request
+			.post('/v2/user/favoriteClassroom')
+			.send({ 'classroomId': 'ryan smells'})
+			.set('x-access-token', token)
+			.end((err,res) => {
+				expect(res.body.error).to.contain('Classroom ID does not exist.');
+				done();			
+			});
+	});
+
+	it('should not remove a malformed classroom id from a users favorite classrooms', (done) => {
+		request
+			.delete('/v2/user/favoriteClassroom')
+			.send({ 'classroomId': 'blah'})
+			.set('x-access-token', token)
+			.end((err, res) => {
+				expect(res.body.error).to.contain('Unable to find classroom in favorites.');
+				done();
+			});
+	});
+
+	it('should remove a classroom from a users favorites', (done) => {
+		request
+			.delete('/v2/user/favoriteClassroom')
+			.send({ 'classroomId': course._id })
+			.set('x-access-token', token)
+			.end((err, res) => {
+				expect(res.body.user.favoriteClassrooms).to.not.contain(course._id);
+				done();
+			});
 	});
 
 	it('should favorite a lesson', (done) => {

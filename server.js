@@ -140,6 +140,8 @@ app.delete('/v1/user/:id',routeAuth, adminRoute ,api.user.removeUser);
 app.put('/v1/user/reset/:email',api.user.resetPassword);
 app.post('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.favoriteLesson);
 app.delete('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.removeFavoriteLesson);
+app.post('/v2/user/favoriteClassroom',routeAuth, api.user.favoriteClassroom);
+app.delete('/v2/user/favoriteClassroom', routeAuth, api.user.removeFavoriteClassroom);
 
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);

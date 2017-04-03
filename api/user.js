@@ -328,6 +328,58 @@ user.removeCourse = (studentId,courseId) => {
 	});
 }
 
+user.favoriteClassroom = (req, res) => {
+	let classroomId = req.body.classroomId;
+	let userId = req.decodedUser.user_id;
+
+	if (!classroomId) {
+		res.send({
+			error: `Malformed classroom id. Got back: ${classroomId}`
+		});
+		return;
+	}
+	
+	models.course.findOne({_id: classroomId}, (err, classroom) => {
+		if (err) {
+			if (err.name === "CastError") {
+				res.send({error: "Classroom ID does not exist."});
+				return;
+			} 
+			res.send({ error: err});
+			return;
+		} else {
+			models.user.findOne({ _id: userId }, { password: 0,__v:0}, (err, doc) => {
+				if (err) {
+					res.send({
+						error: err
+					});
+					return;
+				}
+
+				if (!doc.favoriteClassrooms) {
+					doc.favoriteClassrooms = [];
+				}
+
+				if (!doc.favoriteClassrooms.includes(classroomId)) {
+					doc.favoriteClassrooms.push(classroomId);
+				};
+
+				doc.save((err, newUser) => {
+					if (err) {
+						res.send({
+							error: err
+						});
+						return;
+					}
+					res.send({
+						user: newUser
+					});
+				});
+			});
+		}
+	});
+};
+
 user.favoriteLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
 	let courseId = req.params.courseId;
@@ -373,6 +425,44 @@ user.favoriteLesson = (req,res) => {
 		});
 	});
 };
+
+user.removeFavoriteClassroom = (req,res) => {
+	let classroomId = req.body.classroomId;
+	let userId = req.decodedUser.user_id;
+
+	models.user.findOne({_id: userId}, (err, doc) => {
+		if (err) {
+			res.send({
+				error: err
+			})
+			return;
+		}
+
+		let newFavorites = doc.favoriteClassrooms;
+		const classroomToRemove = newFavorites.indexOf(classroomId);
+
+		if (classroomToRemove > -1) {
+			newFavorites.splice(classroomToRemove, 1);
+			doc.favoriteClassrooms = newFavorites;
+			doc.save((err, savedUser) => {
+				if (err) {
+					res.send({
+						error: err
+					});
+					return;
+				}
+				res.send({
+					user: savedUser
+				});
+			});
+		} else {
+			res.send({
+				error: 'Unable to find classroom in favorites.'
+			});
+			return;
+		}
+	});
+}
 
 user.removeFavoriteLesson = (req,res) => {
 	let lessonId = req.params.lessonId;
