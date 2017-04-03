@@ -16,6 +16,7 @@ let model = {
 	created_at: Number,
 	first_sign_up: Boolean,
 	favorites: Schema.Types.Mixed,
+	favoriteClassrooms: Array,
 	tests: [{type: String, ref: 'Test'}],
 	test_results: Schema.Types.Mixed
 };
