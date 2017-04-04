@@ -95,10 +95,19 @@ issues.removeIssueById = (req, res) => {
 				})
 			return;
 		}
-		res.status(200)
-			.send({
-				issue: {}
-			});
+		models.issue.find({},(err,docs) => {
+			if(err) {
+				res.status(400) 
+					.send({
+						error: err
+					})
+				return;
+			}
+			res.status(200)
+				.send({
+					issues: docs
+				});
+		});	
 	});
 };
 
