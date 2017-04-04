@@ -11,5 +11,6 @@ module.exports = {
 	section: require('./section.js'),
 	media: require('./media.js'),
 	question: require('./question.js'),
-	test: require('./test.js')
+	test: require('./test.js'),
+	issue: require('./issue.js')
 };

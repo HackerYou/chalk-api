@@ -168,6 +168,14 @@ app.put('/v2/tests/:id/user',routeAuth,api.tests.addUser);
 app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
 
+
+//Issues
+app.post('/v2/flaggedIssues',routeAuth,instructorRoute, api.issues.createIssue);
+app.get('/v2/flaggedIssues', routeAuth, instructorRoute, api.issues.getIssues);
+app.get('/v2/flaggedIssues/:id', routeAuth, instructorRoute, api.issues.getIssueById);
+app.put('/v2/flaggedIssues/:id', routeAuth, adminRoute, api.issues.updateIssueById);
+app.delete('/v2/flaggedIssues/:id', routeAuth, adminRoute, api.issues.removeIssueById);
+
 const server = app.listen('3200');
 //This is the evaluating the code questions. Will need to figure out a betters way to do that at some point!
 server.timeout = 1000000; 

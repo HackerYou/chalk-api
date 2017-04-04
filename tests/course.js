@@ -221,7 +221,7 @@ describe('Courses', function() {
 				courseId: mockCourse._id,
 			},
 			body: {
-				emails: 'ryan@hackeryou.com'
+				emails: 'ryan@hackeryouDoubleTest.com'
 			}
 		}, {
 			send(data) {
@@ -240,7 +240,7 @@ describe('Courses', function() {
 				courseId: mockCourse._id,
 			},
 			body: {
-				emails: 'ryan@hackeryou.com'
+				emails: 'ryan@hackeryouDoubleTest.com'
 			}
 		}, {
 			send(data) {
