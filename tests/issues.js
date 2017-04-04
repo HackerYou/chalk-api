@@ -110,9 +110,9 @@ describe("Issues", () => {
 			.delete(`/v2/flaggedIssues/${mockIssue._id}`)
 			.set('x-access-token', token)
 			.end((err, res) => {
-				const issue = res.body.issue;
+				const issues = res.body.issues;
 				expect(err).to.be(null);
-				expect(issue).to.be.empty();
+				expect(issues).to.be.an('array');
 				done();
 			});
 
