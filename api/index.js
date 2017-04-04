@@ -19,5 +19,6 @@ module.exports = {
 	user: require('./user.js'),
 	media: require('./media.js'),
 	question: require('./question.js'),
-	tests: require('./tests.js')
+	tests: require('./tests.js'),
+	issues: require('./issues.js')
 };
