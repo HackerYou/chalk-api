@@ -113,6 +113,7 @@ describe("Issues", () => {
 				const issues = res.body.issues;
 				expect(err).to.be(null);
 				expect(issues).to.be.an('array');
+				expect(issues.length).to.be.eql(0);
 				done();
 			});
 
