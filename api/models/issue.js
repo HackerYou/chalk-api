@@ -8,6 +8,7 @@ let model = Object.assign({
 	body: String,
 	archived: {type: Boolean, default: false},
 	archived_by: { type: String, ref: "User" },
+	archived_at: Number,
 	topic_id: String
 },
 mixin, 
