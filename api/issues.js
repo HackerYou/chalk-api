@@ -32,7 +32,7 @@ issues.getIssues = (req, res) => {
 			.send({
 				issues: docs
 			});
-	});	
+	}).populate('created_by','firstName lastName');	
 };
 
 issues.getIssueById = (req, res) => {

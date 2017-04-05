@@ -16,6 +16,10 @@ mixin,
 	created_at: {
 		type: Number,
 		default: Date.now
+	},
+	created_by: {
+		type: mongoose.Schema.ObjectId,
+		ref: "User"
 	}
 });
 
