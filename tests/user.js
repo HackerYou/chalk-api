@@ -8,7 +8,7 @@ let bcrypt = require('bcryptjs');
 let request = require('supertest')('http://localhost:3200');
 const courseApi = require('../api/course.js');
 
-xdescribe("User", function() {
+describe("User", function() {
 	let mockUser;
 	let password = 'test';
 	let userEmail = `ryan+${+new Date()}@hackeryou.com`;
@@ -203,6 +203,32 @@ xdescribe("User", function() {
 				done();
 			}
 		});
+	});
+	
+	it('should not allow a user to set a filter type that doesnt exist', (done) => {
+		const bogusFilter = 'SHOW_UNICORNS';
+		request
+			.post('/v2/user/setDashboardFilter')
+			.send({ 'filter': bogusFilter  })
+			.set('x-access-token', token)
+			.end((err, res) => {
+				expect(res.body.error).to.contain('Invalid filter');
+				done();
+			});
+	});
+	
+	it('should allow a user to set their dashboard filter', (done) => {
+		const filter = 'SHOW_ALL';
+		request
+			.post('/v2/user/setDashboardFilter')
+			.send({ 'filter': filter })
+			.set('x-access-token', token)
+			.end((err, res) => {
+				expect(res.body.user).to.be.an('object');
+				expect(res.body.user.dashboardFilter).to.contain(filter);
+				done();
+			});
+
 	});
 
 	it('should favorite a classroom', (done) => {

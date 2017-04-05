@@ -328,6 +328,47 @@ user.removeCourse = (studentId,courseId) => {
 	});
 }
 
+user.setDashboardFilter = (req, res) => {
+	let defaultFilter = 'SHOW_ALL';
+	let filters = ['SHOW_ALL', 'SHOW_FAVORITES'];
+	let filter = req.body.filter;
+	let userId = req.decodedUser.user_id;
+
+	models.user.findOne({ _id: userId }, { password: 0,__v:0}, (err, doc) => {
+		if (err) {
+			res.send({
+				error: err
+			});
+			return;
+		}
+
+		if (!doc.dashboardFilter) {
+			doc.dashboardFilter = defaultFilter;
+		}
+
+		if (!filters.includes(filter)) {
+			res.send({
+				error: `Invalid filter: ${filter}.`
+			});
+			return;
+		} 
+
+		doc.dashboardFilter = filter;
+		doc.save((err, user) => {
+			if (err) {
+				res.send({
+					error: err
+				});
+				return;
+			}
+			res.send({
+				user
+			});
+		});
+
+	});
+}
+
 user.favoriteClassroom = (req, res) => {
 	let classroomId = req.body.classroomId;
 	let userId = req.decodedUser.user_id;

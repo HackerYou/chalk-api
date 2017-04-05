@@ -142,6 +142,8 @@ app.post('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.use
 app.delete('/v1/user/course/:courseId/lesson/:lessonId/favorite',routeAuth,api.user.removeFavoriteLesson);
 app.post('/v2/user/favoriteClassroom',routeAuth, api.user.favoriteClassroom);
 app.delete('/v2/user/favoriteClassroom', routeAuth, api.user.removeFavoriteClassroom);
+app.post('/v2/user/setDashboardFilter', routeAuth, api.user.setDashboardFilter);
+
 
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);
