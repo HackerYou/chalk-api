@@ -17,6 +17,7 @@ let model = {
 	first_sign_up: Boolean,
 	favorites: Schema.Types.Mixed,
 	favoriteClassrooms: Array,
+	dashboardFilter: String,
 	tests: [{type: String, ref: 'Test'}],
 	test_results: Schema.Types.Mixed
 };
