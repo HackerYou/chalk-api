@@ -9,7 +9,9 @@ let config = require('./config.js');
 let helmet = require('helmet');
 let Raven = require('raven');
 
-Raven.config(config.sentry_dsn).install();
+Raven.config(config.sentry_dsn,{
+	captureUnhandledRejections: true
+}).install();
 
 app.use(Raven.requestHandler());
 
@@ -40,6 +42,9 @@ function routeAuth(req,res,next) {
 			}
 			else {
 				req.decodedUser = decodedRes;
+				Raven.setContext({
+					user: decodedRes
+				});
 				next();
 			}
 		});
