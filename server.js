@@ -7,13 +7,18 @@ let api = require('./api/index.js');
 let jwt = require('jsonwebtoken');
 let config = require('./config.js');
 let helmet = require('helmet');
+let Raven = require('raven');
+
+Raven.config(config.sentry_dsn).install();
+
+app.use(Raven.requestHandler());
 
 app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Credentials', true);
-  	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Content-length, Accept, x-access-token');
-  	res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-    next();
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Credentials', true);
+	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Content-length, Accept, x-access-token');
+	res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+	next();
 }); 
 
 app.use(helmet());
@@ -22,12 +27,7 @@ app.use(bodyParser.json({
 	limit: '10mb'
 }));
 
-app.use((err,req,res,next) => {
-	if(err) {
-		console.error(`${err} on ${new Date()}`)
-	}
-	next();
-});
+app.use(Raven.errorHandler());
 
 function routeAuth(req,res,next) {
 	let token = req.headers['x-access-token'];
