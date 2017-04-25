@@ -6,6 +6,12 @@ let bcrypt = require('bcryptjs');
 let config = require('../config.js');
 let jwt = require('jsonwebtoken');
 const sendgrid = require('sendgrid')(config.sendGridKey);
+const fireBaseAdmin = require('firebase-admin');
+const fireBaseKey = require('../firebasekey.json');
+fireBaseAdmin.initializeApp({
+  credential: fireBaseAdmin.credential.cert(fireBaseKey),
+  databaseURL: "https://hy-jobs-board.firebaseio.com"
+});
 
 let simplePassword = (length) => {
 	let chars = 'abcdefghijklmnopqrstuvwxyz01234567890';
@@ -285,6 +291,44 @@ user.authenticate = (req,res) => {
 						user_id: doc._id
 					});
 				}
+			});
+		}
+	});
+};
+
+user.authenticateForFirebase = (req,res) => {
+	let email = req.query.email.toLowerCase();
+	let password = req.query.password;
+
+	models.user.findOne({email:email},(err,doc) => {
+		if(err || !doc) {
+			res.send({
+				success: false,
+				message: 'User does not exist'
+			});
+		}
+		else {
+			bcrypt.compare(password,doc.password, (err,result) => {
+				if(err) {
+					res.send({
+						success: false,
+						message: "Password incorrect"
+					});
+					return
+				}
+				fireBaseAdmin.auth().createCustomToken(doc._id.toString())
+					.then((token) => {
+						res.send({
+							success: true,
+							token
+						});
+					})
+					.catch((err) => {
+						res.send({
+							success: false,
+							message: "Error creating token"
+						});
+					})
 			});
 		}
 	});
