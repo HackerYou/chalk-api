@@ -149,6 +149,9 @@ app.post('/v2/user/favoriteClassroom',routeAuth, api.user.favoriteClassroom);
 app.delete('/v2/user/favoriteClassroom', routeAuth, api.user.removeFavoriteClassroom);
 app.post('/v2/user/setDashboardFilter', routeAuth, api.user.setDashboardFilter);
 
+//Users Firebase Auth
+app.get('/v2/user/firebaseAuth', api.user.authenticateForFirebase);
+
 
 //Media
 app.get('/v1/media',routeAuth, adminRoute ,api.media.getFiles);

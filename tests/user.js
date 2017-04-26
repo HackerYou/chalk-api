@@ -337,6 +337,24 @@ describe("User", function() {
 		});
 	});
 
+	it('should authenticate and return a firebase token', (done) => {
+		user.authenticateForFirebase({
+			query: {
+				email: userEmail,
+				password: password
+			},
+			params: {},
+			body: {}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.success).to.be.eql(true);
+				expect(data.token).to.be.a('string');
+				done();	
+			}
+		});
+	})
+
 });
 
 
