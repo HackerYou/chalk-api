@@ -109,6 +109,7 @@ app.put('/v1/lesson/:lessonId/topic/:topicId',routeAuth,adminRoute,api.lesson.ad
 app.delete('/v1/lesson/:lessonId/topic/:topicId',routeAuth,adminRoute,api.lesson.removeTopic);
 
 //Courses 
+
 app.post('/v1/course/template',routeAuth, adminRoute ,api.course.createTemplate);
 app.get('/v1/course/template',routeAuth, adminRoute ,api.course.getTemplates);
 app.get('/v1/course/template/:id',routeAuth, adminRoute ,api.course.getTemplate);
@@ -177,6 +178,7 @@ app.put('/v2/tests/:id/question',routeAuth,adminRoute,api.tests.addQuestion);
 app.put('/v2/tests/:id/user',routeAuth,api.tests.addUser);
 app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
+app.get('/v2/tests/results/:id', routeAuth,adminRoute,api.tests.getTestsForClassroom);
 
 
 //Issues
