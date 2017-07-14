@@ -178,7 +178,7 @@ app.put('/v2/tests/:id/question',routeAuth,adminRoute,api.tests.addQuestion);
 app.put('/v2/tests/:id/user',routeAuth,api.tests.addUser);
 app.delete('/v2/tests/:id/question', routeAuth,adminRoute,api.tests.removeQuestionFromTest);
 app.delete('/v2/tests/:id',routeAuth,adminRoute,api.tests.removeTest);
-app.get('/v2/tests/results/:id', routeAuth,adminRoute,api.tests.getTestsForClassroom);
+app.get('/v2/tests/results/:classroom_id', routeAuth,adminRoute,api.tests.getTestsForClassroom);
 
 
 //Issues

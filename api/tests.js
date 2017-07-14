@@ -47,36 +47,47 @@ tests.createTest = (req,res) => {
 };
 
 tests.getTestsForClassroom = (req,res) => {
-	const id = req.params.id;
-	models.test.find({}, (err,docs) => {
-		if (err) {
+	const id = req.params.classroom_id;
+	//Get classroom, to get students and tests.
+
+	models.course.findOne({_id: id},'tests students',(err,doc) => {
+		if (err !== null) {
 			res.status(400)
 				.send({
 					error: err
 				});
 			return;
 		}
-		const testsClone = JSON.parse(JSON.stringify(docs));
-
-
-		const filteredTests = testsClone.filter(test => test.course === id);
-		models.test.populate(filteredTests, {
-			path: 'users',
-			select: '_id firstName lastName test_results'
-		}, (err, populatedTests) => {
-			if (err) {
-				res.status(400)
-					.send({
-						error: err,
-					});
-			}
-			res.status(200)
-			.send({
-				tests: populatedTests,
-			})
+		const courseTests = doc.tests.map(test =>  test.toString());
+		//This will be an array of students in this class and the
+		//tests results of the tests from that class.
+		const courseStudents = doc.students.map((student) => {
+			//From that filter the students test id's to only be the ones in the class
+			let studentTestIds = Object.keys(student.test_results);
+			let tests = studentTestIds
+				.filter(test => courseTests.includes(test))
+				.map(testId => student.test_results[testId])
+			student.test_results = tests.map(result => {
+				return {
+					correct: result.answers.reduce((acc,ans) => {
+						if(ans.correct === true) {
+							acc += 1;
+						}
+						return acc;
+					},0),
+					results: result.answers,
+				};
+			});
+			return student;
 		});
 
-	});
+		res
+			.status(200)
+			.send({
+				results: courseStudents
+			});
+	})
+	.populate('students','test_results firstName lastName');
 }
 
 tests.getTests = (req,res) => {

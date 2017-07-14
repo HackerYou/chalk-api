@@ -186,19 +186,25 @@ describe('Tests', function() {
 	});
 
 	it('should get all the tests for a specific classroom', (done) => {
-		console.log(courseId);
-		request
-			.get(`/v2/tests/results/${courseId}`)
-			.set(`x-access-token`, token)
-			.end((err, res) => {
-				console.log(res.status);
-				expect(err).to.be(null);
-				expect(res.status).to.not.be(404);
-				expect(res.status).to.not.be(400);
-				expect(res.status).to.be(200);
-				expect(res.body.tests.length).to.be.greaterThan(0);
+		models.course.findOne({term:/spring 2017/ig}, (err,doc) => {
+			expect(err).to.be(null);
+			if(err) {
 				done();
-			});
+			}
+			request
+				.get(`/v2/tests/results/${doc._id}`)
+				.set(`x-access-token`, token)
+				.end((err, res) => {
+					expect(err).to.be(null);
+					expect(res.status).to.not.be(404);
+					expect(res.status).to.not.be(400);
+					expect(res.status).to.be(200);
+					expect(res.body.results.length).to.be.greaterThan(0);
+					expect(res.body.results[0].test_results[0].correct).to.be.a('number');
+					expect(res.body.results[0].test_results[0].results.length).to.be.greaterThan(0);
+					done();
+				});
+		});
 	});
 
 	it('should get all the tests', (done) => {
