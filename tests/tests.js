@@ -185,6 +185,22 @@ describe('Tests', function() {
 			});
 	});
 
+	it('should get all the tests for a specific classroom', (done) => {
+		console.log(courseId);
+		request
+			.get(`/v2/tests/results/${courseId}`)
+			.set(`x-access-token`, token)
+			.end((err, res) => {
+				console.log(res.status);
+				expect(err).to.be(null);
+				expect(res.status).to.not.be(404);
+				expect(res.status).to.not.be(400);
+				expect(res.status).to.be(200);
+				expect(res.body.tests.length).to.be.greaterThan(0);
+				done();
+			});
+	});
+
 	it('should get all the tests', (done) => {
 		request
 			.get(`/v2/tests`)

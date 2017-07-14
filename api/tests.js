@@ -46,6 +46,39 @@ tests.createTest = (req,res) => {
 		});
 };
 
+tests.getTestsForClassroom = (req,res) => {
+	const id = req.params.id;
+	models.test.find({}, (err,docs) => {
+		if (err) {
+			res.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		const testsClone = JSON.parse(JSON.stringify(docs));
+
+
+		const filteredTests = testsClone.filter(test => test.course === id);
+		models.test.populate(filteredTests, {
+			path: 'users',
+			select: '_id firstName lastName test_results'
+		}, (err, populatedTests) => {
+			if (err) {
+				res.status(400)
+					.send({
+						error: err,
+					});
+			}
+			res.status(200)
+			.send({
+				tests: populatedTests,
+			})
+		});
+
+	});
+}
+
 tests.getTests = (req,res) => {
 	models.test.find({},(err,docs) => {
 		if(err){
