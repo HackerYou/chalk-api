@@ -64,20 +64,18 @@ tests.getTestsForClassroom = (req,res) => {
 		const courseStudents = doc.students.map((student) => {
 			//From that filter the students test id's to only be the ones in the class
 			let studentTestIds = Object.keys(student.test_results);
-			let tests = studentTestIds
+			student.test_results = studentTestIds
 				.filter(test => courseTests.includes(test))
-				.map(testId => student.test_results[testId])
-			student.test_results = tests.map(result => {
-				return {
-					correct: result.answers.reduce((acc,ans) => {
-						if(ans.correct === true) {
-							acc += 1;
-						}
-						return acc;
-					},0),
-					results: result.answers,
-				};
-			});
+				.map(testId => ({
+					id: testId,
+					results: student.test_results[testId].answers,
+					correct: student.test_results[testId].answers.reduce((acc,ans) => {
+							if(ans.correct === true) {
+								acc += 1;
+							}
+							return acc;
+						},0)
+				}));
 			return student;
 		});
 
