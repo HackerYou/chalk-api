@@ -95,7 +95,7 @@ exercise.updateExercise = (req,res) => {
 	let model = req.body;
 	model.updated_at = +new Date();
 	models.exercise.findOne({_id:exerciseId},(err,olddoc) => {
-		model.revisions.push(olddoc.toObject());
+		// model.revisions.push(olddoc.toObject());
 		models.exercise.findOneAndUpdate(
 			{_id:exerciseId},
 			model,

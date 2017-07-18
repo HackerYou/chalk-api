@@ -68,10 +68,10 @@ topic.updateTopic = (req,res) => {
 	let model = req.body;
 	model.updated_at = +new Date();
 	models.topic.findOne({_id:topicId}, (err,olddoc) => {
-		if(model.revisions === undefined) {
-			model.revisions = [];
-		}
-		model.revisions.push(olddoc.toObject());
+		// if(model.revisions === undefined) {
+		// 	model.revisions = [];
+		// }
+		// model.revisions.push(olddoc.toObject());
 		models.topic.findOneAndUpdate({_id:topicId},model,{new:true}, (err,doc) => {
 			if(err) {
 				res.send({

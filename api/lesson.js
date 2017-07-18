@@ -90,12 +90,12 @@ lesson.updateLesson = (req,res) => {
 				error: err
 			});
 		}
-		//Store old version of the doc first
-		if(model.revisions === undefined) {
-			model.revisions = [];
-		}
+		// //Store old version of the doc first
+		// if(model.revisions === undefined) {
+		// 	model.revisions = [];
+		// }
 
-		model.revisions.push(doc.toObject());
+		// model.revisions.push(doc.toObject());
 
 		//Set it as updated
 		model.updated_at = +new Date();	
