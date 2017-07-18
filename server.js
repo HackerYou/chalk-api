@@ -26,7 +26,7 @@ app.use(function(req, res, next) {
 app.use(helmet());
 
 app.use(bodyParser.json({
-	limit: '10mb'
+	limit: '50mb'
 }));
 
 app.use(Raven.errorHandler());
