@@ -93,8 +93,6 @@ describe('Lessons', () => {
 				expect(data).to.be.an('object');
 				expect(data.lesson.updated_at).to.be.a('number');
 				expect(data.lesson.title).to.be.eql('New lesson title');
-				expect(data.lesson.revisions).to.be.an('array');
-				expect(data.lesson.revisions).to.have.length(1);
 				done();
 			}
 		})

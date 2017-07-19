@@ -115,8 +115,6 @@ describe('Topics', () => {
 			send(data) {
 				expect(data).to.be.an('object');
 				expect(data.topic.title).to.be.eql('New Topic update');
-				expect(data.topic.revisions).to.be.an('array');
-				expect(data.topic.revisions).to.have.length(1);
 				done();
 			}
 		})

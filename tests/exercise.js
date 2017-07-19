@@ -61,8 +61,6 @@ xdescribe('Exercise', () => {
 				expect(data).to.be.an('object');
 				expect(data.exercise.updated_at).to.have.a('number');
 				expect(data.exercise.title).to.be.eql('Updated Exercise');
-				expect(data.exercise.revisions).to.be.an('array');
-				expect(data.exercise.revisions).to.have.length(1);
 				done();
 			}
 		});

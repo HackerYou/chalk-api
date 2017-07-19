@@ -200,7 +200,7 @@ describe('Tests', function() {
 					expect(res.status).to.not.be(400);
 					expect(res.status).to.be(200);
 					expect(res.body.results.length).to.be.greaterThan(0);
-					expect(res.body.results[0].test_results[0].id).to.be.a('string');
+					expect(res.body.results[0].test_results[0].name).to.be.a('string');
 					expect(res.body.results[0].test_results[0].correct).to.be.a('number');
 					expect(res.body.results[0].test_results[0].results.length).to.be.greaterThan(0);
 					done();
