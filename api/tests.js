@@ -58,16 +58,21 @@ tests.getTestsForClassroom = (req,res) => {
 				});
 			return;
 		}
-		const courseTests = doc.tests.map(test =>  test.toString());
+		//Creates array of objects that are test ID's and titles
+		const courseTests = doc.tests.map(test => ({ id: test._id.toString(), title: test.title }));
 		//This will be an array of students in this class and the
 		//tests results of the tests from that class.
 		const courseStudents = doc.students.map((student) => {
 			//From that filter the students test id's to only be the ones in the class
 			let studentTestIds = Object.keys(student.test_results);
 			student.test_results = studentTestIds
-				.filter(test => courseTests.includes(test))
+				.filter(test => courseTests.findIndex(t => t.id === test)) //
 				.map(testId => ({
 					id: testId,
+					name: ((id) => {
+						const testName = courseTests.find((test) => test.id === id)
+						return testName ? testName.title : ''
+					})(testId),
 					results: student.test_results[testId].answers,
 					correct: student.test_results[testId].answers.reduce((acc,ans) => {
 							if(ans.correct === true) {
@@ -85,7 +90,8 @@ tests.getTestsForClassroom = (req,res) => {
 				results: courseStudents
 			});
 	})
-	.populate('students','test_results firstName lastName');
+	.populate('students','test_results firstName lastName')
+	.populate('tests', 'title');
 }
 
 tests.getTests = (req,res) => {
