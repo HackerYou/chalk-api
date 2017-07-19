@@ -169,7 +169,8 @@ course.getCourse = (req,res) => {
 					return;
 				}
 				models.section.populate(populatedDocs.sections,{
-					path: 'lessons'
+					path: 'lessons',
+					select: 'title'
 				},(err,populatedLesson) => {
 					if(err) {
 						res.send({
