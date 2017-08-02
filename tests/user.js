@@ -35,6 +35,7 @@ describe("User", function() {
 			if(err) {
 				console.error(err);
 			}
+			userId = doc._id;
 			courseApi.createTemplate({
 				body: {
 					"title": "New Template"
@@ -53,14 +54,23 @@ describe("User", function() {
 		});
 	});
 	after((done) => {
-		mongoose.disconnect();
-		done();
+		user.removeUser({
+			params: {
+				id: userId
+			},
+			body: {}
+		}, {
+			send() {
+				mongoose.disconnect();
+				done();
+			}
+		});
 	});
 	it('should create a user', (done) => {
 		user.addUser({
 			params:{},
 			body:  {
-				emails: 'ryan@hackeryou.com'
+				emails: 'ryan@cool.hackeryou.com'
 			}
 		}, {
 			send(data) {
@@ -76,7 +86,7 @@ describe("User", function() {
 		user.addUser({
 			params: {},
 			body: {
-				emails: 'ryan@hackeryou.com,ryan@testingahackeryouwebsite.com'
+				emails: 'ryan@cool.hackeryou.com,ryan@testingahackeryouwebsite.com'
 			}
 		}, {
 			send(data) {
@@ -156,7 +166,7 @@ describe("User", function() {
 	it('should send a reset password', (done) => {
 		user.resetPassword({
 			params: {
-				email: 'ryan@hackeryou.com'
+				email: 'ryan@cool.hackeryou.com'
 			},
 			body: {}
 		}, {
@@ -300,11 +310,10 @@ describe("User", function() {
 			});
 	});
 
-
 	it('should not exist', (done) => {
 		user.authenticate({
 			query: {
-				email: 'drew@hackeryou.com',
+				email: 'drew@cool.hackeryou.com',
 				password: 'thisisatest'
 			},
 			params:{},
@@ -353,7 +362,7 @@ describe("User", function() {
 				done();	
 			}
 		});
-	})
+	});
 
 });
 

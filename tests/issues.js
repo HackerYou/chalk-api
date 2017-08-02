@@ -107,15 +107,20 @@ describe("Issues", () => {
 	});
 	it("should delete specific issue by id", (done) => {
 		request
-			.delete(`/v2/flaggedIssues/${mockIssue._id}`)
-			.set('x-access-token', token)
+			.get(`/v2/flaggedIssues`)
+			.set('x-access-token',token)
 			.end((err, res) => {
-				const issues = res.body.issues;
-				expect(err).to.be(null);
-				expect(issues).to.be.an('array');
-				expect(issues.length).to.be.eql(0);
-				done();
+				const prevIssues = res.body.issues.length;
+				request
+					.delete(`/v2/flaggedIssues/${mockIssue._id}`)
+					.set('x-access-token', token)
+					.end((err, res) => {
+						const issues = res.body.issues;
+						expect(err).to.be(null);
+						expect(issues).to.be.an('array');
+						expect(issues.length).to.be.eql(prevIssues - 1);
+						done();
+					});
 			});
-
 	});
 });

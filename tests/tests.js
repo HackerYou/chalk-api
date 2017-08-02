@@ -186,8 +186,9 @@ describe('Tests', function() {
 	});
 
 	it('should get all the tests for a specific classroom', (done) => {
-		models.course.findOne({term:/spring 2017/ig}, (err,doc) => {
+		models.course.findOne({term:/spring 2017/ig,title:/bootcamp/ig}, (err,doc) => {
 			expect(err).to.be(null);
+			expect(doc).to.not.be(null);
 			if(err) {
 				done();
 			}
