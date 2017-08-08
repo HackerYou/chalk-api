@@ -591,6 +591,59 @@ user.removeFavoriteLesson = (req,res) => {
 	});
 };
 
+user.removeCourseSection = (req,res) => {
+	const userId = req.params.userId;
+	const courseId = req.params.courseId;
+	const sectionId = req.params.sectionId;
+	models.user.findOne({_id:userId},(err,doc) => {
+		console.log(doc);
+		if(err !== null) {
+			res
+				.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		if(doc === null) {
+			res
+				.status(404)
+				.send({
+					error: "No user found"
+				});
+			return;
+		}
+		const courseIndex = doc.courseSections.findIndex((course) => course.courseId === courseId);
+		const sectionIndex = doc.courseSections[courseIndex].sections.indexOf(sectionId);
+
+		if(sectionIndex === -1) {
+			res
+				.status(404)
+				.send({
+					error: "Section not found"
+				});
+			return;
+		}
+
+		doc.courseSections[courseIndex].sections.splice(sectionIndex,1);
+
+		doc.save((err, savedUser) => {
+			if(err !== null) {
+				res
+					.status(400)
+					.send({
+						error: err
+					});
+				return;
+			}
+			res
+				.status(200)
+				.send({
+					user: savedUser
+				});
+		});
+	});
+};
 
 module.exports = user;
 

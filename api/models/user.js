@@ -12,6 +12,12 @@ let model = {
 	email: String,
 	password: String,
 	courses: [{type: String, ref: 'Course'}],
+	courseSections: {
+		type: [{
+			courseId: String,
+			sections: [String]
+		}]
+	},
 	updated_at: Number,
 	created_at: Number,
 	first_sign_up: Boolean,

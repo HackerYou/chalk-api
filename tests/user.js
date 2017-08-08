@@ -8,6 +8,7 @@ let bcrypt = require('bcryptjs');
 let request = require('supertest')('http://localhost:3200');
 const courseApi = require('../api/course.js');
 
+
 describe("User", function() {
 	let mockUser;
 	let password = 'test';
@@ -29,7 +30,11 @@ describe("User", function() {
 			password: userPassword,
 			admin: true,
 			first_sign_up: true,
-			instructor: true
+			instructor: true,
+			courseSections:[{
+				courseId: '898089',
+				sections: ['123','456']
+			}]
 		};
 		models.user(userModel).save((err,doc) => {
 			if(err) {
@@ -61,8 +66,10 @@ describe("User", function() {
 			body: {}
 		}, {
 			send() {
-				mongoose.disconnect();
-				done();
+				models.course.findByIdAndRemove(course._id,(err) => {
+					mongoose.disconnect();
+					done();
+				});
 			}
 		});
 	});
@@ -179,23 +186,6 @@ describe("User", function() {
 		});
 	});
 
-	
-	it('should remove a user', (done) => {
-		user.removeUser({
-			params: {
-				id: mockUser._id
-			},
-			body: {}
-		}, {
-			send(data) {
-				expect(data).to.be.an('object');
-				expect(data.user).to.be.an('array');
-				expect(data.user).to.have.length(0);
-				done();
-			}
-		});
-	});
-
 	it('should authenticate a user', (done) => {
 		user.authenticate({
 			query: {
@@ -215,6 +205,48 @@ describe("User", function() {
 		});
 	});
 	
+	it('should remove a section from the courseSections for a given course', (done) => {
+		request
+			.delete(`/v2/user/removeCourseSection/${userId}/898089/456`)
+			.set('x-access-token',token)
+			.end((err,res) => {
+				const userData = res.body.user; 
+				expect(err).to.be(null);
+				expect(userData.courseSections).to.be.an('array');
+				expect(userData.courseSections[0].sections.length).to.be(1);
+				done();
+			});
+	});
+
+	it('should add a section from the courseSections for a given course', (done) => {
+		request
+			.put(`/v2/user/removeCourseSection/${userId}/898089/456`)
+			.set('x-access-token',token)
+			.end((err,res) => {
+				const userData = res.body.user; 
+				expect(err).to.be(null);
+				expect(userData.courseSections).to.be.an('array');
+				expect(userData.courseSections[0].sections.length).to.be(2);
+				done();
+			});
+	});
+
+	it('should remove a user', (done) => {
+		user.removeUser({
+			params: {
+				id: mockUser._id
+			},
+			body: {}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.user).to.be.an('array');
+				expect(data.user).to.have.length(0);
+				done();
+			}
+		});
+	});
+
 	it('should not allow a user to set a filter type that doesnt exist', (done) => {
 		const bogusFilter = 'SHOW_UNICORNS';
 		request
