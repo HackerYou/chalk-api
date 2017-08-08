@@ -220,7 +220,7 @@ describe("User", function() {
 
 	it('should add a section from the courseSections for a given course', (done) => {
 		request
-			.put(`/v2/user/removeCourseSection/${userId}/898089/456`)
+			.put(`/v2/user/addCourseSection/${userId}/898089/456`)
 			.set('x-access-token',token)
 			.end((err,res) => {
 				const userData = res.body.user; 

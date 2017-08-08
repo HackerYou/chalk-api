@@ -428,7 +428,7 @@ describe('Tests', function() {
 			});
 	});
 	
-	it('should add to the users test results answers array',(done) => {
+	it('should add to the users test results answers object',(done) => {
 		request
 			.get(`/v1/user/${userId}`)
 			.set(`x-access-token`,token)
