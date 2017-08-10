@@ -595,7 +595,12 @@ user.removeCourseSection = (req,res) => {
 	const userId = req.params.userId;
 	const courseId = req.params.courseId;
 	const sectionId = req.params.sectionId;
-	models.user.findOne({_id:userId},(err,doc) => {
+	models.user.findOne({_id:userId},{
+		firstName: 1,
+		lastName: 1,
+		courseSections:1,
+		email: 1
+	},(err,doc) => {
 		if(err !== null) {
 			res
 				.status(400)
@@ -666,7 +671,6 @@ user.addCourseSection = (req,res) => {
 				});
 			return;
 		}
-
 		const courseIndex = doc.courseSections.findIndex((course) => course.courseId === courseId);
 		doc.courseSections[courseIndex].sections.push(sectionId);
 
