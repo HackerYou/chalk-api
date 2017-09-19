@@ -2,12 +2,7 @@
 
 let mongoose = require('mongoose');
 let config = require('../config.js');
-if(process.env.NODE_ENV === 'production') {
-	mongoose.connect(`mongodb://${config.db_user}:${config.db_pass}@localhost/notes`);
-}
-else {
-	mongoose.connect('mongodb://localhost/notes');
-}
+mongoose.connect('mongodb://localhost/notes');
 mongoose.Promise = Promise;
 
 module.exports = {

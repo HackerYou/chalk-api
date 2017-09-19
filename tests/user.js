@@ -8,6 +8,7 @@ let bcrypt = require('bcryptjs');
 let request = require('supertest')('http://localhost:3200');
 const courseApi = require('../api/course.js');
 
+
 describe("User", function() {
 	let mockUser;
 	let password = 'test';
@@ -29,12 +30,17 @@ describe("User", function() {
 			password: userPassword,
 			admin: true,
 			first_sign_up: true,
-			instructor: true
+			instructor: true,
+			courseSections:[{
+				courseId: '898089',
+				sections: ['123','456']
+			}]
 		};
 		models.user(userModel).save((err,doc) => {
 			if(err) {
 				console.error(err);
 			}
+			userId = doc._id;
 			courseApi.createTemplate({
 				body: {
 					"title": "New Template"
@@ -53,14 +59,25 @@ describe("User", function() {
 		});
 	});
 	after((done) => {
-		mongoose.disconnect();
-		done();
+		user.removeUser({
+			params: {
+				id: userId
+			},
+			body: {}
+		}, {
+			send() {
+				models.course.findByIdAndRemove(course._id,(err) => {
+					mongoose.disconnect();
+					done();
+				});
+			}
+		});
 	});
 	it('should create a user', (done) => {
 		user.addUser({
 			params:{},
 			body:  {
-				emails: 'ryan@hackeryou.com'
+				emails: 'ryan@cool.hackeryou.com'
 			}
 		}, {
 			send(data) {
@@ -76,7 +93,7 @@ describe("User", function() {
 		user.addUser({
 			params: {},
 			body: {
-				emails: 'ryan@hackeryou.com,ryan@testingahackeryouwebsite.com'
+				emails: 'ryan@cool.hackeryou.com,ryan@testingahackeryouwebsite.com'
 			}
 		}, {
 			send(data) {
@@ -156,7 +173,7 @@ describe("User", function() {
 	it('should send a reset password', (done) => {
 		user.resetPassword({
 			params: {
-				email: 'ryan@hackeryou.com'
+				email: 'ryan@cool.hackeryou.com'
 			},
 			body: {}
 		}, {
@@ -164,23 +181,6 @@ describe("User", function() {
 				expect(data).to.be.an('object');
 				expect(data.status).to.be.eql('success');
 				expect(data.message).to.be.eql('Email Sent');
-				done();
-			}
-		});
-	});
-
-	
-	it('should remove a user', (done) => {
-		user.removeUser({
-			params: {
-				id: mockUser._id
-			},
-			body: {}
-		}, {
-			send(data) {
-				expect(data).to.be.an('object');
-				expect(data.user).to.be.an('array');
-				expect(data.user).to.have.length(0);
 				done();
 			}
 		});
@@ -205,6 +205,48 @@ describe("User", function() {
 		});
 	});
 	
+	it('should remove a section from the courseSections for a given course', (done) => {
+		request
+			.delete(`/v2/user/removeCourseSection/${userId}/898089/456`)
+			.set('x-access-token',token)
+			.end((err,res) => {
+				const userData = res.body.user; 
+				expect(err).to.be(null);
+				expect(userData.courseSections).to.be.an('array');
+				expect(userData.courseSections[0].sections.length).to.be(1);
+				done();
+			});
+	});
+
+	it('should add a section from the courseSections for a given course', (done) => {
+		request
+			.put(`/v2/user/addCourseSection/${userId}/898089/456`)
+			.set('x-access-token',token)
+			.end((err,res) => {
+				const userData = res.body.user; 
+				expect(err).to.be(null);
+				expect(userData.courseSections).to.be.an('array');
+				expect(userData.courseSections[0].sections.length).to.be(2);
+				done();
+			});
+	});
+
+	it('should remove a user', (done) => {
+		user.removeUser({
+			params: {
+				id: mockUser._id
+			},
+			body: {}
+		}, {
+			send(data) {
+				expect(data).to.be.an('object');
+				expect(data.user).to.be.an('array');
+				expect(data.user).to.have.length(0);
+				done();
+			}
+		});
+	});
+
 	it('should not allow a user to set a filter type that doesnt exist', (done) => {
 		const bogusFilter = 'SHOW_UNICORNS';
 		request
@@ -300,11 +342,10 @@ describe("User", function() {
 			});
 	});
 
-
 	it('should not exist', (done) => {
 		user.authenticate({
 			query: {
-				email: 'drew@hackeryou.com',
+				email: 'drew@cool.hackeryou.com',
 				password: 'thisisatest'
 			},
 			params:{},
@@ -353,7 +394,7 @@ describe("User", function() {
 				done();	
 			}
 		});
-	})
+	});
 
 });
 

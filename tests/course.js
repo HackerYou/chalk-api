@@ -55,6 +55,17 @@ function removeCourse(id) {
 	});
 }
 
+function removeUser(email) {
+	return new Promise((resolve,reject) => {
+		models.user.findOneAndRemove({email},(err) => {
+			if(err !== null) {
+				reject();
+			}
+			resolve();
+		})
+	});
+}
+
 function getStudent(id) {
 	return new Promise((resolve,reject) => {
 		models.user.findOne({_id:id}, (err,doc) => {
@@ -95,7 +106,10 @@ describe('Courses', function() {
 		});
 	});
 	after((done) => {
-		Promise.all([removeCourse(doubleId)])
+		Promise.all([
+			removeCourse(doubleId),
+			removeUser('ryan@hackeryouDoubleTest.com'),
+			removeUser('ryan.doubleadd@hackeryou.com')])
 			.then(() => {
 				mongoose.disconnect();
 				done();
@@ -180,6 +194,7 @@ describe('Courses', function() {
 			}
 		});
 	});
+
 	it('should return all courses', (done) => {
 		course.getCourses({},{
 			send(data) {
@@ -221,14 +236,16 @@ describe('Courses', function() {
 				courseId: mockCourse._id,
 			},
 			body: {
-				emails: 'ryan@hackeryouDoubleTest.com'
+				emails: 'ryan@hackeryoudoubletest.com'
 			}
 		}, {
 			send(data) {
+				const student = data.course.students.find((student) => student.email === 'ryan@hackeryoudoubletest.com');
 				expect(data).to.be.an('object');
 				expect(data.course.students).to.have.length(2)
-				expect(data.course.students[0]).to.not.have.key('password');
-
+				expect(student).to.not.have.key('password');
+				expect(student.courseSections).to.be.an('array');
+				expect(student.courseSections[0].courseId).to.be(mockCourse._id.toString());
 				done();
 			}
 		})
@@ -240,7 +257,7 @@ describe('Courses', function() {
 				courseId: mockCourse._id,
 			},
 			body: {
-				emails: 'ryan@hackeryouDoubleTest.com'
+				emails: 'ryan@hackeryoudoubletest.com'
 			}
 		}, {
 			send(data) {
