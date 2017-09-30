@@ -671,8 +671,17 @@ user.addCourseSection = (req,res) => {
 				});
 			return;
 		}
+
 		const courseIndex = doc.courseSections.findIndex((course) => course.courseId === courseId);
-		doc.courseSections[courseIndex].sections.push(sectionId);
+		if(courseIndex === -1) {
+			doc.courseSections.push({
+				"courseId": courseId,
+				"sections": [sectionId]
+			})
+		}
+		else {
+			doc.courseSections[courseIndex].sections.push(sectionId);
+		}
 
 		doc.save((err,savedDoc) => {
 			if(err !== null) {
