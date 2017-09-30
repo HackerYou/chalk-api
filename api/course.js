@@ -431,7 +431,10 @@ course.addUser = (req,res) => {
 					}
 					//If you can find a user in the DB just push them on the course
 					else if(userDoc) {
-						userDoc.courseSections = courseSections;
+						if(userDoc.courseSections === undefined) {
+							userDoc.courseSections = [];
+						}
+						userDoc.courseSections.push(courseSections);
 						userDoc.save((err,savedUser) => {
 							if(err !== null) {
 								reject();
@@ -443,7 +446,8 @@ course.addUser = (req,res) => {
 					else {
 						// Else create new users and add to course
 						Promise.all( user.createUser(email) ).then(data => {
-							data[0].courseSections = courseSections;
+							data[0].courseSections = [];
+							data[0].courseSections.push(courseSections);
 							data[0].save((err,savedUser) => {
 								doc.students.push(data[0]._id);
 								resolve(data[0]._id);
