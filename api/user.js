@@ -653,7 +653,7 @@ user.addCourseSection = (req,res) => {
 	const userId = req.params.userId;
 	const courseId = req.params.courseId;
 	const sectionId = req.params.sectionId;
-	console.log(courseId)
+
 	models.user.findOne({_id:userId},(err,doc) => {
 		if(err !== null) {
 			res
@@ -671,7 +671,7 @@ user.addCourseSection = (req,res) => {
 				});
 			return;
 		}
-		console.log(JSON.stringify(doc.courseSections))
+
 		const courseIndex = doc.courseSections.findIndex((course) => course.courseId === courseId);
 		if(courseIndex === -1) {
 			doc.courseSections.push({
