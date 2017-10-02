@@ -516,7 +516,7 @@ course.removeUser = (req,res) => {
 					}
 					models.course.populate(
 						doc, 
-						{path: 'students', select: 'firstName lastName email'}, 
+						{ path: 'students', select: 'firstName lastName email courseSections'}, 
 						(err,courseWStudents) => {
 							if(err) {
 								res.send({
