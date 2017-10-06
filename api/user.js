@@ -309,12 +309,12 @@ user.authenticateForFirebase = (req,res) => {
 		}
 		else {
 			bcrypt.compare(password,doc.password, (err,result) => {
-				if(err) {
+				if(err || result === false) {
 					res.send({
 						success: false,
-						message: "Password incorrect"
+						message: "Login information incorrect"
 					});
-					return
+					return;
 				}
 				fireBaseAdmin.auth().createCustomToken(doc._id.toString())
 					.then((token) => {
