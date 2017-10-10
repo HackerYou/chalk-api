@@ -309,12 +309,12 @@ user.authenticateForFirebase = (req,res) => {
 		}
 		else {
 			bcrypt.compare(password,doc.password, (err,result) => {
-				if(err) {
+				if(err || result === false) {
 					res.send({
 						success: false,
-						message: "Password incorrect"
+						message: "Login information incorrect"
 					});
-					return
+					return;
 				}
 				fireBaseAdmin.auth().createCustomToken(doc._id.toString())
 					.then((token) => {
@@ -591,6 +591,116 @@ user.removeFavoriteLesson = (req,res) => {
 	});
 };
 
+user.removeCourseSection = (req,res) => {
+	const userId = req.params.userId;
+	const courseId = req.params.courseId;
+	const sectionId = req.params.sectionId;
+	models.user.findOne({_id:userId},{
+		firstName: 1,
+		lastName: 1,
+		courseSections:1,
+		email: 1
+	},(err,doc) => {
+		if(err !== null) {
+			res
+				.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		if(doc === null) {
+			res
+				.status(404)
+				.send({
+					error: "No user found"
+				});
+			return;
+		}
+		const courseIndex = doc.courseSections.findIndex((course) => course.courseId === courseId);
+		const sectionIndex = doc.courseSections[courseIndex].sections.indexOf(sectionId);
+
+		if(sectionIndex === -1) {
+			res
+				.status(404)
+				.send({
+					error: "Section not found"
+				});
+			return;
+		}
+
+		doc.courseSections[courseIndex].sections.splice(sectionIndex,1);
+
+		doc.save((err, savedUser) => {
+			if(err !== null) {
+				res
+					.status(400)
+					.send({
+						error: err
+					});
+				return;
+			}
+			res
+				.status(200)
+				.send({
+					user: savedUser
+				});
+		});
+	});
+};
+
+user.addCourseSection = (req,res) => {
+	const userId = req.params.userId;
+	const courseId = req.params.courseId;
+	const sectionId = req.params.sectionId;
+
+	models.user.findOne({_id:userId},(err,doc) => {
+		if(err !== null) {
+			res
+				.status(400)
+				.send({
+					error: err
+				});
+			return;
+		}
+		if(doc === null) {
+			res
+				.status(404)
+				.send({
+					error: "No user found"
+				});
+			return;
+		}
+
+		const courseIndex = doc.courseSections.findIndex((course) => course.courseId === courseId);
+		if(courseIndex === -1) {
+			doc.courseSections.push({
+				"courseId": courseId,
+				"sections": [sectionId]
+			})
+		}
+		else {
+			doc.courseSections[courseIndex].sections.push(sectionId);
+		}
+
+		doc.save((err,savedDoc) => {
+			if(err !== null) {
+				res
+					.status(400)
+					.send({
+						error: err
+					});
+				return;
+			}
+			res
+				.status(200)
+				.send({
+					user: savedDoc
+				});
+		});
+
+	});
+};
 
 module.exports = user;
 

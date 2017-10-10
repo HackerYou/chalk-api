@@ -176,7 +176,7 @@ lesson.removeTopic = (req,res) => {
 		else {
 			let lesson = doc[0];
 			let topicIndex = lesson.topics.indexOf(topicId);
-			lesson.topics.splice(topicId,1);
+			lesson.topics.splice(topicIndex,1);
 			lesson.updated_at = +new Date();
 			topic.removeLesson(topicId,lessonId).then(() => {
 				lesson.save((err,doc)=>{

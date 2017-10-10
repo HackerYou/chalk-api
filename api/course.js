@@ -156,7 +156,7 @@ course.getCourse = (req,res) => {
 				},
 				{
 					path: 'students',
-					select: 'firstName lastName email'
+					select: 'firstName lastName email courseSections'
 				}, 
 				{
 					path: 'tests'
@@ -414,7 +414,10 @@ course.addUser = (req,res) => {
 		if(!doc.students) {
 			doc.students = [];
 		}
-
+		const courseSections = {
+			courseId: doc._id,
+			sections: doc.sections
+		};
 		let users = emails.split(',').map((email) => {
 			//Normalize email.
 			email = email.toLowerCase().trim();
@@ -428,14 +431,27 @@ course.addUser = (req,res) => {
 					}
 					//If you can find a user in the DB just push them on the course
 					else if(userDoc) {
-						doc.students.push(userDoc._id);
-						resolve(userDoc._id);
+						if(userDoc.courseSections === undefined) {
+							userDoc.courseSections = [];
+						}
+						userDoc.courseSections.push(courseSections);
+						userDoc.save((err,savedUser) => {
+							if(err !== null) {
+								reject();
+							}
+							doc.students.push(userDoc._id);
+							resolve(userDoc._id);
+						})
 					}
 					else {
 						// Else create new users and add to course
 						Promise.all( user.createUser(email) ).then(data => {
-							doc.students.push(data[0]._id);
-							resolve(data[0]._id);
+							data[0].courseSections = [];
+							data[0].courseSections.push(courseSections);
+							data[0].save((err,savedUser) => {
+								doc.students.push(data[0]._id);
+								resolve(data[0]._id);
+							});
 						});
 					}
 				});
@@ -456,7 +472,7 @@ course.addUser = (req,res) => {
 					}
 				});
 				Promise.all(students).then((data) => {
-					models.course.populate(doc, {path: 'students', select: 'firstName lastName email'},(err,courseWStudents) => {
+					models.course.populate(doc, {path: 'students', select: 'firstName lastName email courseSections'},(err,courseWStudents) => {
 						if(err) {
 							res.send({
 								error: err
@@ -500,7 +516,7 @@ course.removeUser = (req,res) => {
 					}
 					models.course.populate(
 						doc, 
-						{path: 'students', select: 'firstName lastName email'}, 
+						{ path: 'students', select: 'firstName lastName email courseSections'}, 
 						(err,courseWStudents) => {
 							if(err) {
 								res.send({

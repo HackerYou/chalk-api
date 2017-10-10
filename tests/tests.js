@@ -186,8 +186,9 @@ describe('Tests', function() {
 	});
 
 	it('should get all the tests for a specific classroom', (done) => {
-		models.course.findOne({term:/spring 2017/ig}, (err,doc) => {
+		models.course.findOne({term:/spring 2017/ig,title:/bootcamp/ig}, (err,doc) => {
 			expect(err).to.be(null);
+			expect(doc).to.not.be(null);
 			if(err) {
 				done();
 			}
@@ -427,7 +428,7 @@ describe('Tests', function() {
 			});
 	});
 	
-	it('should add to the users test results answers array',(done) => {
+	it('should add to the users test results answers object',(done) => {
 		request
 			.get(`/v1/user/${userId}`)
 			.set(`x-access-token`,token)
