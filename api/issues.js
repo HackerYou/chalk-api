@@ -107,7 +107,7 @@ issues.removeIssueById = (req, res) => {
 				.send({
 					issues: docs
 				});
-		});	
+		}).populate('created_by', 'firstName lastName');	
 	});
 };
 
