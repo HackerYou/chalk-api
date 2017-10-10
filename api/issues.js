@@ -81,8 +81,8 @@ issues.updateIssueById = (req, res) => {
 				.send({
 					issue: doc
 				});
-		});
-	});
+		})
+	}).populate('created_by', 'firstName lastName');;
 };
 
 issues.removeIssueById = (req, res) => {
