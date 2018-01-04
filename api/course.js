@@ -14,19 +14,26 @@ course.createCourse = (req,res) => {
 
 	if (model.instructor !== undefined) {
 		model.students = [model.instructor];
-	}
 
+	}
 	new models.course(model).save((err,doc) => {
 		if(err) {
 			res.send({
 				error: err
 			});
+			return;
 		}
-		else {
-			res.send({
-				course: doc
+		user.addCourse(model.instructor,doc._id)
+			.then(() => {
+				res.send({
+					course: doc
+				});
+			})
+			.catch(err => {
+				res.send({
+					error: err
+				});
 			});
-		}
 	});
 };
 

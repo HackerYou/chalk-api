@@ -99,7 +99,8 @@ describe('Tests', function() {
 					token = data.token;
 					course.createCourse({
 						body: {
-							title: 'Test Course'
+							title: 'Test Course',
+							instructor: userId
 						}
 					}, {
 						send(data) {
