@@ -190,7 +190,11 @@ describe('Courses', function() {
 				expect(data.course.sections).to.be.an('array');
 				expect(data.course.students).to.be.an('array');
 				expect(data.course.template).to.be.eql(false);
-				done();
+				models.user.findOne({_id: instructor._id},(err,doc) => {
+					expect(err).to.be(null);
+					expect(doc.courses.includes(data.course._id.toString())).to.be(true);
+					done();
+				});
 			}
 		});
 	});
